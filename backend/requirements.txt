@@ -1,0 +1,21 @@
+fastapi==0.141.1
+uvicorn[standard]==0.52.3
+sqlalchemy[asyncio]==2.0.52
+asyncpg==0.32.0
+alembic==1.19.1
+pydantic==2.13.4
+pydantic-settings==2.15.0
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-multipart==0.0.32
+structlog==24.4.0
+
+# dev / test / lint — pin loosely on patch, tight on minor
+ruff==0.16.3
+black==26.5.1
+mypy==2.3.1
+pytest==9.1.1
+pytest-asyncio==1.4.0
+httpx==0.28.1
+types-python-jose==3.3.4.20240106
+types-passlib==1.7.7.20240819

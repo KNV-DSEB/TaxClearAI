@@ -1,0 +1,56 @@
+# .pre-commit-config.yaml — app-fullstack with Python backend + JS/TS frontend
+# (e.g. FastAPI backend + Next.js/React/Vue frontend)
+#
+# ESLint/Prettier for frontend/ run through Husky (.husky/pre-commit + lint-staged),
+# not here — see .pre-commit-config.js.yaml for why. This file only needs to scope
+# the Python hooks to backend/ so they never touch frontend/ files.
+default_stages: [pre-commit]
+fail_fast: false
+
+repos:
+  # ── Secret scanning (ALWAYS first, scans the whole repo) ───
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.1
+    hooks:
+      - id: gitleaks
+        name: "Detect hardcoded secrets"
+
+  # ── General file hygiene (whole repo) ──────────────────────
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: check-toml
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        args: ["--maxkb=500"]
+      - id: detect-private-key
+
+  # ── Python lint + format — SCOPED to backend/ only ─────────
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.7.3
+    hooks:
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix]
+        files: ^backend/.*\.py$
+      - id: ruff-format
+        files: ^backend/.*\.py$
+
+  # ── Python type checking — SCOPED to backend/ only ─────────
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.13.0
+    hooks:
+      - id: mypy
+        files: ^backend/.*\.py$
+        additional_dependencies: [pydantic==2.9.2]
+
+  # ── Conventional commits ────────────────────────────────────
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v4.4.0
+    hooks:
+      - id: conventional-pre-commit
+        stages: [commit-msg]
+        args: [feat, fix, docs, style, refactor, test, chore, perf, ci]

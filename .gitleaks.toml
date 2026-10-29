@@ -1,0 +1,23 @@
+title = "VibeCraft gitleaks config"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "vibecraft-internal-token"
+description = "Internal API token format (INTERNAL_ prefix, 32 hex chars)"
+regex = '''INTERNAL_[A-Za-z0-9]{32}'''
+severity = "critical"
+
+[allowlist]
+description = "Known false positives: example env files, test fixtures, docs"
+paths = [
+  '''\.env\.example$''',
+  '''tests?/fixtures/''',
+  '''docs/''',
+]
+regexes = [
+  '''EXAMPLE_KEY''',
+  '''YOUR_API_KEY_HERE''',
+  '''test-secret-key-not-for-production''',
+]

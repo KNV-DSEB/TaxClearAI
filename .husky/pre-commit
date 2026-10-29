@@ -1,0 +1,11 @@
+# JS/TS lint + format on changed files, delegated into backend/frontend so
+# each side's own local eslint config and node_modules are used — see
+# lint-staged block in the root package.json.
+npx lint-staged
+
+# Secret scanning, general hygiene, and Python lint (ruff/mypy) if this
+# project has a Python side — see .pre-commit-config.yaml. Husky owns
+# core.hooksPath here, so this is the only way these checks still run.
+if [ -f .pre-commit-config.yaml ] && command -v pre-commit >/dev/null 2>&1; then
+  pre-commit run --hook-stage pre-commit
+fi

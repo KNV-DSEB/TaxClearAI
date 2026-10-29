@@ -1,0 +1,1 @@
+export { IconPickerField } from './IconPickerField';

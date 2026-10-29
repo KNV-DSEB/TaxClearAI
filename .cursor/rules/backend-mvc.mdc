@@ -1,0 +1,61 @@
+---
+globs: "backend/**/*.py"
+alwaysApply: false
+---
+
+## 4. Backend Structure — FastAPI
+
+### Tech stack (Backend)
+- **Framework**: FastAPI 0.115+ · **Language**: Python 3.12+
+- **ORM/DB**: SQLAlchemy (async) + PostgreSQL, Alembic for migrations
+- **Validation**: Pydantic v2 models for every request/response body
+- **Auth**: `python-jose` (JWT) + `passlib[bcrypt]`
+- **Package manager**: poetry (or pip + `requirements.txt` for `tool-script`)
+
+### Module structure
+
+```
+modules/[feature]/
+  ├── __init__.py
+  ├── router.py         ← APIRouter — Controller in MVC, e.g. @router.post("/login")
+  ├── service.py         ← [Feature]Service class — business logic
+  ├── repository.py      ← ONLY layer allowed to run session.execute()
+  ├── schemas.py         ← Pydantic request/response models (DTOs)
+  └── dependencies.py    ← Depends() functions: get_current_user, require_admin
+```
+
+The repository lives inside its feature's module, not in a shared top-level `repositories/` folder. `models/` (the SQLAlchemy ORM classes) stays a separate top-level folder.
+
+Cross-cutting concerns live in `core/`: `config.py` (pydantic-settings), `database.py` (async engine/session), `security.py` (JWT + hashing), `exceptions.py`, `middleware.py`, `logging.py`.
+
+### Violation examples (AI will refuse to generate these)
+
+```python
+# ✗ WRONG – router.py querying the DB and doing business logic directly
+@router.post("/login")
+async def login(data: LoginRequest, db: AsyncSession = Depends(get_db)):
+    user = await db.execute(select(User).where(User.email == data.email))
+    if user.is_active and user.role == "admin":
+        hashed = bcrypt.hash(data.password)
+
+# ✓ CORRECT – router.py only delegates
+@router.post("/login")
+async def login(data: LoginRequest, db: AsyncSession = Depends(get_db)):
+    result = await auth_service.login(data, db)
+    return TokenResponse(**result)
+```
+
+- `router.py` NEVER calls `db.execute()`/`session.execute()` directly — that belongs in `repository.py`.
+- `router.py` NEVER contains conditionals expressing business rules.
+- `schemas.py` classes NEVER have methods containing business logic — Pydantic shape definitions only.
+
+### Setup commands
+
+```bash
+cd backend
+python -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env
+alembic upgrade head
+uvicorn src.main:app --reload
+```

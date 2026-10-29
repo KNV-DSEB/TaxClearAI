@@ -1,0 +1,119 @@
+# .github/workflows/scheduled-security.yml
+#
+# NOT generated for app-fe-only or tool-script (no deployed server/image to
+# rescan — see 09-FILES-AUTO-GENERATED.md). Actions pinned to commit SHA —
+# see pr-check.yml header comment for policy.
+name: Scheduled Security Scans
+
+on:
+  schedule:
+    - cron: "0 2 * * 1" # Monday 2:00 AM UTC
+  workflow_dispatch:
+
+jobs:
+  # ─── Gitleaks full history scan ───────────────────────────
+  gitleaks-full:
+    name: Gitleaks Full History Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
+
+      - name: Gitleaks scan (full history)
+        uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e # v3.0.0
+        with:
+          args: detect --log-opts="--all"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+
+  # ─── OWASP Dependency-Check weekly ───────────────────────
+  dependency-check-weekly:
+    name: OWASP Dependency-Check (Weekly)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: OWASP Dependency-Check
+        uses: dependency-check/Dependency-Check_Action@75ba02d6183445fe0761d26e836bde58b1560600 # 1.1.0
+        with:
+          project: "${{ github.repository }}"
+          path: "."
+          format: "HTML,JSON"
+          args: >-
+            --failOnCVSS 7
+            --enableRetired
+            --nvdApiKey ${{ secrets.NVD_API_KEY }}
+
+      - name: Upload report
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: dep-check-weekly-${{ github.run_id }}
+          path: reports/
+
+  # ─── ZAP full scan on staging (advisory) ─────────────────
+  # Cron still fires weekly, but this is the priciest job in the pipeline,
+  # so the real scan only runs in the first 7 days of the month.
+  check-monthly-gate:
+    name: Check Monthly ZAP Gate
+    runs-on: ubuntu-latest
+    outputs:
+      run_zap: ${{ steps.check.outputs.run_zap }}
+    steps:
+      - name: Check if within first 7 days of month
+        id: check
+        run: |
+          DAY=$(date +%d)
+          if [ "$DAY" -le 7 ]; then
+            echo "run_zap=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run_zap=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  zap-full-monthly:
+    name: ZAP Full Scan (Monthly)
+    runs-on: ubuntu-latest
+    needs: [check-monthly-gate]
+    if: needs.check-monthly-gate.outputs.run_zap == 'true' || github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: ZAP Full scan
+        uses: zaproxy/action-full-scan@3c58388149901b9a03b7718852c5ba889646c27c # v0.13.0
+        with:
+          target: "${{ vars.STAGING_URL }}"
+          rules_file_name: ".zap/rules.tsv"
+          fail_action: false
+
+      - name: Upload ZAP report
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: zap-full-monthly-${{ github.run_id }}
+          path: report_html.html
+        if: always()
+
+  # ─── Trivy image rescan (latest CVEs) ─────────────────────
+  trivy-rescan:
+    name: Trivy Rescan (Latest Image)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pull latest image
+        run: docker pull ${{ vars.PRODUCTION_IMAGE }}:latest
+
+      - name: Trivy rescan
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          image-ref: "${{ vars.PRODUCTION_IMAGE }}:latest"
+          format: "sarif"
+          output: "trivy-weekly.sarif"
+          severity: "CRITICAL,HIGH"
+          ignore-unfixed: false # include unfixed in the weekly deep scan
+
+      # No upload-sarif (GHAS billed per committer/month on this private repo)
+      - name: Upload Trivy report
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: trivy-weekly-${{ github.run_id }}
+          path: trivy-weekly.sarif
+        if: always()
