@@ -1,9 +1,66 @@
-// Types here MUST match your actual backend's real response shape — see
-// AGENTS.md "Frontend specifics": never guess a field, update this file
-// first when the API contract changes.
-//
-// Left loose here because the exact shape depends on which backend
-// framework this project's `backend/` uses (NestJS returns the object
-// directly, Express wraps it in `{ data: ... }`, FastAPI uses snake_case) —
-// narrow this once you know your project's actual shape.
-export type HealthResponse = Record<string, unknown>;
+export type TriState = 'yes' | 'no' | 'unknown';
+export type ItemStatus = 'available' | 'missing' | 'needs_verification';
+export interface Answers {
+  businessType: 'company' | 'household' | 'unknown';
+  goal: 'dissolution' | 'other' | 'unknown';
+  establishedYear: number | null;
+  revenueStatus: TriState;
+  revenueStartedYear: number | null;
+  filingStatus: 'complete' | 'incomplete' | 'never' | 'unknown';
+  recordsStatus: 'complete' | 'partial' | 'missing' | 'unknown';
+  taxNoticeStatus: TriState;
+  laborInsuranceStatus: 'none' | 'obligations' | 'unknown';
+  assetsInventoryStatus: TriState;
+  receivablesPayablesStatus: TriState;
+}
+export interface Questionnaire {
+  id: string;
+  version: string;
+  contentStatus: 'draft' | 'approved';
+  questions: {
+    id: keyof Answers;
+    label: string;
+    kind: 'choice' | 'year';
+    required: boolean;
+    options: { value: string; label: string }[];
+  }[];
+}
+export interface ChecklistItem {
+  id: string;
+  code: string;
+  label: string;
+  status: ItemStatus;
+  reviewStatus: 'draft' | 'approved';
+  note: string | null;
+}
+export interface Assessment {
+  id: string;
+  questionnaireVersion: string;
+  contentStatus: 'draft' | 'approved';
+  answers: Answers;
+  summary: {
+    scope: 'b2' | 'out_of_scope' | 'needs_confirmation';
+    knownFacts: string[];
+    unknownFacts: string[];
+    reviewReasons: string[];
+    notice: string;
+  };
+  checklist: ChecklistItem[];
+  createdAt: string;
+  updatedAt: string;
+  expiresAt: string;
+}
+
+export interface Citation {
+  sourceId: string;
+  title: string;
+  url: string;
+  reviewedAt: string;
+  kind: 'product' | 'legal';
+}
+export interface ChatReply {
+  reply: string;
+  disposition: 'answered' | 'insufficient_sources' | 'expert_review' | 'blocked_input';
+  citations: Citation[];
+  providerUsed: boolean;
+}
