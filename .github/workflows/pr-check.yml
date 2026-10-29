@@ -6,6 +6,8 @@
 name: PR Check
 
 on:
+  push:
+    branches: ["feature/**", "fix/**", "chore/**"]
   pull_request:
     branches: [main, develop]
     types: [opened, synchronize, reopened]
@@ -15,8 +17,8 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  NODE_VERSION: "22"
-  PYTHON_VERSION: "3.12"
+  NODE_VERSION: "24"
+  PYTHON_VERSION: "3.14"
 
 jobs:
   # ─── Gitleaks secret scan ─────────────────────────────────
@@ -80,7 +82,21 @@ jobs:
   backend-python-quality:
     name: Backend Python Quality
     runs-on: ubuntu-latest
-    if: ${{ vars.PROJECT_TYPE != 'app-fe-only' && vars.BACKEND_LANG == 'python' }}
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: tax_clear_ci
+          POSTGRES_PASSWORD: ${{ github.run_id }}-${{ github.run_attempt }}
+          POSTGRES_DB: tax_clear_ai_test
+        ports:
+          - 127.0.0.1:5432:5432
+        options: >-
+          --health-cmd "pg_isready -U tax_clear_ci -d tax_clear_ai_test"
+          --health-interval 10s --health-timeout 5s --health-retries 5
+    env:
+      DATABASE_URL: postgresql+asyncpg://tax_clear_ci:${{ github.run_id }}-${{ github.run_attempt }}@127.0.0.1:5432/tax_clear_ai_test
+      TEST_DATABASE_URL: postgresql+asyncpg://tax_clear_ci:${{ github.run_id }}-${{ github.run_attempt }}@127.0.0.1:5432/tax_clear_ai_test
     defaults:
       run:
         working-directory: backend
@@ -99,7 +115,7 @@ jobs:
           pip install -r requirements.txt
 
       - name: Ruff lint
-        run: ruff check src/ tests/
+        run: python -m ruff check .
 
       - name: Ruff format check
         run: ruff format --check src/ tests/
@@ -107,11 +123,23 @@ jobs:
       - name: Mypy type check
         run: mypy src/
 
+      - name: Prepare isolated test database and signing key
+        run: |
+          python - <<'PY'
+          import os
+          import secrets
+          value = secrets.token_urlsafe(48)
+          print("::add-mask::" + value)
+          with open(os.environ["GITHUB_ENV"], "a") as stream:
+              stream.write("JWT_SECRET_KEY=" + value + "\n")
+          PY
+          python -m alembic upgrade head
+
       - name: Run tests with coverage
-        run: pytest --cov=src --cov-report=xml --cov-report=term-missing
-        env:
-          DATABASE_URL: "sqlite+aiosqlite:///./test.db"
-          SECRET_KEY: "test-secret-key-not-for-production"
+        run: |
+          python -m coverage run -m pytest
+          python -m coverage report --fail-under=80
+          python -m coverage xml
 
       - name: Upload coverage
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
@@ -123,7 +151,6 @@ jobs:
   frontend-quality:
     name: Frontend Quality
     runs-on: ubuntu-latest
-    if: ${{ vars.PROJECT_TYPE == 'app-fullstack' || vars.PROJECT_TYPE == 'app-fe-only' }}
     defaults:
       run:
         working-directory: frontend
@@ -133,7 +160,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
         with:
-          version: 9
+          version: 12.16.1
 
       - name: Setup Node.js
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
@@ -163,7 +190,7 @@ jobs:
       - name: Build check
         run: pnpm build
         env:
-          NEXT_PUBLIC_API_URL: ${{ vars.API_BASE_URL || 'http://localhost:3000' }}
+          NEXT_PUBLIC_API_URL: ${{ vars.API_BASE_URL || 'http://localhost:8000' }}
 
   # ─── Semgrep SAST (offline CLI — no third-party Action) ───
   sast-semgrep:
@@ -206,11 +233,16 @@ jobs:
     needs:
       - secrets-scan
       - sast-semgrep
+      - backend-python-quality
+      - frontend-quality
     if: always()
     steps:
       - name: Check required jobs passed
         run: |
           if [[ "${{ needs.secrets-scan.result }}" != "success" ]]; then
             echo "Secret scan failed – merge blocked"; exit 1
+          fi
+          if [[ "${{ needs.backend-python-quality.result }}" != "success" || "${{ needs.frontend-quality.result }}" != "success" ]]; then
+            echo "Python/frontend checks failed or were skipped - merge blocked"; exit 1
           fi
           echo "All required quality gates passed"
