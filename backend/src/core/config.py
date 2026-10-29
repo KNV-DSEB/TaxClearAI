@@ -14,6 +14,12 @@ class Settings(BaseSettings):
     jwt_secret_key: str = "change-me"
     jwt_algorithm: str = "HS256"
     jwt_access_expire_minutes: int = 15
+    frontend_origin: str = "http://localhost:3000"
+    bootstrap_username: str = ""
+    bootstrap_password: str = ""
+    gemini_api_key: str = ""
+    gemini_model: str = ""
+    test_database_url: str | None = None
 
 
 @lru_cache

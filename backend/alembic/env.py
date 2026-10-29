@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from src.core.config import get_settings
 from src.core.database import Base
+from src.models import assessment, auth  # noqa: F401
 
 # Import every model module here so Base.metadata sees all tables before
 # `alembic revision --autogenerate` runs. Empty on a fresh project — add
