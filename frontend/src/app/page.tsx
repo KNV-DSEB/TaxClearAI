@@ -70,13 +70,6 @@ export default function HomePage() {
             </li>
           </ol>
         </section>
-        <aside className="disclosure">
-          <strong>Đang thử nghiệm cùng bạn.</strong>
-          <p>
-            Nội dung khảo sát và danh mục hồ sơ đang chờ cố vấn xác nhận. Kết quả chưa thay thế
-            hướng dẫn từ cơ quan tiếp nhận hoặc tư vấn chuyên môn.
-          </p>
-        </aside>
       </main>
     </AppShell>
   );

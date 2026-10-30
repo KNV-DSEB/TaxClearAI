@@ -55,7 +55,7 @@ export function ChatPanel() {
         <span>Gemini</span>
       </div>
       <p className="small muted">
-        Hỏi cách dùng bản thử và checklist. Hướng dẫn pháp lý đang chờ nguồn được cố vấn duyệt.
+        Hỏi cách chuẩn bị, sử dụng checklist và mở lại hồ sơ.
       </p>
       <form
         aria-label="Đặt câu hỏi"
@@ -123,12 +123,12 @@ export function ChatPanel() {
                     <ArrowUpRight size={13} />
                   </Link>
                 ) : (
-                  <span>Nguồn chưa xác nhận đường dẫn.</span>
+                  <span>Không mở được đường dẫn nguồn.</span>
                 )}
                 <span>
                   {citation.kind === 'product'
-                    ? 'Hướng dẫn sử dụng, không phải văn bản pháp luật.'
-                    : 'Nguồn pháp luật đã rà soát.'}
+                    ? 'Hướng dẫn sử dụng'
+                    : 'Tài liệu tham khảo'}
                 </span>
               </div>
             );

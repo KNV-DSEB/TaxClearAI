@@ -398,32 +398,6 @@ fieldset {
   margin-top: 10px;
   max-width: 260px;
 }
-.disclosure {
-  background: #eaf0ed;
-  border: 1px solid #d5e2da;
-  border-radius: 10px;
-  padding: 20px 24px;
-  margin: 10px 0 36px;
-  font-size: 13px;
-  color: #435f56;
-}
-.disclosure p {
-  margin-top: 4px;
-}
-.disclosure.compact {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  margin: 24px 0;
-  padding: 15px 18px;
-}
-.disclosure.compact svg {
-  flex-shrink: 0;
-  margin-top: 2px;
-}
-.disclosure.compact p {
-  margin: 0;
-}
 .site-footer {
   max-width: 1184px;
   padding: 23px 24px;
@@ -588,14 +562,6 @@ fieldset {
 }
 .progress::-moz-progress-bar {
   background: var(--teal);
-}
-.draft-note {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  font-size: 11px;
-  color: #677d70;
-  margin-bottom: 20px;
 }
 .question-panel h2 {
   min-height: 58px;
@@ -939,9 +905,6 @@ details li {
     gap: 7px;
     padding: 20px;
   }
-  .disclosure {
-    padding: 16px;
-  }
   .content-main {
     padding-top: 30px;
   }
@@ -1159,12 +1122,6 @@ details li {
 }
 .guide-article ul {
   padding-left: 20px;
-}
-.guide-article .guide-notice {
-  padding: 18px;
-  background: #edf4f0;
-  border-radius: 8px;
-  margin-top: 24px;
 }
 .guide-article .button {
   margin-top: 22px;

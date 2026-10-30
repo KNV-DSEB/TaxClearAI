@@ -7,12 +7,8 @@ export default function GuidePage() {
     <AppShell>
       <main id="main-content" className="content-main">
         <article className="surface guide-article">
-          <span className="section-kicker">Hướng dẫn sử dụng bản thử</span>
+          <span className="section-kicker">Hướng dẫn sử dụng</span>
           <h1>Chuẩn bị hồ sơ, từng bước.</h1>
-          <p className="guide-notice">
-            Đây là tài liệu sử dụng Tax Clear AI, không phải văn bản pháp luật. Nội dung hồ sơ đang
-            chờ cố vấn xác nhận.
-          </p>
           <h2>Ghi nhận đúng điều bạn biết</h2>
           <p>
             Đăng nhập bằng tài khoản được nhóm cấp và đi qua 11 câu hỏi. Nếu chưa biết, chọn Chưa
@@ -32,8 +28,7 @@ export default function GuidePage() {
             </li>
           </ul>
           <p>
-            Checklist là danh mục gợi ý để khảo sát, chưa phải danh sách pháp lý bắt buộc. Đổi trạng
-            thái, đợi thông báo đã lưu và tải lại trang để kiểm tra.
+            Đổi trạng thái, đợi thông báo đã lưu và tải lại trang để kiểm tra.
           </p>
           <h2>Mở lại và quản lý</h2>
           <p>
@@ -47,10 +42,6 @@ export default function GuidePage() {
             phản hồi. Chỉ dùng dữ liệu giả định; không nhập tên, mã số thuế, căn cước, tài khoản
             hoặc chứng từ. Trợ lý không tính thuế/phạt hay kết luận hồ sơ; khi thiếu nguồn pháp luật
             đã duyệt, hãy trao đổi với chuyên viên.
-          </p>
-          <p className="small muted">
-            Hướng dẫn này chỉ giải thích cách sử dụng bản thử. Nội dung nghiệp vụ cần được cố vấn
-            xác nhận trước khi áp dụng cho hồ sơ thật.
           </p>
           <Link className="button button-primary" href="/khao-sat">
             Mở bộ câu hỏi

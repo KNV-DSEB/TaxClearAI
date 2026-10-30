@@ -37,7 +37,6 @@ export function AppShell({
       {children}
       <footer className="site-footer">
         <span>Tax Clear AI · Chuẩn bị rõ ràng, từng bước một.</span>
-        <span>Nội dung cần cố vấn xác nhận trước khi áp dụng.</span>
       </footer>
     </>
   );

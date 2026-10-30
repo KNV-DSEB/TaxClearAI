@@ -60,8 +60,8 @@ class ChatService:
 
     def insufficient(self, provider_used: bool = False) -> ChatReply:
         return ChatReply(
-            reply="Chưa có đủ nguồn pháp lý được cố vấn duyệt cho câu hỏi này. "
-            "Bạn nên trao đổi với chuyên viên. Tôi có thể giải thích cách dùng checklist trên web.",
+            reply="Tôi chưa tìm thấy nguồn phù hợp cho câu hỏi này. "
+            "Bạn có thể hỏi cách dùng checklist hoặc trao đổi với chuyên viên.",
             disposition="insufficient_sources",
             provider_used=provider_used,
         )

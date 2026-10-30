@@ -44,10 +44,29 @@ const assessment = {
 beforeEach(() => vi.resetAllMocks());
 
 describe('Chuẩn bị hồ sơ khảo sát', () => {
-  it('giữ nhãn chờ duyệt và thông tin chưa biết', () => {
+  it('ẩn nhãn nội bộ cũ và vẫn hiển thị thông tin chưa biết', () => {
     render(<AssessmentWorkspace initial={assessment} />);
-    expect(screen.getAllByText(/chờ cố vấn xác nhận/i).length).toBeGreaterThan(0);
+    expect(screen.queryByText(/cố vấn xác nhận/i)).not.toBeInTheDocument();
     expect(screen.getByText('Tình trạng kê khai chưa biết')).toBeInTheDocument();
+  });
+
+  it('hiển thị tên trung tính cho nhãn giấy tờ đã lưu từ phiên bản cũ', () => {
+    render(
+      <AssessmentWorkspace
+        initial={{
+          ...assessment,
+          checklist: [
+            {
+              ...assessment.checklist[0],
+              code: 'purchase_schedules',
+              label: 'Bảng kê mua hàng theo mẫu cần cố vấn xác nhận',
+            },
+          ],
+        }}
+      />,
+    );
+    expect(screen.getByText('Bảng kê mua hàng theo kỳ áp dụng')).toBeInTheDocument();
+    expect(screen.queryByText(/cố vấn xác nhận/i)).not.toBeInTheDocument();
   });
 
   it('chỉ báo lưu sau khi API xác nhận trạng thái giấy tờ', async () => {

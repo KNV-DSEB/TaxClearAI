@@ -1,9 +1,7 @@
 from src.modules.assessments.schemas import Option, Question, Questionnaire
 
 VERSION = "b2-draft-1"
-NOTICE = (
-    "Nội dung mẫu, chờ cố vấn xác nhận. Đây là bản chuẩn bị khảo sát, chưa phải hướng dẫn pháp lý."
-)
+NOTICE = "Bản tổng hợp câu trả lời và danh mục hồ sơ cần chuẩn bị để trao đổi với chuyên viên."
 TRI = [("yes", "Có"), ("no", "Không"), ("unknown", "Chưa biết")]
 QUESTION_DATA = [
     (
@@ -65,7 +63,7 @@ DOCUMENTS = [
     ("finance_policy", "Quy chế tài chính nội bộ"),
     ("personal_statements", "Sao kê tài khoản chủ sở hữu/giám đốc liên quan kinh doanh"),
     ("purchase_invoices", "Hóa đơn đầu vào, hợp đồng và biên bản giao nhận"),
-    ("purchase_schedules", "Bảng kê mua hàng theo mẫu cần cố vấn xác nhận"),
+    ("purchase_schedules", "Bảng kê mua hàng theo kỳ áp dụng"),
     ("sales_invoices", "Hóa đơn đầu ra, hợp đồng và biên bản giao nhận"),
     ("company_statements", "Sổ phụ ngân hàng doanh nghiệp"),
     ("general_ledgers", "Sổ tài khoản loại 1–9"),

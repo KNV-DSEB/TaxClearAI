@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowLeft, ArrowRight, Info } from 'lucide-react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -147,9 +147,6 @@ export function QuestionnaireForm() {
           max={questionnaire.questions.length}
           aria-label="Tiến độ câu hỏi"
         />
-        <p className="draft-note">
-          <Info size={16} /> Nội dung mẫu · Chờ cố vấn xác nhận
-        </p>
         <form
           onSubmit={(event) => {
             event.preventDefault();

@@ -22,7 +22,7 @@ def item_view(item: ChecklistItem) -> ChecklistItemView:
             "label": item.label_snapshot,
             "status": item.status,
             "review_status": item.review_status,
-            "note": "Mục gợi ý để khảo sát; chuyên viên cần xác nhận có áp dụng cho hồ sơ của bạn.",
+            "note": "Theo dõi giấy tờ đã có, còn thiếu hoặc cần xác minh.",
         }
     )
 

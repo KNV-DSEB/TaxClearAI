@@ -1,6 +1,6 @@
 'use client';
 
-import { Check, ClipboardList, Info, LogOut, Plus, Trash2 } from 'lucide-react';
+import { Check, ClipboardList, LogOut, Plus, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
@@ -87,10 +87,6 @@ export function AssessmentWorkspace({ initial }: { initial: WorkspaceAssessment 
           <LogOut size={16} /> Đăng xuất
         </button>
       </div>
-      <aside className="disclosure compact">
-        <Info size={19} />
-        <p>{assessment.summary.notice}</p>
-      </aside>
       <div className="workspace-grid">
         <section className="surface checklist-panel">
           <div className="panel-heading">
@@ -104,10 +100,7 @@ export function AssessmentWorkspace({ initial }: { initial: WorkspaceAssessment 
           </div>
           {assessment.checklist.length > 0 ? (
             <>
-              <p className="muted small">
-                Danh mục gợi ý để khảo sát, chưa xác nhận là giấy tờ bắt buộc cho trường hợp của
-                bạn.
-              </p>
+              <p className="muted small">Theo dõi giấy tờ đã có, còn thiếu hoặc cần xác minh.</p>
               <progress
                 className="progress"
                 aria-label="Giấy tờ đã có"
@@ -115,7 +108,12 @@ export function AssessmentWorkspace({ initial }: { initial: WorkspaceAssessment 
                 max={assessment.checklist.length}
               />
               <ul className="checklist">
-                {assessment.checklist.map((item) => (
+                {assessment.checklist.map((item) => {
+                  const label =
+                    item.code === 'purchase_schedules'
+                      ? 'Bảng kê mua hàng theo kỳ áp dụng'
+                      : item.label;
+                  return (
                   <li key={item.id}>
                     <span
                       className={`check-indicator ${item.status === 'available' ? 'done' : ''}`}
@@ -124,12 +122,11 @@ export function AssessmentWorkspace({ initial }: { initial: WorkspaceAssessment 
                       {item.status === 'available' ? <Check size={15} /> : null}
                     </span>
                     <div className="checklist-copy">
-                      <strong>{item.label}</strong>
-                      <span>Chờ cố vấn xác nhận</span>
+                      <strong>{label}</strong>
                     </div>
                     <select
                       name={item.code}
-                      aria-label={`Trạng thái: ${item.label}`}
+                      aria-label={`Trạng thái: ${label}`}
                       value={item.status}
                       disabled={saving !== '' || busy}
                       onChange={(event) => {
@@ -141,7 +138,8 @@ export function AssessmentWorkspace({ initial }: { initial: WorkspaceAssessment 
                       <option value="missing">Còn thiếu</option>
                     </select>
                   </li>
-                ))}
+                  );
+                })}
               </ul>
             </>
           ) : (
@@ -179,7 +177,7 @@ export function AssessmentWorkspace({ initial }: { initial: WorkspaceAssessment 
               </ul>
             ) : (
               <p className="muted">
-                Chuyên viên vẫn cần rà soát câu trả lời trước khi áp dụng cho hồ sơ thật.
+                Mở thông tin đã ghi nhận để xem lại câu trả lời.
               </p>
             )}
             <details>

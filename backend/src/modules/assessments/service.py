@@ -25,20 +25,20 @@ def get_approved_chat_sources() -> list[SourceRecord]:
     return [
         SourceRecord(
             id="product-guide",
-            title="Hướng dẫn sử dụng bản thử Tax Clear AI",
+            title="Hướng dẫn sử dụng Tax Clear AI",
             url="/huong-dan",
             text=(
                 "Bản thử dành cho doanh nghiệp từng hoạt động muốn chuẩn bị khảo sát giải thể. "
                 "Đăng nhập bằng tài khoản được cấp. Trả lời 11 câu; có thể chọn chưa biết hoặc "
-                "để trống năm. Chọn Lưu và xem hồ sơ ở cuối để lưu. Checklist chỉ là danh mục "
-                "gợi ý, chờ cố vấn xác nhận, không phải yêu cầu pháp lý bắt buộc. "
+                "để trống năm. Chọn Lưu và xem hồ sơ ở cuối để lưu. "
+                "Checklist giúp theo dõi giấy tờ đã có, còn thiếu hoặc cần xác minh. "
                 "Có ba trạng thái: "
                 "Đã có, Còn thiếu, Cần xác minh. Thay đổi trạng thái, đợi thông báo đã lưu rồi "
                 "tải lại để kiểm tra. Giữ đường dẫn hồ sơ để mở lại sau đăng nhập. "
                 "Hồ sơ hết hạn truy cập sau 7 ngày; chưa tự xóa khỏi ổ đĩa. Có thể xóa hồ sơ thử "
                 "đang hiệu lực sau bước xác nhận. Chỉ dùng dữ liệu giả định, không tải chứng từ. "
                 "Chat không ghi nhớ hội thoại, không nhận hồ sơ đã lưu, không tính thuế/phạt. "
-                "Hướng dẫn sử dụng này không phải văn bản pháp luật."
+                "Đây là hướng dẫn sử dụng các chức năng trên web."
             ),
             reviewed_at=date(2026, 10, 30),
             kind="product",

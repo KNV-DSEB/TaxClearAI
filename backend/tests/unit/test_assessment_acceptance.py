@@ -29,7 +29,7 @@ def test_unknown_answers_remain_unknown_in_summary():
     assert summary.scope == "b2"
     assert summary.unknown_facts
     assert summary.review_reasons
-    assert "chưa" in summary.notice.lower()
+    assert "tổng hợp câu trả lời" in summary.notice.lower()
 
 
 def test_household_receives_scope_notice_and_no_company_checklist():
