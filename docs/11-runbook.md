@@ -2,7 +2,7 @@
 
 ## Phạm vi
 
-Windows, FastAPI backend và Next.js frontend, PostgreSQL riêng đã dựng từ bộ cài 18 sẵn có. Chỉ dữ liệu giả định, không mở LAN/public. Chưa có tag release/CI xanh được xác minh. Không phải hướng dẫn deploy production.
+Windows, FastAPI backend và Next.js frontend, PostgreSQL riêng đã dựng từ bộ cài 18 sẵn có. Chỉ dữ liệu giả định, không mở LAN/public. CI code SHA 3e0e1a5 đã xanh, xem docs/12; chưa có tag release. Không phải hướng dẫn deploy production.
 
 ## Môi trường
 

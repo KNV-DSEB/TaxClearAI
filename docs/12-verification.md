@@ -41,7 +41,14 @@ pnpm command thật trên máy: `node C:/Users/Admin/AppData/Roaming/npm/node_mo
 
 ## Còn trước phát hành
 
-Nguồn luật/cây quyết định/checklist do cố vấn duyệt; điều kiện dữ liệu thật (TTL/purge/TLS/mã hóa/riêng tư); QA browser/thiết bị; residual bảo mật được quyết định; CI GitHub SHA mới; ký UAT đúng phạm vi. Chưa tag v0.1.0, chưa deploy.
+Nguồn luật/cây quyết định/checklist do cố vấn duyệt; điều kiện dữ liệu thật (TTL/purge/TLS/mã hóa/riêng tư); QA browser/thiết bị; residual bảo mật được quyết định; ký UAT đúng phạm vi dùng thật. Chưa tag v0.1.0, chưa deploy.
+
+## Git và CI đã xác minh
+
+- Nhánh `feature/s1-assessment-checklist` đã push, không push/merge main.
+- Code + workflow + tài liệu tại SHA `3e0e1a569bb67607bc12b32b11141c8bb3ce1d1f` đã qua [GitHub Actions run 40959496981](https://github.com/KNV-DSEB/TaxClearAI/actions/runs/40959496981), status completed/conclusion success.
+- Backend Python Quality, Frontend Quality, Secret Scanning, SAST – Semgrep và Quality Gate đều success theo API run/jobs; Backend TS Quality skipped đúng repo Python. Không dùng job Semgrep success để phủ nhận các advisory pip-audit đã ghi.
+- Bốn commit: `3a030e6` backend, `2798625` frontend, `2f51577` CI, `3e0e1a5` tài liệu. Có thể có commit theo sau chỉ cập nhật kết quả CI trong tài liệu; mã ứng dụng không đổi. Xem lịch sử nhánh để lấy SHA cuối.
 
 Coverage frontend là report V8 theo cấu hình hiện tại, không phải chứng minh mọi route/tệp chưa được import đều được kiểm thử. AssessmentLoader và QA trực quan cần kiểm tra riêng; không tắt test hoặc đổi phạm vi coverage để tăng số. Các test bổ sung là ca lỗi phiên/mạng, redirect, nguồn độc hại và sai năm từ yêu cầu thực tế.
 

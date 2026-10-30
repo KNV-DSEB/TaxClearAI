@@ -9,7 +9,7 @@ Ngày: 2026-10-30. Khách đã yêu cầu Codex tự thực hiện toàn bộ, c
 | S2-T01–S2-T03 | Đã nối Gemini/UI, có nguồn hướng dẫn sử dụng, chặn tính tiền/thiếu nguồn/PII phổ biến; khách xác nhận phù hợp bản thử nội bộ |
 | Q01 | Đã có test plan, UAT checklist và defects; kết quả tự động/giới hạn cập nhật tại docs/12-verification.md |
 | Q02 | Rà tĩnh và kiểm tra tự động đã chạy; UAT nội bộ S1/S2 có xác nhận khách; responsive/QA browser đầy đủ và nghiệm thu pháp lý còn mở |
-| R01 | Runbook và bản sửa CI đã có; chờ commit/push/CI của SHA mới được kiểm chứng; chưa tag hoặc deploy |
+| R01 | Runbook và 4 commit đã push feature; CI SHA 3e0e1a5/run 40959496981 success. Chưa tag/deploy; còn gate nội dung cố vấn và dữ liệu thật |
 | O01 | Không làm bản in trong đợt này, ưu tiên Must/QA và nội dung cần cố vấn duyệt |
 
 Hợp đồng API phải duyệt từ docs/05 trước A/B làm song song. Mỗi người giữ quyền sở hữu HANDOFF mục 5. `backend/src/main.py`, core/models/alembic và cấu hình chung chỉ trưởng nhóm sửa. Nhánh `feature/<ticket>-description`, Conventional Commits; không push main, không merge khi chưa rà soát.
