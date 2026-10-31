@@ -16,5 +16,10 @@
 | D12 | Minor test | Hai test wizard chọn text trùng h2/legend và fail | Đã sửa dùng role heading, kiểm tra lại xanh; không disable test |
 | D13 | Major trước dữ liệu thật | Hết hạn truy cập 7 ngày chưa phải purge vật lý; bảo vệ ổ đĩa/TLS production chưa xác minh | Đã công bố giới hạn trong UI/runbook; chỉ dữ liệu giả định local, cần chốt vận hành/xác nhận pháp lý trước nhận hồ sơ thật |
 | D14 | Đã sửa, công cụ dev | Audit installed environment phát hiện pip 25.2 có bản vá | Đã nâng pip 26.2 và kiểm tra lại: không còn pip/Black trong findings; còn 2 advisory duy nhất ở ecdsa/python-jose |
+| D15 | Major | Bộ lọc chat so khớp chuỗi con: "phat" khớp "phát sinh"/"phát hành", "so thue" khớp "hồ sơ thuế" nên câu hỏi hợp lệ bị chuyển chuyên viên; "mã số thuế"/"căn cước" chặn cả câu hỏi khái niệm; khoảng năm "2020-2023" bị coi là số định danh | Đã sửa 2026-10-31: so khớp nguyên cụm từ, chỉ chặn định danh khi kèm giá trị có chữ số, bỏ số năm trước khi dò; có test hồi quy |
+| D16 | Major | Hồ sơ hết hạn không xóa được (DELETE lọc expires_at) và chưa có cách dọn, dữ liệu nằm lại vô thời hạn | Đã sửa: owner xóa được hồ sơ hết hạn từ Hồ sơ của tôi; thêm lệnh purge có dry-run. Chưa lên lịch chạy tự động |
+| D17 | Minor | Ghi chú checklist khác nhau giữa lúc tạo và lúc tải lại (chuỗi viết cứng trong repository) | Đã sửa: một hằng CHECKLIST_NOTE, service gắn ghi chú |
+| D18 | Major UX | Không có danh sách hồ sơ; muốn mở lại phải giữ đường dẫn, đăng nhập xong luôn vào khảo sát mới | Đã sửa: GET /assessments có phân trang và trang /ho-so |
+| D19 | Major release gate | Nguồn luật của chat là trích tự động từ cổng văn bản nhà nước, chưa cố vấn rà soát; hiệu lực mọi đoạn "không rõ"; một số đoạn có lỗi tách âm tiết do PDF; dữ liệu hết hạn dùng sau 30 ngày vì chưa có công cụ đồng bộ | Mở. UI và citation ghi rõ chưa rà soát; cần cố vấn duyệt và quyết định công cụ đồng bộ (cần thêm dependency) |
 
 Không có lỗi dữ liệu thật được ghi nhận vì chưa nhận dữ liệu thật. Danh sách này không có nghĩa sản phẩm đã qua pentest, UAT hay được phát hành.

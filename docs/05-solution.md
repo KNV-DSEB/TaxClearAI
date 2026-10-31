@@ -46,12 +46,13 @@ JSON camelCase. Thành công dùng `{ "data": ... }`, lỗi RFC 7807 `{type,titl
 | DELETE /auth/sessions/current | cookie | 204, revoke refresh và xóa cookie |
 | GET /questionnaires/b2 | không | 200 data:Questionnaire; nội dung có phiên bản |
 | POST /assessments | {questionnaireVersion,answers:Answers} | 201 + Location /api/v1/assessments/{id}; data:Assessment |
+| GET /assessments?page&pageSize | page ≥1, pageSize 1–100 (mặc định 20) | 200 data:{items:AssessmentListItem[],page,pageSize,total}; chỉ hồ sơ của owner, mới cập nhật trước, gồm cả hồ sơ hết hạn (expired=true) để owner xóa |
 | GET /assessments/{id} | UUID | 200 data:Assessment của owner; thiếu/không sở hữu/hết hạn đều 404 |
 | PATCH /assessments/{id}/checklist-items/{itemId} | {status} | 200 data:ChecklistItem; truy vấn gắn owner và item thuộc hồ sơ |
-| DELETE /assessments/{id} | UUID | 204, xóa chính xác hồ sơ của owner và checklist; chức năng xóa dữ liệu này cần duyệt tại Cổng 1, không xóa dữ liệu hiện có trong bước lập kế hoạch |
+| DELETE /assessments/{id} | UUID | 204, xóa chính xác hồ sơ của owner và checklist, kể cả hồ sơ đã hết hạn (cập nhật 2026-10-31) |
 | POST /chat/messages | {message,disclosureAccepted:true} | 200 data:ChatReply; không nhận assessmentId hoặc hồ sơ |
 
-Không có endpoint list trong MVP nên không có danh sách không giới hạn. Nếu sau này thêm list phải default 20/max 100. Enum/options trong questionnaire tối đa theo bộ 11 câu, checklist snapshot tối đa 19 mục, không phải list toàn bộ khách.
+Endpoint list thêm ngày 2026-10-31 theo đúng quy tắc phân trang default 20/max 100; đếm trạng thái checklist trong cùng một truy vấn (không N+1). Enum/options trong questionnaire tối đa theo bộ 11 câu, checklist snapshot tối đa 19 mục, không phải list toàn bộ khách.
 
 ### Schema chốt cho A/B
 
@@ -87,3 +88,11 @@ Cần khách duyệt cụ thể cùng giải pháp: migration mới cho bốn b�
 - Backend: `python -m pytest`, `python -m ruff check .`, `python -m mypy src`, dùng Python của backend/.venv. Frontend: `pnpm lint`, `pnpm type-check`, `pnpm test`, `pnpm build`. Lint hiện có --fix nên chỉ chạy qua codeagent và kiểm tra diff sau chạy, không tự sửa scripts.
 - Tự rà code-review mỗi lát; security-audit cho auth/dữ liệu/chat, database khi đổi schema; ui-design trước markup, frontend/ui-design-review sau UI. Release dùng các skill backend/security-audit/performance đúng phạm vi.
 - Đo API nội bộ riêng với mục tiêu p95 <200 ms và ghi số mẫu/môi trường; Gemini latency/quota báo riêng. Không tối ưu không có số đo, không cache câu trả lời riêng tư.
+
+## Cập nhật 2026-10-31 — nguồn luật cho chat và Hồ sơ của tôi
+
+- **Nguồn luật B2:** `backend/src/modules/chat/data/legal_sources_b2.json` gồm 25 đoạn trích nguyên văn (Luật Doanh nghiệp 59/2020 Điều 207–210, Luật 76/2025 Điều 1 khoản 23, Nghị định 168/2025 Điều 64, Luật 108/2025 Điều 10, Nghị định 252/2026 Điều 7 khoản 1 điểm d.1, Thông tư 90/2026 Điều 29 khoản 1 điểm a.1, Nghị quyết 198/2025 Điều 10 khoản 7). Dữ liệu và chính sách nguồn lấy từ PR #15 (trandang2507), bỏ phần hộ kinh doanh, đoạn giữ chỗ và Nghị định 296/2026 (đoạn trích không cho biết sửa điều nào).
+- **Chính sách nguồn** (`chat/legal_sources.py`): chỉ dùng đoạn có SHA-256 khớp nguyên văn, URL HTTPS thuộc danh sách tên miền nhà nước, lấy về không quá 30 ngày. Repo chưa có công cụ đồng bộ lại (bản của PR #15 cần thêm pypdf/pymupdf, chưa duyệt), nên sau 30/11/2026 chat tự trả "chưa đủ nguồn" cho câu hỏi pháp lý cho tới khi dữ liệu được lấy lại.
+- **Trạng thái nội dung:** đoạn trích là văn bản gốc, **chưa được cố vấn rà soát**, hiệu lực chưa xác minh. Citation trả `reviewStatus: "unreviewed"`, `fetchedAt`, `reviewedAt: null`; UI ghi rõ điều này. Không thay cho bước cố vấn duyệt checklist/quy tắc (D11).
+- **Chọn đoạn:** so khớp cụm hai âm tiết trên chuỗi đã bỏ dấu và khoảng trắng (chịu được lỗi tách âm tiết của PDF), bỏ cụm chung như "thủ tục", "doanh nghiệp", cần ít nhất 2 cụm khớp, tối đa 4 đoạn.
+- **Hồ sơ của tôi:** trang `/ho-so`, đăng nhập xong vào thẳng đây; lệnh `python -m src.modules.assessments.purge` (mặc định chỉ đếm, `--apply` mới xóa) xóa hồ sơ hết hạn.

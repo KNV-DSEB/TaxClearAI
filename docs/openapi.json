@@ -264,6 +264,77 @@
             }
           }
         }
+      },
+      "get": {
+        "tags": [
+          "assessments"
+        ],
+        "summary": "List Assessments",
+        "operationId": "list_assessments_api_v1_assessments_get",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 1000,
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 20,
+              "title": "Pagesize"
+            }
+          },
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_AssessmentPage_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/api/v1/assessments/{assessment_id}": {
@@ -645,6 +716,90 @@
         ],
         "title": "Answers"
       },
+      "AssessmentListItem": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "scope": {
+            "type": "string",
+            "enum": [
+              "b2",
+              "out_of_scope",
+              "needs_confirmation"
+            ],
+            "title": "Scope"
+          },
+          "counts": {
+            "$ref": "#/components/schemas/ChecklistCounts"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Createdat"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updatedat"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Expiresat"
+          },
+          "expired": {
+            "type": "boolean",
+            "title": "Expired"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "scope",
+          "counts",
+          "createdAt",
+          "updatedAt",
+          "expiresAt",
+          "expired"
+        ],
+        "title": "AssessmentListItem"
+      },
+      "AssessmentPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/AssessmentListItem"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "pageSize": {
+            "type": "integer",
+            "title": "Pagesize"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "total"
+        ],
+        "title": "AssessmentPage"
+      },
       "AssessmentView": {
         "properties": {
           "id": {
@@ -767,6 +922,30 @@
         ],
         "title": "ChatRequest"
       },
+      "ChecklistCounts": {
+        "properties": {
+          "available": {
+            "type": "integer",
+            "title": "Available"
+          },
+          "missing": {
+            "type": "integer",
+            "title": "Missing"
+          },
+          "needsVerification": {
+            "type": "integer",
+            "title": "Needsverification"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "available",
+          "missing",
+          "needsVerification"
+        ],
+        "title": "ChecklistCounts"
+      },
       "ChecklistItemView": {
         "properties": {
           "id": {
@@ -837,8 +1016,15 @@
             "title": "Url"
           },
           "reviewedAt": {
-            "type": "string",
-            "format": "date",
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Reviewedat"
           },
           "kind": {
@@ -848,6 +1034,27 @@
               "legal"
             ],
             "title": "Kind"
+          },
+          "fetchedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fetchedat"
+          },
+          "reviewStatus": {
+            "type": "string",
+            "enum": [
+              "reviewed",
+              "unreviewed"
+            ],
+            "title": "Reviewstatus",
+            "default": "reviewed"
           }
         },
         "additionalProperties": false,
@@ -879,6 +1086,19 @@
           "answers"
         ],
         "title": "CreateAssessment"
+      },
+      "Envelope_AssessmentPage_": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/AssessmentPage"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "Envelope[AssessmentPage]"
       },
       "Envelope_AssessmentView_": {
         "properties": {
