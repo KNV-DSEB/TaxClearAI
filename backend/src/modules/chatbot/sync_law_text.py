@@ -92,7 +92,9 @@ def _read_url(url: str, timeout: float) -> bytes:
     raise RuntimeError("request retry limit exceeded")
 
 
-def _extract_official_document_text(page: str, source_url: str) -> str | None:
+def _extract_official_document_text(
+    page: str, source_url: str, failures: list[str] | None = None
+) -> str | None:
     link_parser = _LinkExtractor()
     link_parser.feed(page)
     document_urls = []
@@ -124,7 +126,15 @@ def _extract_official_document_text(page: str, source_url: str) -> str | None:
                 continue
             with zipfile.ZipFile(BytesIO(payload)) as archive:
                 xml = ElementTree.fromstring(archive.read("word/document.xml"))
-        except (OSError, ValueError, KeyError, zipfile.BadZipFile, urllib.error.URLError):
+        except (
+            OSError,
+            ValueError,
+            KeyError,
+            zipfile.BadZipFile,
+            urllib.error.URLError,
+        ) as error:
+            if failures is not None:
+                failures.append(f"{document_url} ({type(error).__name__}: {error})")
             continue
         paragraphs: list[str] = []
         for paragraph in xml.iter(
@@ -227,7 +237,8 @@ def synchronize() -> dict[str, object]:
             extractor = _TextExtractor()
             extractor.feed(page)
             page_text = extractor.text()
-            document_text = _extract_official_document_text(page, url)
+            attachment_failures: list[str] = []
+            document_text = _extract_official_document_text(page, url, failures=attachment_failures)
             if document_text:
                 page_text = page_text + "\n" + document_text
         except Exception as error:
@@ -273,7 +284,10 @@ def synchronize() -> dict[str, object]:
                 page_text, provision["article"], provision["clause"], provision.get("point")
             )
             if not content or document["document_number"] not in page_text:
-                skipped.append(f"{key}: không tách được duy nhất điều/khoản/điểm")
+                reason = "không tách được duy nhất điều/khoản/điểm"
+                if attachment_failures:
+                    reason += "; không đọc được tệp đính kèm theo robots.txt hoặc lỗi tải"
+                skipped.append(f"{key}: {reason}")
                 continue
             record = {
                 **provision,

@@ -185,3 +185,28 @@ def test_extracts_text_from_official_pdf_attachment(
 
     assert fetched == ["https://datafiles.chinhphu.vn/cpp/files/vbpq/2026/7/90-btc.signed.pdf"]
     assert extracted == "Điều 27. Nội dung từ tài liệu PDF."
+
+
+def test_pdf_attachment_failure_is_recorded_for_sync_report(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("LAW_SOURCE_ALLOWLIST", "congbao.chinhphu.vn,datafiles.chinhphu.vn")
+    get_settings.cache_clear()
+    fixture = Path(__file__).parents[2] / "fixtures" / "law" / "pdf_source.html"
+    page = fixture.read_text(encoding="utf-8-sig")
+
+    def blocked(_url: str) -> bytes:
+        raise ValueError("không đọc được robots.txt")
+
+    monkeypatch.setattr(sync_law_text, "_fetch_bytes", blocked)
+    failures: list[str] = []
+
+    extracted = sync_law_text._extract_official_document_text(
+        page,
+        "https://congbao.chinhphu.vn/van-ban/test.htm",
+        failures=failures,
+    )
+
+    assert extracted is None
+    assert len(failures) == 1
+    assert "robots.txt" in failures[0]
