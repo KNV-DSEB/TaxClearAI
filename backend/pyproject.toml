@@ -34,6 +34,7 @@ indent-style = "space"
 [tool.black]
 target-version = ["py312"]
 line-length = 100
+extend-exclude = "\\.pytest-tmp"
 
 [tool.mypy]
 python_version = "3.12"
