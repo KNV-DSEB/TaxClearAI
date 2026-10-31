@@ -1,5 +1,5 @@
 [project]
-name = "[PROJECT_NAME]-backend"
+name = "tax-clear-ai-backend"
 version = "0.1.0"
 requires-python = ">=3.12"
 
@@ -34,6 +34,7 @@ indent-style = "space"
 [tool.black]
 target-version = ["py312"]
 line-length = 100
+extend-exclude = "\\.pytest-tmp"
 
 [tool.mypy]
 python_version = "3.12"
@@ -44,6 +45,10 @@ exclude = ["alembic/versions", ".venv"]
 [[tool.mypy.overrides]]
 module = "tests.*"
 disallow_untyped_defs = false
+
+[[tool.mypy.overrides]]
+module = "pymupdf.*"
+ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 minversion = "8.0"
