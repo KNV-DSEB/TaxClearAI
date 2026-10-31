@@ -9,7 +9,12 @@ from src.core.config import get_settings
 from src.modules.chatbot import sync_law_text
 from src.modules.chatbot.schemas import EffectivenessStatus, LawEntry, Segment
 from src.modules.chatbot.source_policy import is_usable_source
-from src.modules.chatbot.sync_law_text import _TextExtractor, extract_provision
+from src.modules.chatbot.sync_law_text import (
+    _repair_ocr_form_codes,
+    _repair_vietnamese_ocr_errors,
+    _TextExtractor,
+    extract_provision,
+)
 
 
 @pytest.fixture(autouse=True)
@@ -56,6 +61,23 @@ def test_valid_recent_official_source_is_usable() -> None:
     assert is_usable_source(source())
 
 
+def test_unknown_effectiveness_is_usable_with_pipeline_warning() -> None:
+    assert is_usable_source(source(effectiveness_status=EffectivenessStatus.UNKNOWN))
+
+
+def test_ocr_repairs_unambiguous_form_code_errors(monkeypatch: pytest.MonkeyPatch) -> None:
+    text = "Mẫu số 18/TÌ B-ĐKT và 24/ĐÐKT"
+    repaired = _repair_ocr_form_codes(text)
+    assert repaired == "Mẫu số 18/TB-ĐKT và 24/ĐKT"
+
+
+def test_ocr_repairs_common_tax_term_errors() -> None:
+    text = "Người nộp thuê nộp hỗ sơ đền cơ quan thuê quản lý trực tiệp."
+    assert _repair_vietnamese_ocr_errors(text) == (
+        "Người nộp thuế nộp hồ sơ đến cơ quan thuế quản lý trực tiếp."
+    )
+
+
 def test_extracts_requested_clause_and_rejects_ambiguous_structure() -> None:
     fixture = Path(__file__).parents[2] / "fixtures" / "law" / "simple.html"
     parser = _TextExtractor()
@@ -64,6 +86,58 @@ def test_extracts_requested_clause_and_rejects_ambiguous_structure() -> None:
     assert extract_provision(text, "Điều 1", "Khoản 1", None) == "1. Nguyên văn khoản một."
     ambiguous = text + " Điều 1. Lặp điều. 1. Nội dung."
     assert extract_provision(ambiguous, "Điều 1", "Khoản 1", None) is None
+
+
+def test_extracts_nested_point_without_treating_it_as_a_clause() -> None:
+    text = (
+        "\u0110i\u1ec1u 7. Ngh\u0129a v\u1ee5.\n"
+        "1. N\u1ed9i dung kho\u1ea3n.\n"
+        "d) Tr\u00e1ch nhi\u1ec7m g\u1ed3m:\n"
+        "d.1) Ngh\u0129a v\u1ee5 th\u1ee9 nh\u1ea5t.\n"
+        "d.2) Ngh\u0129a v\u1ee5 th\u1ee9 hai.\n"
+        "2. Kho\u1ea3n ti\u1ebfp theo.\n"
+        "\u0110i\u1ec1u 8. Ti\u1ebfp theo.\n"
+    )
+
+    assert (
+        extract_provision(text, "\u0110i\u1ec1u 7", "Kho\u1ea3n 1", "\u0110i\u1ec3m d.1")
+        == "d.1) Ngh\u0129a v\u1ee5 th\u1ee9 nh\u1ea5t."
+    )
+
+
+def test_article_heading_inside_amendment_text_does_not_end_article() -> None:
+    text = (
+        "\u0110i\u1ec1u 1. S\u1eeda \u0111\u1ed5i lu\u1eadt.\n"
+        "1. S\u1eeda \u0111\u1ed5i m\u1ed9t s\u1ed1 quy \u0111\u1ecbnh t\u1ea1i "
+        "\u0110i\u1ec1u 25.\n"
+        "23. S\u1eeda \u0111\u1ed5i \u0111i\u1ec3m c kho\u1ea3n 1 "
+        "\u0110i\u1ec1u 207: nguy\u00ean v\u0103n.\n"
+        "\u0110i\u1ec1u 2. Ti\u1ebfp theo.\n"
+    )
+
+    assert extract_provision(text, "\u0110i\u1ec1u 1", "Kho\u1ea3n 23", None) == (
+        "23. S\u1eeda \u0111\u1ed5i \u0111i\u1ec3m c kho\u1ea3n 1 "
+        "\u0110i\u1ec1u 207: nguy\u00ean v\u0103n."
+    )
+
+
+def test_generic_amendment_reference_extracts_complete_article() -> None:
+    text = (
+        "\u0110i\u1ec1u 1. S\u1eeda \u0111\u1ed5i.\n"
+        "1. Nguy\u00ean v\u0103n s\u1eeda \u0111\u1ed5i.\n"
+        "\u0110i\u1ec1u 2. Ti\u1ebfp theo."
+    )
+
+    assert (
+        extract_provision(
+            text,
+            "\u0110i\u1ec1u 1",
+            "C\u00e1c kho\u1ea3n s\u1eeda \u0111\u1ed5i, b\u1ed5 sung "
+            "Ngh\u1ecb \u0111\u1ecbnh 168/2025/N\u0110-CP",
+            None,
+        )
+        == "1. Nguy\u00ean v\u0103n s\u1eeda \u0111\u1ed5i."
+    )
 
 
 def test_sync_extracts_fixture_and_reports_expired_status(

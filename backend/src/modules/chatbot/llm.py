@@ -182,13 +182,16 @@ class GeminiLLM:
         temperature: float,
         json_schema: type[BaseModel] | None = None,
     ) -> str | None:
+        thinking_cfg = None
+        if not json_schema and "3." not in model:
+            thinking_cfg = types.ThinkingConfig(thinking_budget=0)
         config = types.GenerateContentConfig(
             system_instruction=system_prompt,
             max_output_tokens=max_output_tokens,
             temperature=temperature,
             response_mime_type="application/json" if json_schema else None,
             response_schema=json_schema,
-            thinking_config=types.ThinkingConfig(thinking_budget=0) if not json_schema else None,
+            thinking_config=thinking_cfg,
         )
         # Redact once more at the provider boundary, including any retrieved context.
         system_prompt = redact_sensitive_data(system_prompt)
@@ -291,7 +294,7 @@ def _situation_user_prompt(answers: dict[str, object], free_text: str | None) ->
 def _get_gemini_client(api_key: str | None) -> genai.Client:
     return genai.Client(
         api_key=api_key,
-        http_options=types.HttpOptions(timeout=20_000),
+        http_options=types.HttpOptions(timeout=60_000),
     )
 
 

@@ -1,0 +1,152 @@
+[
+  {
+    "id": "demo-lawyer-01",
+    "display_name": "Chuyên gia mẫu 1",
+    "expert_type": "luat_su",
+    "verified": true,
+    "verified_by": "Dữ liệu mẫu MVP",
+    "verified_date": "Dữ liệu mẫu MVP",
+    "regions": ["DEMO - Miền Bắc", "DEMO - Toàn quốc"],
+    "segments": ["A1", "A2", "A3"],
+    "services": [
+      {
+        "name": "Dịch vụ làm việc với cơ quan thuế cho hộ kinh doanh",
+        "scope": "Làm việc với cơ quan thuế và phòng chuyên môn cho hồ sơ hộ kinh doanh; phí từ 5.000.000 trở lên tùy lượng hồ sơ.",
+        "price_min": 5000000,
+        "price_max": null,
+        "price_unit": "VND/hồ sơ",
+        "exclusions": ["Tiền thuế, tiền phạt và lệ phí nộp nhà nước"]
+      }
+    ],
+    "platform_fee_note": "MVP: nền tảng chưa xử lý thanh toán hoặc thu phí.",
+    "illustrative": true
+  },
+  {
+    "id": "demo-accountant-02",
+    "display_name": "Chuyên gia mẫu 2",
+    "expert_type": "ke_toan",
+    "verified": true,
+    "verified_by": "Dữ liệu mẫu MVP",
+    "verified_date": "Dữ liệu mẫu MVP",
+    "regions": ["DEMO - Miền Nam", "DEMO - Toàn quốc"],
+    "segments": ["A2", "A3", "B1", "B2"],
+    "services": [
+      {
+        "name": "Dịch vụ làm việc với cơ quan thuế cho hộ kinh doanh",
+        "scope": "Làm việc với cơ quan thuế và phòng chuyên môn cho hồ sơ hộ kinh doanh; phí từ 5.000.000 trở lên tùy lượng hồ sơ.",
+        "price_min": 5000000,
+        "price_max": null,
+        "price_unit": "VND/hồ sơ",
+        "exclusions": ["Tiền thuế, tiền phạt và lệ phí nộp nhà nước"]
+      },
+      {
+        "name": "Dịch vụ làm việc với cơ quan thuế cho B1",
+        "scope": "Dịch vụ làm việc với cơ quan thuế cho doanh nghiệp không hoạt động.",
+        "price_min": 10000000,
+        "price_max": 15000000,
+        "price_unit": "VND/hồ sơ",
+        "exclusions": ["Tiền thuế, tiền phạt và lệ phí nộp nhà nước"]
+      },
+      {
+        "name": "Dịch vụ cho nhóm B2",
+        "scope": "Báo giá sau khi khảo sát hồ sơ thực tế",
+        "price_min": null,
+        "price_max": null,
+        "price_unit": "VND/hồ sơ",
+        "exclusions": ["Tiền thuế, tiền phạt và lệ phí nộp nhà nước"]
+      }
+    ],
+    "platform_fee_note": "MVP: nền tảng chưa xử lý thanh toán hoặc thu phí.",
+    "illustrative": true
+  },
+  {
+    "id": "demo-tax-agent-03",
+    "display_name": "Chuyên gia mẫu 3",
+    "expert_type": "dai_ly_thue",
+    "verified": true,
+    "verified_by": "Dữ liệu mẫu MVP",
+    "verified_date": "Dữ liệu mẫu MVP",
+    "regions": ["DEMO - Miền Trung"],
+    "segments": ["A1", "A2", "A3"],
+    "services": [
+      {
+        "name": "Dịch vụ làm việc với cơ quan thuế cho hộ kinh doanh",
+        "scope": "Làm việc với cơ quan thuế và phòng chuyên môn cho hồ sơ hộ kinh doanh; phí từ 5.000.000 trở lên tùy lượng hồ sơ.",
+        "price_min": 5000000,
+        "price_max": null,
+        "price_unit": "VND/hồ sơ",
+        "exclusions": ["Tiền thuế, tiền phạt và lệ phí nộp nhà nước"]
+      }
+    ],
+    "platform_fee_note": "MVP: nền tảng chưa xử lý thanh toán hoặc thu phí.",
+    "illustrative": true
+  },
+  {
+    "id": "demo-lawyer-04",
+    "display_name": "Chuyên gia mẫu 4",
+    "expert_type": "luat_su",
+    "verified": true,
+    "verified_by": "Dữ liệu mẫu MVP",
+    "verified_date": "Dữ liệu mẫu MVP",
+    "regions": ["DEMO - Miền Bắc"],
+    "segments": ["B1", "B2"],
+    "services": [
+      {
+        "name": "Dịch vụ làm việc với Sở/cơ quan đăng ký kinh doanh",
+        "scope": "Làm việc với Sở hoặc cơ quan đăng ký kinh doanh trong phạm vi hồ sơ.",
+        "price_min": 1500000,
+        "price_max": 4500000,
+        "price_unit": "VND/hồ sơ",
+        "exclusions": ["Tiền thuế, tiền phạt và lệ phí nộp nhà nước"]
+      },
+      {
+        "name": "Dịch vụ làm việc với cơ quan thuế cho B1",
+        "scope": "Dịch vụ làm việc với cơ quan thuế cho doanh nghiệp không hoạt động.",
+        "price_min": 10000000,
+        "price_max": 15000000,
+        "price_unit": "VND/hồ sơ",
+        "exclusions": ["Tiền thuế, tiền phạt và lệ phí nộp nhà nước"]
+      },
+      {
+        "name": "Dịch vụ cho nhóm B2",
+        "scope": "Báo giá sau khi khảo sát hồ sơ thực tế",
+        "price_min": null,
+        "price_max": null,
+        "price_unit": "VND/hồ sơ",
+        "exclusions": ["Tiền thuế, tiền phạt và lệ phí nộp nhà nước"]
+      }
+    ],
+    "platform_fee_note": "MVP: nền tảng chưa xử lý thanh toán hoặc thu phí.",
+    "illustrative": true
+  },
+  {
+    "id": "demo-accountant-unverified-05",
+    "display_name": "Chuyên gia mẫu 5",
+    "expert_type": "ke_toan",
+    "verified": false,
+    "verified_by": "",
+    "verified_date": "",
+    "regions": ["DEMO - Miền Nam"],
+    "segments": ["B1", "B2"],
+    "services": [
+      {
+        "name": "Dịch vụ làm việc với cơ quan thuế cho B1",
+        "scope": "Dịch vụ làm việc với cơ quan thuế cho doanh nghiệp không hoạt động.",
+        "price_min": 10000000,
+        "price_max": 15000000,
+        "price_unit": "VND/hồ sơ",
+        "exclusions": ["Tiền thuế, tiền phạt và lệ phí nộp nhà nước"]
+      },
+      {
+        "name": "Dịch vụ cho nhóm B2",
+        "scope": "Báo giá sau khi khảo sát hồ sơ thực tế",
+        "price_min": null,
+        "price_max": null,
+        "price_unit": "VND/hồ sơ",
+        "exclusions": ["Tiền thuế, tiền phạt và lệ phí nộp nhà nước"]
+      }
+    ],
+    "platform_fee_note": "MVP: nền tảng chưa xử lý thanh toán hoặc thu phí.",
+    "illustrative": true
+  }
+]

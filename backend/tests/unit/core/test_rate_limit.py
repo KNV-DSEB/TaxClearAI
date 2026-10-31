@@ -4,10 +4,21 @@ from starlette.requests import Request
 
 from src.core.config import Settings
 from src.core.rate_limit import (
+    InMemoryRateLimitStore,
     enforce_api_rate_limit,
     enforce_chatbot_rate_limit,
     reset_rate_limit_state,
 )
+
+
+def test_in_memory_rate_limit_store_supports_scoped_reset() -> None:
+    store = InMemoryRateLimitStore()
+
+    assert store.allow("api", "192.0.2.1", 10.0, 1)
+    assert not store.allow("api", "192.0.2.1", 11.0, 1)
+    assert store.allow("chatbot", "192.0.2.1", 11.0, 1)
+    store.reset("api")
+    assert store.allow("api", "192.0.2.1", 12.0, 1)
 
 
 def _request(client_ip: str) -> Request:

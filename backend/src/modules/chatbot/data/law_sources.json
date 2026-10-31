@@ -1,12 +1,158 @@
 [
-  {"document_number":"108/2025/QH15","source_url":"https://congbao.chinhphu.vn/van-ban/luat-so-108-2025-qh15-468670.htm","provisions":[{"article":"Điều 10","clause":"Khoản 1"},{"article":"Điều 10","clause":"Khoản 2"}]},
-  {"document_number":"168/2025/NĐ-CP","source_url":"https://congbao.chinhphu.vn/van-ban/nghi-dinh-so-168-2025-nd-cp-45354/57297.htm","provisions":[{"article":"Điều 64","clause":"Khoản 1"},{"article":"Điều 64","clause":"Khoản 2"},{"article":"Điều 64","clause":"Khoản 3, khoản 4, khoản 5"},{"article":"Điều 104","clause":"Khoản 1","point":"Điểm a"},{"article":"Điều 104","clause":"Khoản 1","point":"Điểm b"},{"article":"Điều 104","clause":"Khoản 1","point":"Điểm c, điểm d"},{"article":"Điều 83","clause":"Khoản 1"},{"article":"Điều 99","clause":"Khoản 1, khoản 2"},{"article":"Điều 99","clause":"Khoản 3"}]},
-  {"document_number":"252/2026/NĐ-CP","source_url":"https://congbao.chinhphu.vn/van-ban/nghi-dinh-so-252-2026-nd-cp-469958.htm","provisions":[{"article":"Điều 7","clause":"Khoản 1","point":"Điểm d.1"}]},
-  {"document_number":"296/2026/NĐ-CP","source_url":"https://congbao.chinhphu.vn/van-ban/nghi-dinh-so-296-2026-nd-cp-470177/67429.htm","provisions":[{"article":"Điều 1","clause":"Các khoản sửa đổi, bổ sung Nghị định 168/2025/NĐ-CP"}]},
-  {"document_number":"59/2020/QH14","source_url":"https://congbao.chinhphu.vn/van-ban/luat-so-59-2020-qh14-31674.htm","provisions":[{"article":"Điều 207","clause":"Khoản 1, khoản 2"},{"article":"Điều 208","clause":"Khoản 1, khoản 2, khoản 3, khoản 4, khoản 5"},{"article":"Điều 209","clause":"Khoản 1 đến khoản 6"},{"article":"Điều 210","clause":"Khoản 1"}]},
-  {"document_number":"76/2025/QH15","source_url":"https://congbao.chinhphu.vn/van-ban/luat-so-76-2025-qh15-45505/57568.htm","provisions":[{"article":"Điều 1","clause":"Khoản 23"}]},
-  {"document_number":"90/2026/TT-BTC","source_url":"https://vanban.chinhphu.vn/?classid=1&docid=218839&orggroupid=4&pageid=27160","provisions":[{"article":"Điều 27","clause":"Khoản 1","point":"Điểm a"},{"article":"Điều 27","clause":"Khoản 4, khoản 5"},{"article":"Điều 28","clause":"Khoản 1, khoản 2"},{"article":"Điều 29","clause":"Khoản 1","point":"Điểm a.1, a.5"}]},
-  {"document_number":"117/2025/NĐ-CP","source_url":"https://congbao.chinhphu.vn/van-ban/nghi-dinh-so-117-2025-nd-cp-45045.htm","provisions":[]},
-  {"document_number":"310/2025/NĐ-CP","source_url":"https://congbao.chinhphu.vn/van-ban/nghi-dinh-so-310-2025-nd-cp-46755.htm","provisions":[]},
-  {"document_number":"198/2025/QH15","source_url":"https://congbao.chinhphu.vn/van-ban/nghi-quyet-so-198-2025-qh15-44898/56348.htm","provisions":[{"article":"Điều 10","clause":"Khoản 7"}]}
+  {
+    "document_number": "108/2025/QH15",
+    "source_url": "https://congbao.chinhphu.vn/van-ban/luat-so-108-2025-qh15-468670.htm",
+    "provisions": [
+      {
+        "article": "Điều 10",
+        "clause": "Khoản 1"
+      },
+      {
+        "article": "Điều 10",
+        "clause": "Khoản 2"
+      }
+    ]
+  },
+  {
+    "document_number": "168/2025/NĐ-CP",
+    "source_url": "https://congbao.chinhphu.vn/van-ban/nghi-dinh-so-168-2025-nd-cp-45354/57297.htm",
+    "provisions": [
+      {
+        "article": "Điều 64",
+        "clause": "Khoản 1"
+      },
+      {
+        "article": "Điều 64",
+        "clause": "Khoản 2"
+      },
+      {
+        "article": "Điều 64",
+        "clause": "Khoản 3, khoản 4, khoản 5"
+      },
+      {
+        "article": "Điều 104",
+        "clause": "Khoản 1",
+        "point": "Điểm a"
+      },
+      {
+        "article": "Điều 104",
+        "clause": "Khoản 1",
+        "point": "Điểm b"
+      },
+      {
+        "article": "Điều 104",
+        "clause": "Khoản 1",
+        "point": "Điểm c"
+      },
+      {
+        "article": "Điều 83",
+        "clause": "Khoản 1"
+      },
+      {
+        "article": "Điều 99",
+        "clause": "Khoản 1, khoản 2"
+      },
+      {
+        "article": "Điều 99",
+        "clause": "Khoản 3"
+      }
+    ]
+  },
+  {
+    "document_number": "252/2026/NĐ-CP",
+    "source_url": "https://congbao.chinhphu.vn/van-ban/nghi-dinh-so-252-2026-nd-cp-469958.htm",
+    "provisions": [
+      {
+        "article": "Điều 7",
+        "clause": "Khoản 1",
+        "point": "Điểm d.1"
+      }
+    ]
+  },
+  {
+    "document_number": "296/2026/NĐ-CP",
+    "source_url": "https://congbao.chinhphu.vn/van-ban/nghi-dinh-so-296-2026-nd-cp-470177/67429.htm",
+    "provisions": [
+      {
+        "article": "Điều 1",
+        "clause": "Các khoản sửa đổi, bổ sung Nghị định 168/2025/NĐ-CP"
+      }
+    ]
+  },
+  {
+    "document_number": "59/2020/QH14",
+    "source_url": "https://congbao.chinhphu.vn/tai-ve-van-ban-so-59-2020-qh14-31674-31833?format=pdf",
+    "provisions": [
+      {
+        "article": "Điều 207",
+        "clause": "Khoản 1, khoản 2"
+      },
+      {
+        "article": "Điều 208",
+        "clause": "Khoản 1, khoản 2, khoản 3, khoản 4, khoản 5"
+      },
+      {
+        "article": "Điều 209",
+        "clause": "Khoản 1 đến khoản 6"
+      },
+      {
+        "article": "Điều 210",
+        "clause": "Khoản 1"
+      }
+    ]
+  },
+  {
+    "document_number": "76/2025/QH15",
+    "source_url": "https://congbao.chinhphu.vn/van-ban/luat-so-76-2025-qh15-45505/57568.htm",
+    "provisions": [
+      {
+        "article": "Điều 1",
+        "clause": "Khoản 23"
+      }
+    ]
+  },
+  {
+    "document_number": "90/2026/TT-BTC",
+    "source_url": "https://hue.gov.vn/Trang-chu/He-thong-van-ban-phap-luat/doc/all/vb/61383",
+    "provisions": [
+      {
+        "article": "Điều 27",
+        "clause": "Khoản 1",
+        "point": "Điểm a"
+      },
+      {
+        "article": "Điều 27",
+        "clause": "Khoản 4, khoản 5"
+      },
+      {
+        "article": "Điều 28",
+        "clause": "Khoản 1, khoản 2"
+      },
+      {
+        "article": "Điều 29",
+        "clause": "Khoản 1",
+        "point": "Điểm a.1, a.5"
+      }
+    ]
+  },
+  {
+    "document_number": "117/2025/NĐ-CP",
+    "source_url": "https://congbao.chinhphu.vn/van-ban/nghi-dinh-so-117-2025-nd-cp-45045.htm",
+    "provisions": []
+  },
+  {
+    "document_number": "310/2025/NĐ-CP",
+    "source_url": "https://congbao.chinhphu.vn/van-ban/nghi-dinh-so-310-2025-nd-cp-46755.htm",
+    "provisions": []
+  },
+  {
+    "document_number": "198/2025/QH15",
+    "source_url": "https://congbao.chinhphu.vn/van-ban/nghi-quyet-so-198-2025-qh15-44898/56348.htm",
+    "provisions": [
+      {
+        "article": "Điều 10",
+        "clause": "Khoản 7"
+      }
+    ]
+  }
 ]

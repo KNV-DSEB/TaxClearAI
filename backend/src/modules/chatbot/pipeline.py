@@ -68,6 +68,7 @@ class ChatbotPipeline:
         penalty_principle_question = risk_label == "hoi_co_bi_phat"
         if penalty_principle_question:
             risk_label = None
+        classifier_uncertain = False
         retrieved: list[LawEntry] = []
         approved: list[LawEntry] = []
         if risk_label is None and not penalty_principle_question:
@@ -94,10 +95,18 @@ class ChatbotPipeline:
                     predicted = self._failsafe_label()
             if predicted == "khong":
                 risk_label = None
+            elif predicted == "khong_chac_chan":
+                classifier_uncertain = True
+                risk_label = None
             elif predicted in RISK_LABELS:
                 risk_label = predicted
             else:
-                risk_label = self._failsafe_label()
+                predicted = self._failsafe_label()
+                if predicted == "khong_chac_chan":
+                    classifier_uncertain = True
+                    risk_label = None
+                else:
+                    risk_label = predicted
 
         if risk_label == "hoi_co_bi_phat":
             penalty_principle_question = True
@@ -164,6 +173,10 @@ class ChatbotPipeline:
 
         cited_sources = [source for source in approved if source.id in parsed.citations]
         source_warnings = _source_warnings(cited_sources)
+        if classifier_uncertain:
+            source_warnings.append(
+                "Cảnh báo: bộ phân loại rủi ro chưa kết luận; câu trả lời cần chuyên gia rà soát."
+            )
         oldest_fetch = min(source.fetched_at for source in cited_sources if source.fetched_at)
         data_note = (
             "Nội dung lấy tự động từ nguồn nhà nước công bố, cập nhật ngày "

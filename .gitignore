@@ -34,7 +34,10 @@ htmlcov/
 .DS_Store
 Thumbs.db
 
-# VibeCraft-managed AI IDE fan-out (uncomment if you only want to track AGENTS.md)
+# Archives
+*.zip
+*.tar.gz
+
 # .cursorrules
 # .windsurfrules
 # CLAUDE.md

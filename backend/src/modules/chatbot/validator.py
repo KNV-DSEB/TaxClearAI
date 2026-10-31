@@ -65,12 +65,16 @@ def validate_answer(answer: LLMAnswer, sources: list[LawEntry]) -> str | None:
         if not normalized_quote or not any(normalized_quote in text for text in source_texts):
             return "quote_not_in_source"
     for number, unit in _DURATION.findall(normalized):
-        canonical = f"{_canonical_number(number)} {re.sub(r'\s+', ' ', unit)}"
-        if not any(_contains_phrase(text, canonical) for text in source_texts):
+        clean_unit = re.sub(r"\s+", " ", unit)
+        c_num = _canonical_number(number)
+        pattern = rf"(?<![a-z0-9])0*{re.escape(c_num)}\s+{re.escape(clean_unit)}(?![a-z0-9])"
+        if not any(re.search(pattern, text) for text in source_texts):
             return "figure_not_in_source"
     for kind, number in _LEGAL_REFERENCE.findall(normalized):
-        reference = f"{kind} {number}"
-        if not any(_contains_phrase(text, reference) for text in source_texts):
+        clean_kind = re.sub(r"\s+", " ", kind)
+        c_num = _canonical_number(number)
+        pattern = rf"(?<![a-z0-9]){re.escape(clean_kind)}\s+0*{re.escape(c_num)}(?![a-z0-9])"
+        if not any(re.search(pattern, text) for text in source_texts):
             return "figure_not_in_source"
     return None
 

@@ -18,7 +18,12 @@ def is_usable_source(source: LawEntry, *, now: datetime | None = None) -> bool:
     parsed_url = urlparse(source.source_url)
     if parsed_url.scheme != "https" or (parsed_url.hostname or "").lower() != domain:
         return False
-    if source.effectiveness_status != EffectivenessStatus.CURRENT:
+    # Unknown status can be surfaced with an expert warning by the response pipeline.
+    # Expired and not-yet-effective documents must never support an answer.
+    if source.effectiveness_status in {
+        EffectivenessStatus.EXPIRED,
+        EffectivenessStatus.NOT_YET_EFFECTIVE,
+    }:
         return False
     if source.fetched_at is None:
         return False
