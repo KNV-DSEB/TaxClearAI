@@ -12,11 +12,59 @@ from src.modules.assessments.service import get_approved_chat_sources
 from src.modules.chat.schemas import ChatReply, Citation, GeneratedAnswer
 
 SENSITIVE = re.compile(r"[\w.+-]+@[\w.-]+\.[a-zA-Z]{2,}|(?:\d[\s.-]*){7,}")
+YEARS = re.compile(r"\b(?:19|20)\d{2}\b")
 MONEY = re.compile(r"\d[\d.,\s]*(?:đồng|vnd|vnđ|triệu|tỷ|%)", re.IGNORECASE)
-PRIVATE_TERMS = ("cccd", "can cuoc", "ma so thue", "so tai khoan", "mat khau", "api key")
-RISK_TERMS = ("bao nhieu tien", "tien thue", "so thue", "truy thu", "phat", "ne thue", "tron thue")
-LEGAL_TERMS = ("quy dinh", "phap ly", "dieu luat", "thu tuc", "giai the", "ke khai", "co quan thue")
-PRODUCT_TERMS = ("checklist", "trang thai", "luu", "mo lai", "khao sat", "dang nhap", "cach dung")
+
+
+def phrases(*terms: str) -> re.Pattern[str]:
+    # So khớp nguyên cụm từ: "phat" không được khớp "phát sinh" hay "phát hành"
+    return re.compile(r"\b(?:" + "|".join(terms) + r")\b")
+
+
+# Chỉ chặn khi người dùng đưa giá trị, không chặn câu hỏi về chính khái niệm đó
+PRIVATE_VALUE = phrases(
+    r"(?:cccd|can cuoc|cmnd|ma so thue|mst|so tai khoan)(?:\s+cua\s+\w+)?\s*(?:la|:)\s*[\w-]*\d\w*",
+    "mat khau",
+    "api key",
+)
+RISK_TERMS = phrases(
+    "bao nhieu tien",
+    "so tien thue",
+    "tien thue",
+    "so thue phai nop",
+    "truy thu",
+    "tien phat",
+    "bi phat",
+    "muc phat",
+    "khoan phat",
+    "xu phat",
+    "nop phat",
+    "phat bao nhieu",
+    "phat cham nop",
+    "ne thue",
+    "tron thue",
+    "lach thue",
+)
+LEGAL_TERMS = phrases(
+    "quy dinh",
+    "phap ly",
+    "phap luat",
+    "dieu luat",
+    "luat",
+    "nghi dinh",
+    "thong tu",
+    "thu tuc",
+    "giai the",
+    "ke khai",
+    "co quan thue",
+    "ma so thue",
+    "mon bai",
+    "nghia vu",
+    "thanh ly",
+)
+PRODUCT_TERMS = phrases(
+    "checklist", "trang thai", "luu", "mo lai", "khao sat", "dang nhap", "cach dung"
+)
 
 
 def normalize(text: str) -> str:
@@ -33,9 +81,11 @@ class ChatService:
         self,
         provider: AnswerProvider,
         source_loader: Callable[[], list[SourceRecord]] = get_approved_chat_sources,
+        legal_selector: Callable[[str], list[SourceRecord]] = lambda _: [],
     ) -> None:
         self.provider = provider
         self.source_loader = source_loader
+        self.legal_selector = legal_selector
         self.buckets: dict[UUID, tuple[int, int]] = {}
         self.day = datetime.now(UTC).date()
         self.daily_calls = 0
@@ -69,25 +119,24 @@ class ChatService:
     async def answer(self, owner: UUID, message: str) -> ChatReply:
         self.check_rate(owner)
         text = normalize(message)
-        if SENSITIVE.search(message) or any(term in text for term in PRIVATE_TERMS):
+        if SENSITIVE.search(YEARS.sub(" ", message)) or PRIVATE_VALUE.search(text):
             return ChatReply(
                 reply="Câu hỏi có dấu hiệu chứa thông tin riêng tư. Vui lòng bỏ thông tin "
                 "nhận diện và chỉ hỏi bằng tình huống giả định.",
                 disposition="blocked_input",
             )
-        if any(term in text for term in RISK_TERMS):
+        if RISK_TERMS.search(text):
             return ChatReply(
                 reply="Tôi không tính thuế, tiền phạt hoặc kết luận cho hồ sơ cụ thể. "
                 "Bạn cần chuyên viên thuế xem xét thông tin đã được xác minh.",
                 disposition="expert_review",
             )
-        legal = any(term in text for term in LEGAL_TERMS)
-        product = any(term in text for term in PRODUCT_TERMS)
-        sources = [
-            source
-            for source in self.source_loader()
-            if source.kind == ("legal" if legal else "product")
-        ]
+        legal = bool(LEGAL_TERMS.search(text))
+        product = bool(PRODUCT_TERMS.search(text))
+        if legal:
+            sources = self.legal_selector(message)
+        else:
+            sources = [source for source in self.source_loader() if source.kind == "product"]
         if not sources or (not legal and not product):
             return self.insufficient()
         self.reserve_quota()
@@ -102,6 +151,8 @@ class ChatService:
                 url=source.url,
                 reviewed_at=source.reviewed_at,
                 kind=source.kind,
+                fetched_at=source.fetched_at,
+                review_status=source.review_status,
             )
             for source in sources
             if source.id in generated.source_ids

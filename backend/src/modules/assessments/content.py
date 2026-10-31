@@ -2,6 +2,7 @@ from src.modules.assessments.schemas import Option, Question, Questionnaire
 
 VERSION = "b2-draft-1"
 NOTICE = "Bản tổng hợp câu trả lời và danh mục hồ sơ cần chuẩn bị để trao đổi với chuyên viên."
+CHECKLIST_NOTE = "Mục gợi ý để khảo sát; chuyên viên cần xác nhận có áp dụng cho hồ sơ của bạn."
 TRI = [("yes", "Có"), ("no", "Không"), ("unknown", "Chưa biết")]
 QUESTION_DATA = [
     (

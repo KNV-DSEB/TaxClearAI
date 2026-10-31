@@ -1,10 +1,11 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Response
+from fastapi import APIRouter, Depends, Query, Response
 
 from src.core.schemas import Envelope
 from src.modules.assessments.dependencies import get_assessment_service
 from src.modules.assessments.schemas import (
+    AssessmentPage,
     AssessmentView,
     ChecklistItemView,
     CreateAssessment,
@@ -33,6 +34,16 @@ async def create_assessment(
     result = await service.create(user.id, data)
     response.headers["Location"] = f"/api/v1/assessments/{result.id}"
     return Envelope(data=result)
+
+
+@router.get("/assessments", response_model=Envelope[AssessmentPage])
+async def list_assessments(
+    page: int = Query(default=1, ge=1, le=1000),
+    page_size: int = Query(default=20, ge=1, le=100, alias="pageSize"),
+    user: UserRecord = Depends(get_current_user),
+    service: AssessmentService = Depends(get_assessment_service),
+) -> Envelope[AssessmentPage]:
+    return Envelope(data=await service.list_page(user.id, page, page_size))
 
 
 @router.get("/assessments/{assessment_id}", response_model=Envelope[AssessmentView])

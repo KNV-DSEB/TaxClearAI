@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from typing import Literal
 
 from pydantic import ConfigDict, Field
@@ -16,8 +16,10 @@ class Citation(ApiModel):
     source_id: str
     title: str
     url: str
-    reviewed_at: date
+    reviewed_at: date | None
     kind: Literal["product", "legal"]
+    fetched_at: datetime | None = None
+    review_status: Literal["reviewed", "unreviewed"] = "reviewed"
 
 
 class ChatReply(ApiModel):

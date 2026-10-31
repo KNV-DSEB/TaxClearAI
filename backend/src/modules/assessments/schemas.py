@@ -90,3 +90,26 @@ class CreateAssessment(ApiModel):
 
 class UpdateChecklistItem(ApiModel):
     status: ItemStatus
+
+
+class ChecklistCounts(ApiModel):
+    available: int
+    missing: int
+    needs_verification: int
+
+
+class AssessmentListItem(ApiModel):
+    id: UUID
+    scope: Literal["b2", "out_of_scope", "needs_confirmation"]
+    counts: ChecklistCounts
+    created_at: datetime
+    updated_at: datetime
+    expires_at: datetime
+    expired: bool
+
+
+class AssessmentPage(ApiModel):
+    items: list[AssessmentListItem]
+    page: int
+    page_size: int
+    total: int

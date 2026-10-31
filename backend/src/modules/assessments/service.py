@@ -3,12 +3,25 @@ from typing import Literal
 from uuid import UUID, uuid4
 
 from src.core.errors import ApplicationError
-from src.modules.assessments.content import DOCUMENTS, NOTICE, VERSION, get_questionnaire
-from src.modules.assessments.domain import AssessmentRecord, SourceRecord
+from src.modules.assessments.content import (
+    CHECKLIST_NOTE,
+    DOCUMENTS,
+    NOTICE,
+    VERSION,
+    get_questionnaire,
+)
+from src.modules.assessments.domain import (
+    AssessmentRecord,
+    AssessmentSummaryRecord,
+    SourceRecord,
+)
 from src.modules.assessments.repository import AssessmentRepository
 from src.modules.assessments.schemas import (
     Answers,
+    AssessmentListItem,
+    AssessmentPage,
     AssessmentView,
+    ChecklistCounts,
     ChecklistItemView,
     CreateAssessment,
     ItemStatus,
@@ -34,9 +47,10 @@ def get_approved_chat_sources() -> list[SourceRecord]:
                 "Checklist giúp theo dõi giấy tờ đã có, còn thiếu hoặc cần xác minh. "
                 "Có ba trạng thái: "
                 "Đã có, Còn thiếu, Cần xác minh. Thay đổi trạng thái, đợi thông báo đã lưu rồi "
-                "tải lại để kiểm tra. Giữ đường dẫn hồ sơ để mở lại sau đăng nhập. "
-                "Hồ sơ hết hạn truy cập sau 7 ngày; chưa tự xóa khỏi ổ đĩa. Có thể xóa hồ sơ thử "
-                "đang hiệu lực sau bước xác nhận. Chỉ dùng dữ liệu giả định, không tải chứng từ. "
+                "tải lại để kiểm tra. Sau khi đăng nhập, trang Hồ sơ của tôi liệt kê các hồ sơ "
+                "đã lưu để mở lại. Hồ sơ hết hạn truy cập sau 7 ngày; hồ sơ hết hạn vẫn hiện "
+                "trong danh sách để bạn xóa. Có thể xóa hồ sơ thử sau bước xác nhận. "
+                "Chỉ dùng dữ liệu giả định, không tải chứng từ. "
                 "Chat không ghi nhớ hội thoại, không nhận hồ sơ đã lưu, không tính thuế/phạt. "
                 "Đây là hướng dẫn sử dụng các chức năng trên web."
             ),
@@ -83,10 +97,30 @@ def prepare_checklist(data: Answers, assessment_id: UUID) -> list[ChecklistItemV
             label=label,
             status="needs_verification",
             review_status="draft",
-            note="Mục gợi ý để khảo sát; chuyên viên cần xác nhận có áp dụng cho hồ sơ của bạn.",
+            note=CHECKLIST_NOTE,
         )
         for code, label in DOCUMENTS
     ]
+
+
+def with_note(item: ChecklistItemView) -> ChecklistItemView:
+    return item.model_copy(update={"note": CHECKLIST_NOTE})
+
+
+def to_list_item(record: AssessmentSummaryRecord, now: datetime) -> AssessmentListItem:
+    return AssessmentListItem(
+        id=record.id,
+        scope=record.scope,
+        counts=ChecklistCounts(
+            available=record.available,
+            missing=record.missing,
+            needs_verification=record.needs_verification,
+        ),
+        created_at=record.created_at,
+        updated_at=record.updated_at,
+        expires_at=record.expires_at,
+        expired=record.expires_at <= now,
+    )
 
 
 def to_view(record: AssessmentRecord) -> AssessmentView:
@@ -97,7 +131,10 @@ def to_view(record: AssessmentRecord) -> AssessmentView:
         content_status="draft",
         answers=record.answers,
         summary=record.summary,
-        checklist=sorted(record.checklist, key=lambda item: order.get(item.code, len(order))),
+        checklist=sorted(
+            (with_note(item) for item in record.checklist),
+            key=lambda item: order.get(item.code, len(order)),
+        ),
         created_at=record.created_at,
         updated_at=record.updated_at,
         expires_at=record.expires_at,
@@ -142,7 +179,22 @@ class AssessmentService:
         item = await self.repository.update_item(owner_id, assessment_id, item_id, status)
         if item is None:
             raise ApplicationError(404, "Không tìm thấy mục hồ sơ.")
-        return item
+        return with_note(item)
+
+    async def list_page(self, owner_id: UUID, page: int, page_size: int) -> AssessmentPage:
+        records, total = await self.repository.list_page(
+            owner_id, (page - 1) * page_size, page_size
+        )
+        now = datetime.now(UTC)
+        return AssessmentPage(
+            items=[to_list_item(record, now) for record in records],
+            page=page,
+            page_size=page_size,
+            total=total,
+        )
+
+    async def purge_expired(self, apply: bool) -> int:
+        return await self.repository.purge_expired(datetime.now(UTC), apply)
 
     async def remove(self, owner_id: UUID, assessment_id: UUID) -> None:
         if not await self.repository.remove(owner_id, assessment_id):

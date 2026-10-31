@@ -130,3 +130,32 @@ async def test_quota_is_reported_without_provider_body_or_secret():
         await provider.generate("Cách dùng checklist?", [])
     assert caught.value.status == 429
     assert "private" not in caught.value.detail
+
+
+@pytest.mark.parametrize(
+    "message",
+    [
+        "Doanh thu phát sinh nghĩa là gì trong checklist?",
+        "Phát hành hóa đơn liên quan mục nào trong checklist?",
+        "Kỳ 2020-2023 tôi cần đánh dấu trạng thái checklist thế nào?",
+        "Hồ sơ thuế cần lưu ở mục nào trong checklist?",
+    ],
+)
+async def test_common_tax_words_are_not_mistaken_for_penalty_or_private_data(message):
+    result = await ChatService(FakeProvider()).answer(uuid4(), message)
+    assert result.disposition == "answered"
+
+
+@pytest.mark.parametrize(
+    ("message", "disposition"),
+    [
+        ("Doanh nghiệp tôi có bị phạt không?", "expert_review"),
+        ("Mức phạt chậm nộp hồ sơ là bao nhiêu?", "expert_review"),
+        ("MST của tôi là 0312-AB, kiểm tra giúp", "blocked_input"),
+        ("Mã số thuế là gì?", "insufficient_sources"),
+        ("Chấm dứt hiệu lực mã số thuế là gì?", "insufficient_sources"),
+    ],
+)
+async def test_penalty_and_identifier_values_are_still_caught(message, disposition):
+    result = await ChatService(FakeProvider()).answer(uuid4(), message)
+    assert result.disposition == disposition
