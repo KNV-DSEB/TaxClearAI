@@ -163,15 +163,25 @@ class ChatbotPipeline:
             return response
 
         cited_sources = [source for source in approved if source.id in parsed.citations]
-        mode = 3 if parsed.needs_expert else 1
+        source_warnings = _source_warnings(cited_sources)
+        oldest_fetch = min(source.fetched_at for source in cited_sources if source.fetched_at)
+        data_note = (
+            "Nội dung lấy tự động từ nguồn nhà nước công bố, cập nhật ngày "
+            f"{oldest_fetch.date().isoformat()}; có thể chậm so với thay đổi mới nhất. "
+            "Không thay thế tư vấn chuyên môn."
+        )
+        needs_expert = parsed.needs_expert or penalty_principle_question or bool(source_warnings)
+        mode = 3 if needs_expert else 1
         response = ChatResponse(
             answer=parsed.answer
-            + ("\n\n" + PENALTY_PRINCIPLE_EXPERT_NOTE if penalty_principle_question else ""),
+            + ("\n\n" + PENALTY_PRINCIPLE_EXPERT_NOTE if penalty_principle_question else "")
+            + ("\n\n" + "\n".join(source_warnings) if source_warnings else ""),
             citations=parsed.citations,
             sources=cited_sources,
-            needs_expert=parsed.needs_expert or penalty_principle_question,
-            mode=3 if penalty_principle_question else mode,
+            needs_expert=needs_expert,
+            mode=mode,
             block_reason=None,
+            data_note=data_note,
         )
         self._log_request(message, step, request, response, "")
         return response
@@ -259,3 +269,14 @@ def _context_risk_label(context: dict[str, bool]) -> str | None:
 def _is_service_fee_query(message: str) -> bool:
     normalized = normalize_text(message)
     return any(term in normalized for term in ("phi dich vu", "phi tu van", "phi chuyen gia"))
+
+
+def _source_warnings(sources: list[LawEntry]) -> list[str]:
+    warnings: list[str] = []
+    if any(source.amended_by for source in sources):
+        warnings.append(
+            "Cảnh báo: nguồn có thông tin văn bản sửa đổi; cần đối chiếu nội dung sửa đổi mới nhất."
+        )
+    if any(source.effectiveness_status.value == "khong_ro" for source in sources):
+        warnings.append("Cảnh báo: tình trạng hiệu lực của nguồn chưa rõ.")
+    return warnings

@@ -7,9 +7,9 @@ import pytest
 
 from src.core.config import Settings
 from src.modules.chatbot.llm import MockLLM
-from src.modules.chatbot.pipeline import ChatbotPipeline
+from src.modules.chatbot.pipeline import ChatbotPipeline, _source_warnings
 from src.modules.chatbot.retriever import KeywordRetriever
-from src.modules.chatbot.schemas import ChatRequest, LawEntry, Segment
+from src.modules.chatbot.schemas import ChatRequest, EffectivenessStatus, LawEntry, Segment
 from src.modules.chatbot.templates import SAFE_FALLBACK_TEMPLATE
 
 
@@ -122,6 +122,10 @@ async def test_pipeline_sanitizes_before_llm_and_only_passes_allowlisted_flags()
     assert response.citations == ["L900"]
     assert response.sources[0].document_number == "TEST/2026"
     assert response.sources[0].article == "Điều 1"
+    assert response.sources[0].source_url == "https://congbao.chinhphu.vn/test"
+    assert response.sources[0].fetched_at is not None
+    assert response.data_note is not None
+    assert response.sources[0].fetched_at.date().isoformat() in response.data_note
     assert response.ai_disclosure == (
         "Gợi ý do AI hỗ trợ, bạn là người xác nhận; không thay thế tư vấn chuyên môn."
     )
@@ -153,6 +157,35 @@ async def test_fabricated_deadline_uses_expert_safe_fallback() -> None:
     assert response.mode == 3
     assert response.needs_expert is True
     assert response.block_reason == "figure_not_in_source"
+
+
+@pytest.mark.asyncio
+async def test_amended_citation_adds_warning_and_escalates() -> None:
+    class AmendedRetriever(ApprovedRetriever):
+        def retrieve(self, query: str, segment: Segment, top_k: int) -> list[LawEntry]:
+            source = super().retrieve(query, segment, top_k)[0]
+            return [source.model_copy(update={"amended_by": "2/2026/QH15"})]
+
+    pipeline = ChatbotPipeline(
+        Settings(_env_file=None, chatbot_mock_mode=True), AmendedRetriever(), CapturingLLM()
+    )
+
+    response = await pipeline.answer(make_request())
+
+    assert response.needs_expert is True
+    assert response.mode == 3
+    assert "văn bản sửa đổi" in response.answer
+    assert response.sources[0].amended_by == "2/2026/QH15"
+
+
+def test_unknown_effectiveness_source_has_warning() -> None:
+    source = (
+        ApprovedRetriever()
+        .retrieve("", Segment.A1, 1)[0]
+        .model_copy(update={"effectiveness_status": EffectivenessStatus.UNKNOWN})
+    )
+
+    assert _source_warnings([source]) == ["Cảnh báo: tình trạng hiệu lực của nguồn chưa rõ."]
 
 
 @pytest.mark.asyncio
