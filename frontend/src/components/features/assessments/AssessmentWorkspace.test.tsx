@@ -109,7 +109,7 @@ describe('Chuẩn bị hồ sơ khảo sát', () => {
     render(<AssessmentWorkspace initial={assessment} />);
     fireEvent.click(screen.getByRole('button', { name: 'Xóa hồ sơ thử này' }));
     fireEvent.click(screen.getByRole('button', { name: 'Xác nhận xóa hồ sơ' }));
-    await waitFor(() => expect(navigation.replace).toHaveBeenCalledWith('/khao-sat'));
+    await waitFor(() => expect(navigation.replace).toHaveBeenCalledWith('/ho-so'));
     expect(assessmentsService.remove).toHaveBeenCalledWith('case-1');
   });
 

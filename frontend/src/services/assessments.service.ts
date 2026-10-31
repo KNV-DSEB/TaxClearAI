@@ -1,6 +1,7 @@
 import type {
   Answers,
   Assessment,
+  AssessmentPage,
   ChecklistItem,
   ItemStatus,
   Questionnaire,
@@ -17,6 +18,9 @@ export const assessmentsService = {
       method: 'POST',
       body: JSON.stringify({ questionnaireVersion, answers }),
     });
+  },
+  async list(page: number, signal?: AbortSignal): Promise<AssessmentPage> {
+    return apiData<AssessmentPage>(`/api/v1/assessments?page=${page}&pageSize=20`, { signal });
   },
   async get(id: string, signal?: AbortSignal): Promise<Assessment> {
     return apiData<Assessment>(`/api/v1/assessments/${encodeURIComponent(id)}`, { signal });

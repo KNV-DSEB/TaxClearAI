@@ -1131,3 +1131,66 @@ details li {
     padding: 24px;
   }
 }
+
+/* Hồ sơ của tôi */
+.case-list {
+  display: grid;
+  gap: 14px;
+  margin-top: 28px;
+  padding: 0;
+  list-style: none;
+}
+.case-card {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 16px;
+  align-items: center;
+  padding: 22px 24px;
+}
+.case-card h2 {
+  font-size: 1.05rem;
+  margin-top: 6px;
+}
+.case-counts {
+  margin-top: 8px;
+  color: var(--ink);
+  font-size: 13px;
+}
+.case-card .small {
+  margin-top: 6px;
+}
+.case-card-actions {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+.case-card .delete-confirm {
+  grid-column: 1 / -1;
+  margin-top: 0;
+}
+.case-empty {
+  margin-top: 28px;
+  padding: 28px;
+}
+.case-empty .button {
+  margin-top: 18px;
+}
+.case-loading {
+  margin-top: 28px;
+}
+.case-pagination {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 24px;
+}
+@media (max-width: 600px) {
+  .case-card {
+    grid-template-columns: 1fr;
+    padding: 18px;
+  }
+  .case-card-actions {
+    justify-content: space-between;
+  }
+}

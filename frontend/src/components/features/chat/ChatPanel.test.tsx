@@ -20,6 +20,8 @@ describe('Trợ lý có nguồn', () => {
   it.each([
     ['product', 'javascript:alert(1)', false],
     ['legal', 'https://example.gov.vn/van-ban', true],
+    ['legal', 'https://congbao.chinhphu.vn/van-ban/luat-59.htm', true],
+    ['legal', 'https://congbao.chinhphu.vn.attacker.example/van-ban', false],
     ['legal', 'http://example.gov.vn/van-ban', false],
     ['legal', 'javascript:alert(1)', false],
   ] as const)('kiểm tra đường dẫn nguồn %s %s trước khi mở', async (kind, url, allowed) => {
@@ -128,5 +130,29 @@ describe('Trợ lý có nguồn', () => {
     ask();
     expect(await screen.findByText('<script>alert(1)</script>')).toBeInTheDocument();
     expect(view.container.querySelector('script')).toBeNull();
+  });
+
+  it('ghi rõ trích văn bản luật chưa được chuyên gia rà soát', async () => {
+    vi.mocked(chatService.send).mockResolvedValue({
+      reply: 'Theo Điều 210 khoản 1, hồ sơ gồm thông báo giải thể.',
+      disposition: 'answered',
+      providerUsed: true,
+      citations: [
+        {
+          sourceId: 'L1',
+          title: 'Luật Doanh nghiệp 59/2020/QH14 — Điều 210, Khoản 1',
+          url: 'https://congbao.chinhphu.vn/van-ban/luat-59.htm',
+          reviewedAt: null,
+          kind: 'legal',
+          fetchedAt: '2026-10-31T10:11:53Z',
+          reviewStatus: 'unreviewed',
+        },
+      ],
+    });
+    render(<ChatPanel />);
+    ask();
+    expect(
+      await screen.findByText(/chưa được chuyên gia rà soát, chưa xác minh hiệu lực/),
+    ).toHaveTextContent('lấy ngày 31/10/2026');
   });
 });

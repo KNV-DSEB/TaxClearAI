@@ -7,14 +7,30 @@ import { useState } from 'react';
 import { chatService } from '@/services/chat.service';
 import type { ChatReply, Citation } from '@/types/api.types';
 
+// Khớp danh sách tên miền nguồn luật ở backend (modules/chat/legal_sources.py)
+const OFFICIAL_DOMAINS = ['chinhphu.vn', 'vbpl.vn', 'gov.vn'];
+
 function sourceHref(citation: Citation): string | null {
   if (citation.kind === 'product') return citation.url === '/huong-dan' ? citation.url : null;
   try {
     const url = new URL(citation.url);
-    return url.protocol === 'https:' && url.hostname.endsWith('.gov.vn') ? url.href : null;
+    const official = OFFICIAL_DOMAINS.some(
+      (domain) => url.hostname === domain || url.hostname.endsWith(`.${domain}`),
+    );
+    return url.protocol === 'https:' && official ? url.href : null;
   } catch {
     return null;
   }
+}
+
+function sourceNote(citation: Citation): string {
+  if (citation.kind === 'product') return 'Hướng dẫn sử dụng';
+  const fetched = citation.fetchedAt
+    ? ` lấy ngày ${new Intl.DateTimeFormat('vi-VN').format(new Date(citation.fetchedAt))}`
+    : '';
+  return citation.reviewStatus === 'unreviewed'
+    ? `Trích văn bản gốc${fetched} · chưa được chuyên gia rà soát, chưa xác minh hiệu lực`
+    : `Văn bản pháp luật${fetched}`;
 }
 
 export function ChatPanel() {
@@ -55,7 +71,7 @@ export function ChatPanel() {
         <span>Gemini</span>
       </div>
       <p className="small muted">
-        Hỏi cách chuẩn bị, sử dụng checklist và mở lại hồ sơ.
+        Hỏi cách dùng checklist, hoặc hỏi về thủ tục giải thể và chấm dứt mã số thuế.
       </p>
       <form
         aria-label="Đặt câu hỏi"
@@ -74,7 +90,7 @@ export function ChatPanel() {
           required
           value={message}
           onChange={(event) => setMessage(event.target.value)}
-          placeholder="Ví dụ: Tôi dùng checklist trên web thế nào?"
+          placeholder="Ví dụ: Hồ sơ giải thể doanh nghiệp gồm những giấy tờ gì?"
           aria-describedby="chat-privacy"
           disabled={busy}
         />
@@ -125,11 +141,7 @@ export function ChatPanel() {
                 ) : (
                   <span>Không mở được đường dẫn nguồn.</span>
                 )}
-                <span>
-                  {citation.kind === 'product'
-                    ? 'Hướng dẫn sử dụng'
-                    : 'Tài liệu tham khảo'}
-                </span>
+                <span>{sourceNote(citation)}</span>
               </div>
             );
           })}

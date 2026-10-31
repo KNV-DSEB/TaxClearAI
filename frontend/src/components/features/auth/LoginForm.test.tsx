@@ -14,7 +14,8 @@ beforeEach(() => vi.resetAllMocks());
 describe('Đăng nhập bản thử', () => {
   it.each([
     ['/ho-so/11111111-1111-4111-8111-111111111111', '/ho-so/11111111-1111-4111-8111-111111111111'],
-    ['https://outside.example/collect', '/khao-sat'],
+    ['/ho-so', '/ho-so'],
+    ['https://outside.example/collect', '/ho-so'],
   ])('mở lại đúng hồ sơ và từ chối redirect bên ngoài: %s', async (destination, expected) => {
     window.history.replaceState(null, '', `/dang-nhap?returnTo=${encodeURIComponent(destination)}`);
     vi.mocked(authService.login).mockResolvedValue({
@@ -28,7 +29,7 @@ describe('Đăng nhập bản thử', () => {
     window.history.replaceState(null, '', '/');
   });
 
-  it('chỉ chuyển sang khảo sát sau khi server xác nhận phiên', async () => {
+  it('chỉ chuyển sang danh sách hồ sơ sau khi server xác nhận phiên', async () => {
     vi.mocked(authService.login).mockResolvedValue({
       user: { id: 'u1', username: 'demo' },
       expiresAt: '',
@@ -38,7 +39,7 @@ describe('Đăng nhập bản thử', () => {
     fireEvent.change(screen.getByLabelText('Mật khẩu'), { target: { value: password } });
     fireEvent.click(screen.getByRole('button', { name: 'Đăng nhập để chuẩn bị hồ sơ' }));
     await waitFor(() => expect(authService.login).toHaveBeenCalledWith('demo', password));
-    expect(navigation.replace).toHaveBeenCalledWith('/khao-sat');
+    expect(navigation.replace).toHaveBeenCalledWith('/ho-so');
   });
 
   it('thông báo sai thông tin và cho phép nhập lại', async () => {

@@ -27,21 +27,25 @@ export default function GuidePage() {
               <strong>Cần xác minh:</strong> bạn hoặc chuyên viên cần kiểm tra thêm.
             </li>
           </ul>
-          <p>
-            Đổi trạng thái, đợi thông báo đã lưu và tải lại trang để kiểm tra.
-          </p>
+          <p>Đổi trạng thái, đợi thông báo đã lưu và tải lại trang để kiểm tra.</p>
           <h2>Mở lại và quản lý</h2>
           <p>
-            Giữ đường dẫn trang hồ sơ. Sau đăng nhập, bạn có thể mở lại để bổ sung. Hồ sơ hết hạn
-            truy cập sau 7 ngày; bản thử chưa tự xóa dữ liệu khỏi ổ đĩa. Bạn có thể xóa hồ sơ đang
-            hiệu lực sau bước xác nhận.
+            Sau khi đăng nhập, trang Hồ sơ của tôi liệt kê các hồ sơ đã lưu để bạn mở lại và bổ
+            sung. Hồ sơ hết hạn truy cập sau 7 ngày nhưng vẫn hiện trong danh sách để bạn xóa. Mọi
+            hồ sơ đều xóa được sau bước xác nhận.
           </p>
           <h2>Hỏi trợ lý bằng câu hỏi tổng quát</h2>
           <p>
             Chat không ghi nhớ câu trước và không tự gửi hồ sơ đã lưu. Google nhận câu hỏi để tạo
             phản hồi. Chỉ dùng dữ liệu giả định; không nhập tên, mã số thuế, căn cước, tài khoản
-            hoặc chứng từ. Trợ lý không tính thuế/phạt hay kết luận hồ sơ; khi thiếu nguồn pháp luật
-            đã duyệt, hãy trao đổi với chuyên viên.
+            hoặc chứng từ. Trợ lý không tính thuế/phạt hay kết luận hồ sơ.
+          </p>
+          <h2>Câu trả lời có trích văn bản pháp luật</h2>
+          <p>
+            Với câu hỏi về thủ tục giải thể hoặc chấm dứt mã số thuế, trợ lý trích nguyên văn một số
+            điều khoản lấy từ cổng văn bản của Nhà nước và ghi ngày lấy văn bản. Các đoạn trích này
+            chưa được chuyên gia rà soát và chưa xác minh còn hiệu lực hay đã bị sửa đổi. Hãy dùng
+            để tìm hiểu, sau đó xác minh với chuyên viên trước khi áp dụng cho hồ sơ thật.
           </p>
           <Link className="button button-primary" href="/khao-sat">
             Mở bộ câu hỏi

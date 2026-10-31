@@ -51,12 +51,30 @@ export interface Assessment {
   expiresAt: string;
 }
 
+export interface AssessmentListItem {
+  id: string;
+  scope: Assessment['summary']['scope'];
+  counts: { available: number; missing: number; needsVerification: number };
+  createdAt: string;
+  updatedAt: string;
+  expiresAt: string;
+  expired: boolean;
+}
+export interface AssessmentPage {
+  items: AssessmentListItem[];
+  page: number;
+  pageSize: number;
+  total: number;
+}
+
 export interface Citation {
   sourceId: string;
   title: string;
   url: string;
-  reviewedAt: string;
+  reviewedAt: string | null;
   kind: 'product' | 'legal';
+  fetchedAt?: string | null;
+  reviewStatus?: 'reviewed' | 'unreviewed';
 }
 export interface ChatReply {
   reply: string;

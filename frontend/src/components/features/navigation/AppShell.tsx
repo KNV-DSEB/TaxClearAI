@@ -6,7 +6,7 @@ export function AppShell({
   active = '',
 }: {
   children: React.ReactNode;
-  active?: 'survey' | 'home' | '';
+  active?: 'survey' | 'home' | 'cases' | '';
 }) {
   return (
     <>
@@ -25,6 +25,9 @@ export function AppShell({
         <nav aria-label="Điều hướng chính">
           <Link href="/" aria-current={active === 'home' ? 'page' : undefined}>
             Giới thiệu
+          </Link>
+          <Link href="/ho-so" aria-current={active === 'cases' ? 'page' : undefined}>
+            Hồ sơ của tôi
           </Link>
           <Link href="/khao-sat" aria-current={active === 'survey' ? 'page' : undefined}>
             Chuẩn bị hồ sơ <ArrowUpRight size={15} />

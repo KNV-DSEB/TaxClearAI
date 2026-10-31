@@ -53,7 +53,7 @@ export function AssessmentWorkspace({ initial }: { initial: WorkspaceAssessment 
     setError('');
     try {
       await assessmentsService.remove(assessment.id);
-      router.replace('/khao-sat');
+      router.replace('/ho-so');
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Chưa xóa được. Vui lòng thử lại.');
     } finally {
@@ -76,7 +76,13 @@ export function AssessmentWorkspace({ initial }: { initial: WorkspaceAssessment 
         <div>
           <span className="section-kicker">Hồ sơ chuẩn bị khảo sát</span>
           <h1>Đã rõ hơn. Cùng bổ sung từng mục.</h1>
-          <p className="muted">Giữ lại đường dẫn trang này để mở lại hồ sơ sau khi đăng nhập.</p>
+          <p className="muted">
+            Mở lại hồ sơ này bất cứ lúc nào từ trang{' '}
+            <Link className="text-link" href="/ho-so">
+              Hồ sơ của tôi
+            </Link>
+            .
+          </p>
         </div>
         <button
           className="button button-quiet"
@@ -114,30 +120,30 @@ export function AssessmentWorkspace({ initial }: { initial: WorkspaceAssessment 
                       ? 'Bảng kê mua hàng theo kỳ áp dụng'
                       : item.label;
                   return (
-                  <li key={item.id}>
-                    <span
-                      className={`check-indicator ${item.status === 'available' ? 'done' : ''}`}
-                      aria-hidden="true"
-                    >
-                      {item.status === 'available' ? <Check size={15} /> : null}
-                    </span>
-                    <div className="checklist-copy">
-                      <strong>{label}</strong>
-                    </div>
-                    <select
-                      name={item.code}
-                      aria-label={`Trạng thái: ${label}`}
-                      value={item.status}
-                      disabled={saving !== '' || busy}
-                      onChange={(event) => {
-                        void update(item.id, event.target.value as ItemStatus);
-                      }}
-                    >
-                      <option value="needs_verification">Cần xác minh</option>
-                      <option value="available">Đã có</option>
-                      <option value="missing">Còn thiếu</option>
-                    </select>
-                  </li>
+                    <li key={item.id}>
+                      <span
+                        className={`check-indicator ${item.status === 'available' ? 'done' : ''}`}
+                        aria-hidden="true"
+                      >
+                        {item.status === 'available' ? <Check size={15} /> : null}
+                      </span>
+                      <div className="checklist-copy">
+                        <strong>{label}</strong>
+                      </div>
+                      <select
+                        name={item.code}
+                        aria-label={`Trạng thái: ${label}`}
+                        value={item.status}
+                        disabled={saving !== '' || busy}
+                        onChange={(event) => {
+                          void update(item.id, event.target.value as ItemStatus);
+                        }}
+                      >
+                        <option value="needs_verification">Cần xác minh</option>
+                        <option value="available">Đã có</option>
+                        <option value="missing">Còn thiếu</option>
+                      </select>
+                    </li>
                   );
                 })}
               </ul>
@@ -176,9 +182,7 @@ export function AssessmentWorkspace({ initial }: { initial: WorkspaceAssessment 
                 ))}
               </ul>
             ) : (
-              <p className="muted">
-                Mở thông tin đã ghi nhận để xem lại câu trả lời.
-              </p>
+              <p className="muted">Mở thông tin đã ghi nhận để xem lại câu trả lời.</p>
             )}
             <details>
               <summary>Thông tin chưa biết ({assessment.summary.unknownFacts.length})</summary>

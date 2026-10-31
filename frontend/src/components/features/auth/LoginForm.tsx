@@ -20,7 +20,7 @@ export function LoginForm() {
     try {
       await authService.login(String(values.get('username')), String(values.get('password')));
       const destination = new URLSearchParams(window.location.search).get('returnTo') ?? '';
-      router.replace(/^\/ho-so\/[a-f0-9-]{36}$/.test(destination) ? destination : '/khao-sat');
+      router.replace(/^\/ho-so(\/[a-f0-9-]{36})?$/.test(destination) ? destination : '/ho-so');
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Chưa đăng nhập được. Vui lòng thử lại.');
     } finally {
