@@ -1,3 +1,3 @@
-# H??ng d?n chatbot
+# Hướng dẫn chatbot Tax Clear AI
 
-T?i li?u v?n h?nh ch?nh: [docs/chatbot.md](../../docs/chatbot.md).
+Tài liệu vận hành chính: [docs/chatbot.md](../../docs/chatbot.md).

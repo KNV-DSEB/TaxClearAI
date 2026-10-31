@@ -1,44 +1,59 @@
-# Chatbot ph?p l?
+# Chatbot pháp lý — Tax Clear AI
 
-## Lu?ng x? l?
+## Luồng xử lý
 
-1. ?n danh th?ng tin nh?n di?n v? ?p d?ng guardrail.
-2. Truy xu?t c?c ?o?n lu?t nguy?n v?n t? kho chung. Ch? ngu?n nh? n??c c?ng b?, c?n hi?u l?c, ??ng allowlist, c?n h?n c?p nh?t v? c? hash h?p l? m?i ???c d?ng.
-3. N?u kh?ng c? ngu?n d?ng ???c, tr? m?u ?Ch?a c? c?n c? ph?p l? ph? h?p? v? kh?ng g?i LLM.
-4. LLM tr? JSON c? citation. Validator ??i chi?u citation, tr?ch d?n, th?i h?n, s? ?i?u/Kho?n v? s? ti?n v?i n?i dung c?a ??ng ngu?n.
-5. N?u ki?m ch?ng th?t b?i, tr? m?u an to?n, mode 3 v? c?n chuy?n gia. T?i ?a hai l?n g?i LLM.
-6. Ph?n h?i k?m metadata ngu?n, ng?y ??ng b? c? nh?t v? c?nh b?o n?u v?n b?n c? s?a ??i ho?c t?nh tr?ng hi?u l?c ch?a r?.
+1. Ẩn danh thông tin nhận diện và áp dụng guardrail.
+2. Truy xuất nguyên văn từ kho luật chung. Chỉ dùng nguồn nhà nước công bố, nằm trong allowlist, còn hiệu lực, chưa quá hạn cập nhật và có hash hợp lệ.
+3. Nếu không có nguồn dùng được, trả mẫu “Chưa có căn cứ pháp lý phù hợp” và không gọi LLM.
+4. LLM trả JSON có citation. Validator đối chiếu citation, trích dẫn, thời hạn, số điều/khoản và số tiền với nội dung nguồn.
+5. Nếu kiểm chứng thất bại, trả mẫu an toàn, mode 3, cần chuyên gia. Tối đa hai lần gọi LLM.
+6. Phản hồi kèm metadata nguồn, ngày đồng bộ cũ nhất và cảnh báo nếu văn bản có sửa đổi hoặc tình trạng hiệu lực chưa rõ.
 
-## ??ng b? lu?t
+## Đồng bộ luật
 
-Ch?y t?i th? m?c `backend`:
+Chạy từ thư mục `backend`:
 
 ```powershell
-.\.venv\Scripts\python.exe -m src.modules.chatbot.sync_law_text sync
-.\.venv\Scripts\python.exe -m src.modules.chatbot.validate_law_library validate --strict
+.\.venv\Scripts\python.exe -m src.modules.chatbot.sync_law_text
+.\.venv\Scripts\python.exe -m src.modules.chatbot.validate_law_library --strict
 ```
 
-Khuy?n ngh? ch?y h?ng tu?n, th? Hai l?c 03:00 (cron):
+Khuyến nghị chạy hằng tuần, Thứ Hai lúc 03:00 bằng cron:
 
 ```cron
-0 3 * * 1 cd /path/to/TaxClearAI/backend && .venv/bin/python -m src.modules.chatbot.import_law_text sync >> /var/log/taxclear-law-sync.log 2>&1
+0 3 * * 1 cd /path/to/TaxClearAI/backend && .venv/bin/python -m src.modules.chatbot.sync_law_text >> /var/log/taxclear-law-sync.log 2>&1
 ```
 
-Ki?m tra b?o c?o ??ng b? v? validate sau m?i l?n ch?y. Th? m?c `src/modules/chatbot/data` l? kho lu?t chung; legal_library ??c metadata t? kho n?y theo `document_number`, kh?ng sao ch?p metadata.
+Kiểm tra báo cáo đồng bộ và validate sau mỗi lần chạy. `src/modules/chatbot/data/law_text.json` là kho luật chung; legal_library đọc từ kho này theo `document_number`, không sao chép metadata.
 
-## C?u h?nh
+PDF quét có thể dùng OCR dự phòng. Cần cài Tesseract OCR cùng traineddata tiếng Việt; bật `LAW_OCR_ENABLED=true`. Khi chạy đồng bộ trên máy Windows, ví dụ nếu traineddata nằm ở `C:\Users\<user>\tessdata_fast`:
 
-| Bi?n | M?c ??nh | ? ngh?a |
+```powershell
+$env:LAW_OCR_ENABLED='true'
+$env:LAW_OCR_TESSERACT_CMD='C:\Program Files\Tesseract-OCR\tesseract.exe'
+$env:LAW_OCR_TESSDATA_DIR="$env:USERPROFILE\tessdata_fast"
+.\.venv\Scripts\python.exe -m src.modules.chatbot.sync_law_text
+```
+
+OCR chỉ được dùng khi điểm tin cậy trung bình đạt ngưỡng; PDF không đạt ngưỡng sẽ bị bỏ qua và nêu trong báo cáo.
+
+## Cấu hình
+
+| Biến | Mặc định | Ý nghĩa |
 | --- | --- | --- |
-| `LAW_SOURCE_ALLOWLIST` | `congbao.chinhphu.vn,g7.cdnchinhphu.vn,vanban.chinhphu.vn,datafiles.chinhphu.vn,vbpl.vn,xaydungchinhsach.chinhphu.vn` | Domain ngu?n nh? n??c ???c ph?p. |
-| `LAW_MAX_AGE_DAYS` | `30` | Tu?i t?i ?a c?a l?n l?y ngu?n g?n nh?t. |
-| `CHATBOT_TOP_K` | `6` | S? ngu?n t?i ?a truy xu?t. |
-| `CHATBOT_MIN_RETRIEVAL_SCORE` | `1` | ?i?m t? kh?a t?i thi?u. |
-| `CHATBOT_LLM_PROVIDER` | `gemini` | `gemini`, `anthropic` ho?c `mock`. |
-| `CHATBOT_MOCK_MODE` | `false` | B?t mock ?? ph?t tri?n c?c b?. |
-| `GEMINI_API_KEY`, `ANTHROPIC_API_KEY` | ch?a ??t | Kh?a provider t??ng ?ng. |
-| `MODEL_GUARDRAIL`, `MODEL_ANSWER`, `CHATBOT_FAILSAFE` | theo c?u h?nh backend | Model v? nh?n d? ph?ng. |
+| `LAW_SOURCE_ALLOWLIST` | `congbao.chinhphu.vn,g7.cdnchinhphu.vn,vanban.chinhphu.vn,datafiles.chinhphu.vn,vbpl.vn,xaydungchinhsach.chinhphu.vn,hue.gov.vn` | Domain nguồn nhà nước được phép. |
+| `LAW_MAX_AGE_DAYS` | `30` | Tuổi tối đa của lần lấy nguồn gần nhất. |
+| `LAW_OCR_ENABLED` | `false` | Bật OCR dự phòng cho PDF quét; yêu cầu Tesseract và traineddata. |
+| `LAW_OCR_TESSERACT_CMD` | `tesseract` | Đường dẫn hoặc tên lệnh Tesseract. |
+| `LAW_OCR_LANGUAGE` | `vie` | Mã ngôn ngữ OCR cần có traineddata tương ứng. |
+| `LAW_OCR_TESSDATA_DIR` | để trống | Thư mục traineddata nếu không nằm ở vị trí mặc định. |
+| `LAW_OCR_MIN_CONFIDENCE` | `85` | Điểm tin cậy OCR trung bình tối thiểu; thấp hơn sẽ loại PDF. |
+| `CHATBOT_TOP_K` | `6` | Số nguồn tối đa được truy xuất. |
+| `CHATBOT_MIN_RETRIEVAL_SCORE` | `1` | Điểm từ khóa tối thiểu. |
+| `CHATBOT_LLM_PROVIDER` | `gemini` | `gemini`, `anthropic` hoặc `mock`. |
+| `CHATBOT_MOCK_MODE` | `false` | Bật mock cho phát triển cục bộ. |
+| `GEMINI_API_KEY`, `ANTHROPIC_API_KEY` | chưa đặt | Khóa provider tương ứng. |
 
-## Gi?i h?n
+## Giới hạn
 
-N?i dung c? th? ch?m c?p nh?t so v?i thay ??i m?i nh?t. Trang ngu?n thay ??i c?u tr?c, PDF kh?ng tr?ch ???c ch? ho?c robots.txt ch?n t?i c? th? l?m b? qua v?n b?n; b?o c?o ??ng b? n?u l? do khi nh?n di?n ???c. T?ch ?i?u/kho?n t? n?i dung ngu?n c? th? l?i; m?c kh?ng ch?c ch?n b? lo?i kh?i kho d?ng ???c. Ngu?n b? lo?i s? kh?ng l?m c?n c? cho c?u tr? l?i. D? li?u t? ??ng kh?ng thay th? t? v?n chuy?n m?n.
+Nội dung có thể chậm cập nhật so với thay đổi mới nhất. Trang nguồn đổi cấu trúc hoặc robots.txt chặn tải có thể khiến văn bản bị bỏ qua. OCR có thể nhận dạng sai; nội dung dưới ngưỡng tin cậy bị loại. Tách điều/khoản từ nguồn có thể lỗi nên mọi mục không chắc chắn bị loại khỏi tập dùng được. Dữ liệu tự động không thay thế tư vấn chuyên môn.
