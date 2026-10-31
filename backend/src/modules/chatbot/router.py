@@ -13,7 +13,9 @@ def get_chatbot_pipeline() -> ChatbotPipeline:
     settings = get_settings()
     return ChatbotPipeline(
         settings,
-        KeywordRetriever(use_demo_law=settings.chatbot_use_demo_law),
+        KeywordRetriever(
+            min_score=settings.chatbot_min_retrieval_score,
+        ),
     )
 
 
