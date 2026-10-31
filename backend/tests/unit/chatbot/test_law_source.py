@@ -150,3 +150,38 @@ def test_sync_skips_ambiguous_changed_page_and_keeps_old_record(
     stored = json.loads((data_dir / "law_text.json").read_text(encoding="utf-8"))
     assert stored[0]["fetched_at"] == old_fetched_at
     assert stored[0]["noi_dung"] == old_record["noi_dung"]
+
+
+def test_extracts_text_from_official_pdf_attachment(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import pypdf
+
+    monkeypatch.setenv("LAW_SOURCE_ALLOWLIST", "congbao.chinhphu.vn,datafiles.chinhphu.vn")
+    get_settings.cache_clear()
+    fixture = Path(__file__).parents[2] / "fixtures" / "law" / "pdf_source.html"
+    page = fixture.read_text(encoding="utf-8-sig")
+    fetched: list[str] = []
+    monkeypatch.setattr(
+        sync_law_text,
+        "_fetch_bytes",
+        lambda url: fetched.append(url) or b"fixture PDF bytes",
+    )
+
+    class FakePage:
+        @staticmethod
+        def extract_text() -> str:
+            return "Điều 27. Nội dung từ tài liệu PDF."
+
+    class FakePdfReader:
+        def __init__(self, _payload: bytes) -> None:
+            self.pages = [FakePage()]
+
+    monkeypatch.setattr(pypdf, "PdfReader", FakePdfReader)
+
+    extracted = sync_law_text._extract_official_document_text(
+        page, "https://congbao.chinhphu.vn/van-ban/test.htm"
+    )
+
+    assert fetched == ["https://datafiles.chinhphu.vn/cpp/files/vbpq/2026/7/90-btc.signed.pdf"]
+    assert extracted == "Điều 27. Nội dung từ tài liệu PDF."

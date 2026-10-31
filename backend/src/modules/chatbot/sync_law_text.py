@@ -99,7 +99,8 @@ def _extract_official_document_text(page: str, source_url: str) -> str | None:
     for link in link_parser.links:
         parsed_link = urlparse(link)
         file_name = parse_qs(parsed_link.query).get("file_name", [""])[0]
-        if parsed_link.path.lower().endswith(".docx") or file_name.lower().endswith(".docx"):
+        extension = Path(file_name or parsed_link.path).suffix.lower()
+        if extension in {".docx", ".pdf"}:
             document_urls.append(urljoin(source_url, link))
     allowed_domains = get_settings().allowed_law_domains
     for document_url in document_urls:
@@ -107,6 +108,20 @@ def _extract_official_document_text(page: str, source_url: str) -> str | None:
             continue
         try:
             payload = _fetch_bytes(document_url)
+            if urlparse(document_url).path.lower().endswith(".pdf") or parse_qs(
+                urlparse(document_url).query
+            ).get("file_name", [""])[0].lower().endswith(".pdf"):
+                from pypdf import PdfReader
+
+                pdf = PdfReader(BytesIO(payload))
+                pdf_paragraphs = [
+                    text
+                    for page_item in pdf.pages
+                    if (text := page_item.extract_text()) and text.strip()
+                ]
+                if pdf_paragraphs:
+                    return "\n".join(pdf_paragraphs)
+                continue
             with zipfile.ZipFile(BytesIO(payload)) as archive:
                 xml = ElementTree.fromstring(archive.read("word/document.xml"))
         except (OSError, ValueError, KeyError, zipfile.BadZipFile, urllib.error.URLError):

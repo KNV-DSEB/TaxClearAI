@@ -30,7 +30,8 @@ class Settings(BaseSettings):
     chatbot_failsafe: str = "khong_chac_chan"
     chatbot_guardrail_cache_size: int = Field(default=512, ge=0, le=10000)
     law_source_allowlist: str = (
-        "congbao.chinhphu.vn,g7.cdnchinhphu.vn,vbpl.vn,xaydungchinhsach.chinhphu.vn"
+        "congbao.chinhphu.vn,g7.cdnchinhphu.vn,vanban.chinhphu.vn,datafiles.chinhphu.vn,"
+        "vbpl.vn,xaydungchinhsach.chinhphu.vn"
     )
     law_max_age_days: int = Field(default=30, ge=1, le=3650)
     ai_provider_data_terms_ack: bool = False
