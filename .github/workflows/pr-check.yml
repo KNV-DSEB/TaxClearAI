@@ -73,7 +73,7 @@ jobs:
           NODE_ENV: test
 
       - name: Upload coverage
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: backend-ts-coverage
           path: backend/coverage/
@@ -142,7 +142,7 @@ jobs:
           python -m coverage xml
 
       - name: Upload coverage
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: backend-python-coverage
           path: backend/coverage.xml
@@ -182,7 +182,7 @@ jobs:
         run: pnpm test:cov
 
       - name: Upload coverage
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: frontend-coverage
           path: frontend/coverage/
@@ -220,7 +220,7 @@ jobs:
 
       # No upload-sarif (GHAS billed per committer/month on this private repo)
       - name: Upload Semgrep report
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: semgrep-report
           path: semgrep.sarif
