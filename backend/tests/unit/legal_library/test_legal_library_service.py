@@ -91,8 +91,25 @@ def test_requires_procedure_or_query() -> None:
 
 
 def test_new_references_expose_shared_law_sync_fields(
-    service: LegalLibraryService,
+    service: LegalLibraryService, monkeypatch: pytest.MonkeyPatch
 ) -> None:
+    record = LawTextRecord.model_validate(
+        {
+            "document_number": "198/2025/QH15",
+            "article": "Điều 10",
+            "clause": "Khoản 7",
+            "noi_dung": "[CHƯA CÓ NỘI DUNG NGUYÊN VĂN]",
+            "source_url": "https://congbao.chinhphu.vn/van-ban/nghi-quyet-so-198-2025-qh15-44898/56348.htm",
+            "source_domain": "congbao.chinhphu.vn",
+            "fetched_at": None,
+            "content_sha256": "",
+            "effectiveness_status": "khong_ro",
+        }
+    )
+    monkeypatch.setattr(
+        "src.modules.legal_library.service.read_law_text_records",
+        lambda: ({record.key: record}, []),
+    )
     result = service.search(LegalLookupRequest(query="kinh tế tư nhân"))
     resolution = next(item for item in result.results if item.document_number == "198/2025/QH15")
 

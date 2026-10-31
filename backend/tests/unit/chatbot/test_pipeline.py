@@ -89,7 +89,7 @@ def make_request(message: str = "Giải thích hồ sơ?") -> ChatRequest:
 async def test_pipeline_returns_fixed_no_source_without_placeholder_law() -> None:
     pipeline = ChatbotPipeline(
         Settings(_env_file=None, chatbot_mock_mode=True),
-        KeywordRetriever(),
+        KeywordRetriever(entries=[]),
         MockLLM(),
     )
 
@@ -235,11 +235,16 @@ async def test_pipeline_checks_original_message_before_redaction(
 
 @pytest.mark.parametrize(
     "classification",
-    ["nhan_khong_duoc_ho_tro", "", RuntimeError("LLM không phản hồi")],
-    ids=["unknown-label", "empty-output", "classifier-error"],
+    [
+        "nhan_khong_duoc_ho_tro",
+        "",
+        "khong_chac_chan",
+        RuntimeError("LLM không phản hồi"),
+    ],
+    ids=["unknown-label", "empty-output", "uncertain-label", "classifier-error"],
 )
 @pytest.mark.asyncio
-async def test_layer_two_classifier_failure_uses_failsafe_without_continuing(
+async def test_layer_two_classifier_failure_continues_with_expert_warning(
     classification: str | Exception,
 ) -> None:
     llm = FakeLLM(classification)
@@ -257,8 +262,10 @@ async def test_layer_two_classifier_failure_uses_failsafe_without_continuing(
 
     assert response.mode == 3
     assert response.needs_expert is True
-    assert response.block_reason == "khong_chac_chan"
-    assert llm.generate_calls == 0
+    assert response.block_reason is None
+    assert "bộ phân loại rủi ro chưa kết luận" in response.answer
+    assert response.citations == ["L900"]
+    assert llm.generate_calls == 1
 
 
 @pytest.mark.asyncio
@@ -478,7 +485,9 @@ async def test_penalty_principle_question_retrieves_and_always_recommends_expert
 @pytest.mark.asyncio
 async def test_penalty_principle_without_source_uses_expert_no_source_response() -> None:
     pipeline = ChatbotPipeline(
-        Settings(_env_file=None, chatbot_mock_mode=True), KeywordRetriever(), CapturingLLM()
+        Settings(_env_file=None, chatbot_mock_mode=True),
+        KeywordRetriever(entries=[]),
+        CapturingLLM(),
     )
 
     response = await pipeline.answer(make_request("Có bị phạt không nếu chưa kê khai?"))
@@ -538,7 +547,7 @@ async def test_missing_provenance_returns_fixed_no_source_without_answer_generat
             chatbot_mock_mode=True,
             chatbot_guardrail_cache_size=0,
         ),
-        KeywordRetriever(),
+        KeywordRetriever(entries=[]),
         llm,
     )
     request = ChatRequest.model_validate(

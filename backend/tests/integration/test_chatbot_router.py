@@ -19,7 +19,7 @@ _CUSTOMER_AMOUNT_PATTERN = re.compile(
 def mock_chatbot_dependency():
     app.dependency_overrides[get_chatbot_pipeline] = lambda: ChatbotPipeline(
         Settings(_env_file=None, chatbot_mock_mode=True),
-        KeywordRetriever(),
+        KeywordRetriever(entries=[]),
         MockLLM(),
     )
     yield
