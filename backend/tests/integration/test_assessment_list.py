@@ -62,6 +62,7 @@ def test_list_shows_own_cases_newest_first_with_checklist_counts(live_client):
         "needsVerification": 18,
     }
     assert not page["items"][0]["expired"]
+    assert page["items"][0]["status"] == "in_progress"
     next_page = client.get("/api/v1/assessments", params={"page": 2, "pageSize": 1})
     assert [entry["id"] for entry in next_page.json()["data"]["items"]] == [first["id"]]
 
@@ -82,6 +83,7 @@ def test_list_rejects_oversized_page_and_hides_other_owners(live_client):
         "page": 1,
         "pageSize": 20,
         "total": 0,
+        "statusCounts": {"all": 0, "inProgress": 0, "ready": 0},
     }
 
 
@@ -93,6 +95,7 @@ def test_expired_case_is_listed_and_owner_can_still_delete_it(live_client):
 
     listed = client.get("/api/v1/assessments").json()["data"]["items"]
     assert listed[0]["expired"]
+    assert listed[0]["status"] == "expired"
     assert client.get(f"/api/v1/assessments/{created['id']}").status_code == 404
     assert client.delete(f"/api/v1/assessments/{created['id']}", headers=ORIGIN).status_code == 204
     assert client.get("/api/v1/assessments").json()["data"]["total"] == 0
@@ -119,3 +122,32 @@ def test_purge_dry_run_counts_and_apply_removes_only_expired_cases(live_client):
     remaining = client.get("/api/v1/assessments").json()["data"]["items"]
     assert [entry["id"] for entry in remaining] != [old["id"]]
     assert len(remaining) == 1
+
+
+def test_status_filter_and_counts_follow_checklist_completion(live_client):
+    client, username, password = live_client
+    login(client, username, password)
+    ready = client.post("/api/v1/assessments", headers=ORIGIN, json=PAYLOAD).json()["data"]
+    client.post("/api/v1/assessments", headers=ORIGIN, json=PAYLOAD)
+    for item in ready["checklist"]:
+        client.patch(
+            f"/api/v1/assessments/{ready['id']}/checklist-items/{item['id']}",
+            headers=ORIGIN,
+            json={"status": "available"},
+        )
+
+    page = client.get("/api/v1/assessments", params={"status": "ready"}).json()["data"]
+    assert [entry["id"] for entry in page["items"]] == [ready["id"]]
+    assert page["items"][0]["status"] == "ready"
+    assert page["total"] == 1
+    assert page["statusCounts"] == {"all": 2, "inProgress": 1, "ready": 1}
+    in_progress = client.get("/api/v1/assessments", params={"status": "in_progress"})
+    assert [entry["status"] for entry in in_progress.json()["data"]["items"]] == ["in_progress"]
+    assert client.get("/api/v1/assessments", params={"status": "done"}).status_code == 422
+
+
+def test_current_session_returns_signed_in_user_only(live_client):
+    client, username, password = live_client
+    assert client.get("/api/v1/auth/sessions/current").status_code == 401
+    login(client, username, password)
+    assert client.get("/api/v1/auth/sessions/current").json()["data"]["username"] == username

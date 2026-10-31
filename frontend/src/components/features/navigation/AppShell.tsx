@@ -1,46 +1,50 @@
-import { ArrowUpRight, Files } from 'lucide-react';
+import { ArrowUpRight, Files, House } from 'lucide-react';
 import Link from 'next/link';
+
+import { UserMenu } from './UserMenu';
+
+type Section = 'home' | 'cases' | 'survey' | 'chat' | '';
 
 export function AppShell({
   children,
   active = '',
 }: {
   children: React.ReactNode;
-  active?: 'survey' | 'home' | 'cases' | '';
+  active?: Section;
 }) {
+  const current = (section: Section) => (active === section ? 'page' : undefined);
   return (
-    <>
+    <div className="app-canvas">
       <a className="skip-link" href="#main-content">
         Đến nội dung chính
       </a>
       <header className="site-header">
         <Link href="/" className="brand" aria-label="Tax Clear AI — Trang chủ">
           <span className="brand-icon">
-            <Files size={24} strokeWidth={1.7} />
+            <Files size={20} strokeWidth={1.8} />
           </span>
           <span>
             Tax Clear<span className="brand-ai"> AI</span>
           </span>
         </Link>
         <nav aria-label="Điều hướng chính">
-          <Link href="/" aria-current={active === 'home' ? 'page' : undefined}>
-            Giới thiệu
+          <Link href="/" aria-current={current('home')}>
+            <House size={15} /> Trang chủ
           </Link>
-          <Link href="/ho-so" aria-current={active === 'cases' ? 'page' : undefined}>
+          <Link href="/ho-so" aria-current={current('cases')}>
             Hồ sơ của tôi
           </Link>
-          <Link href="/khao-sat" aria-current={active === 'survey' ? 'page' : undefined}>
-            Chuẩn bị hồ sơ <ArrowUpRight size={15} />
+          <Link href="/khao-sat" aria-current={current('survey')}>
+            Chuẩn bị hồ sơ <ArrowUpRight size={14} />
           </Link>
         </nav>
-        <span className="trial-label">
-          <span /> Bản thử nghiệm
-        </span>
+        <UserMenu />
       </header>
       {children}
       <footer className="site-footer">
-        <span>Tax Clear AI · Chuẩn bị rõ ràng, từng bước một.</span>
+        <span>Tax Clear AI · Bản thử nghiệm · Chỉ dùng dữ liệu giả định.</span>
+        <Link href="/huong-dan">Hướng dẫn sử dụng</Link>
       </footer>
-    </>
+    </div>
   );
 }

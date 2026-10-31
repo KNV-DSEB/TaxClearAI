@@ -51,9 +51,17 @@ export interface Assessment {
   expiresAt: string;
 }
 
+export type CaseStatus = 'in_progress' | 'ready' | 'expired';
+export type CaseFilter = 'all' | 'in_progress' | 'ready';
+export interface StatusCounts {
+  all: number;
+  inProgress: number;
+  ready: number;
+}
 export interface AssessmentListItem {
   id: string;
   scope: Assessment['summary']['scope'];
+  status: CaseStatus;
   counts: { available: number; missing: number; needsVerification: number };
   createdAt: string;
   updatedAt: string;
@@ -65,6 +73,7 @@ export interface AssessmentPage {
   page: number;
   pageSize: number;
   total: number;
+  statusCounts: StatusCounts;
 }
 
 export interface Citation {

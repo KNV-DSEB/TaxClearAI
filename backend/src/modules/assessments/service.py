@@ -21,6 +21,8 @@ from src.modules.assessments.schemas import (
     AssessmentListItem,
     AssessmentPage,
     AssessmentView,
+    CaseFilter,
+    CaseStatus,
     ChecklistCounts,
     ChecklistItemView,
     CreateAssessment,
@@ -107,10 +109,25 @@ def with_note(item: ChecklistItemView) -> ChecklistItemView:
     return item.model_copy(update={"note": CHECKLIST_NOTE})
 
 
+def case_status(record: AssessmentSummaryRecord, now: datetime) -> CaseStatus:
+    """Đủ giấy tờ để làm việc với chuyên viên, không phải hoàn tất thủ tục pháp lý."""
+    if record.expires_at <= now:
+        return "expired"
+    if (
+        record.scope == "b2"
+        and record.available > 0
+        and record.missing == 0
+        and record.needs_verification == 0
+    ):
+        return "ready"
+    return "in_progress"
+
+
 def to_list_item(record: AssessmentSummaryRecord, now: datetime) -> AssessmentListItem:
     return AssessmentListItem(
         id=record.id,
         scope=record.scope,
+        status=case_status(record, now),
         counts=ChecklistCounts(
             available=record.available,
             missing=record.missing,
@@ -181,12 +198,15 @@ class AssessmentService:
             raise ApplicationError(404, "Không tìm thấy mục hồ sơ.")
         return with_note(item)
 
-    async def list_page(self, owner_id: UUID, page: int, page_size: int) -> AssessmentPage:
-        records, total = await self.repository.list_page(
-            owner_id, (page - 1) * page_size, page_size
-        )
+    async def list_page(
+        self, owner_id: UUID, page: int, page_size: int, case_filter: CaseFilter = "all"
+    ) -> AssessmentPage:
         now = datetime.now(UTC)
+        records, total, status_counts = await self.repository.list_page(
+            owner_id, (page - 1) * page_size, page_size, case_filter, now
+        )
         return AssessmentPage(
+            status_counts=status_counts,
             items=[to_list_item(record, now) for record in records],
             page=page,
             page_size=page_size,

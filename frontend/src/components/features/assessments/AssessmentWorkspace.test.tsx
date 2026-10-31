@@ -2,16 +2,14 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { assessmentsService } from '@/services/assessments.service';
-import { authService } from '@/services/auth.service';
 
 import { AssessmentWorkspace } from './AssessmentWorkspace';
 
 const navigation = vi.hoisted(() => ({ replace: vi.fn() }));
 vi.mock('next/navigation', () => ({ useRouter: () => navigation }));
-vi.mock('@/services/auth.service', () => ({ authService: { logout: vi.fn() } }));
 
 vi.mock('@/services/assessments.service', () => ({
-  assessmentsService: { updateItem: vi.fn(), remove: vi.fn() },
+  assessmentsService: { updateItem: vi.fn(), remove: vi.fn(), list: vi.fn() },
 }));
 
 const assessment = {
@@ -41,7 +39,16 @@ const assessment = {
   expiresAt: '2026-11-06T00:00:00Z',
 };
 
-beforeEach(() => vi.resetAllMocks());
+beforeEach(() => {
+  vi.resetAllMocks();
+  vi.mocked(assessmentsService.list).mockResolvedValue({
+    items: [],
+    page: 1,
+    pageSize: 20,
+    total: 3,
+    statusCounts: { all: 3, inProgress: 2, ready: 1 },
+  });
+});
 
 describe('Chuẩn bị hồ sơ khảo sát', () => {
   it('ẩn nhãn nội bộ cũ và vẫn hiển thị thông tin chưa biết', () => {
@@ -122,19 +129,33 @@ describe('Chuẩn bị hồ sơ khảo sát', () => {
     expect(navigation.replace).not.toHaveBeenCalled();
   });
 
-  it('đăng xuất qua service rồi mở màn đăng nhập', async () => {
-    vi.mocked(authService.logout).mockResolvedValue(undefined);
+  it('hiển thị tiến trình, số mục còn cần chuẩn bị và bộ đếm hồ sơ', async () => {
     render(<AssessmentWorkspace initial={assessment} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Đăng xuất' }));
-    await waitFor(() => expect(navigation.replace).toHaveBeenCalledWith('/dang-nhap'));
+    expect(
+      screen.getByRole('heading', { name: 'Hồ sơ: Giải thể doanh nghiệp' }),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Đang thực hiện', { selector: '.badge' })).toBeInTheDocument();
+    expect(screen.getByText(/1 mục cần chuẩn bị/)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Tải bản tổng hợp/ })).toHaveAttribute(
+      'href',
+      '/ho-so/case-1/ban-in',
+    );
+    const steps = screen.getByRole('list', { name: 'Tiến trình hồ sơ' });
+    expect(steps.querySelector('[aria-current="step"]')).toHaveTextContent('Chuẩn bị hồ sơ');
+    expect(await screen.findByText('3')).toBeInTheDocument();
   });
 
-  it('không giả vờ đã đăng xuất khi API lỗi', async () => {
-    vi.mocked(authService.logout).mockRejectedValue(new Error('Chưa đăng xuất được.'));
+  it('chuyển sang Đã đủ giấy tờ khi mọi mục là Đã có, không gọi là hoàn tất thủ tục', async () => {
+    vi.mocked(assessmentsService.updateItem).mockResolvedValue({
+      ...assessment.checklist[0],
+      status: 'available',
+    });
     render(<AssessmentWorkspace initial={assessment} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Đăng xuất' }));
-    expect(await screen.findByRole('alert')).toHaveTextContent('Chưa đăng xuất được.');
-    expect(navigation.replace).not.toHaveBeenCalled();
+    fireEvent.change(screen.getByLabelText('Trạng thái: Giấy đăng ký kinh doanh'), {
+      target: { value: 'available' },
+    });
+    expect(await screen.findByText('Đã đủ giấy tờ', { selector: '.badge' })).toBeInTheDocument();
+    expect(screen.queryByText(/hoàn tất thủ tục/i)).not.toBeInTheDocument();
   });
 
   it('không tạo checklist sai phạm vi', () => {

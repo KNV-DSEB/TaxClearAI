@@ -5,8 +5,8 @@ import { AppShell } from '@/components/features/navigation/AppShell';
 export default function GuidePage() {
   return (
     <AppShell>
-      <main id="main-content" className="content-main">
-        <article className="surface guide-article">
+      <main id="main-content" className="page">
+        <article className="card guide-article">
           <span className="section-kicker">Hướng dẫn sử dụng</span>
           <h1>Chuẩn bị hồ sơ, từng bước.</h1>
           <h2>Ghi nhận đúng điều bạn biết</h2>

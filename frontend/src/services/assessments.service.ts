@@ -2,6 +2,7 @@ import type {
   Answers,
   Assessment,
   AssessmentPage,
+  CaseFilter,
   ChecklistItem,
   ItemStatus,
   Questionnaire,
@@ -19,8 +20,11 @@ export const assessmentsService = {
       body: JSON.stringify({ questionnaireVersion, answers }),
     });
   },
-  async list(page: number, signal?: AbortSignal): Promise<AssessmentPage> {
-    return apiData<AssessmentPage>(`/api/v1/assessments?page=${page}&pageSize=20`, { signal });
+  async list(page: number, status: CaseFilter, signal?: AbortSignal): Promise<AssessmentPage> {
+    return apiData<AssessmentPage>(
+      `/api/v1/assessments?page=${page}&pageSize=20&status=${status}`,
+      { signal },
+    );
   },
   async get(id: string, signal?: AbortSignal): Promise<Assessment> {
     return apiData<Assessment>(`/api/v1/assessments/${encodeURIComponent(id)}`, { signal });

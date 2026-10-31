@@ -136,3 +136,11 @@ Chưa biết tên thành viên và phạm vi sản phẩm, nên dùng nhãn **Tr
 - **Kiểm tra local 2026-10-31:** backend ruff/format/mypy sạch, pytest 53 passed trên PostgreSQL thật (5543), coverage 92%; frontend lint 0 lỗi (2 cảnh báo cũ), type-check, 143 test, build pass. Một lượt Gemini thật với câu hỏi pháp lý chung trả `answered`, trích Luật Doanh nghiệp Điều 210 khoản 1, citation `unreviewed`. Chưa kiểm tra bằng trình duyệt thật.
 - **Còn mở:** D19 (nguồn luật chưa cố vấn rà soát, hiệu lực chưa xác minh, hết dùng sau 30/11/2026 nếu không đồng bộ lại); checklist vẫn giống nhau cho mọi hồ sơ B2 cho tới khi cố vấn duyệt quy tắc theo tình huống; purge chưa lên lịch; QA trình duyệt/thiết bị và UAT có chữ ký.
 - **PostgreSQL local** được khởi động lại bằng `pg_ctl` theo runbook để chạy test; đang chạy ở 127.0.0.1:5543.
+
+## 13. Thiết kế lại giao diện theo mẫu — 2026-10-31
+
+- Giao diện mới theo ảnh mẫu của khách: trang chủ (hero + 3 lối bắt đầu), màn chào khảo sát, trang `/hoi-dap` riêng (chủ đề gợi ý, hội thoại trong phiên, trích dẫn, nút sao chép), Hồ sơ của tôi có thanh bên lọc (Tất cả / Đang thực hiện / Đã đủ giấy tờ), chi tiết hồ sơ có thanh tiến trình 4 bước, trang `/ho-so/[id]/ban-in` (in hoặc lưu PDF bằng hộp thoại in của trình duyệt), menu tài khoản (chữ viết tắt, đăng xuất).
+- Quyết định của khách: "Đã đủ giấy tờ" tự động khi mọi mục checklist là "Đã có" (không phải hoàn tất thủ tục pháp lý); bỏ trang Lịch sử hoạt động, khối Liên hệ chuyên gia và nút thích/không thích. Không cần migration.
+- Câu chữ của mẫu đã đổi cho đúng thực tế: không ghi "đủ điều kiện giải thể", "hồ sơ đã sẵn sàng" hay "thông tin được bảo mật"; ghi đúng 11 câu hỏi.
+- Backend thêm `GET /api/v1/auth/sessions/current` và `status` + `statusCounts` cho `GET /api/v1/assessments` (lọc `status=all|in_progress|ready`).
+- Kiểm tra: backend pytest 55 passed, ruff/mypy sạch; frontend 153 test, lint 0 lỗi, type-check, build pass. Ảnh chụp kiểm tra ở `docs/screenshots/2026-10-31-redesign/` (chưa commit).

@@ -2,7 +2,8 @@ from fastapi import APIRouter, Cookie, Depends, Response
 
 from src.core.config import get_settings
 from src.core.schemas import Envelope
-from src.modules.auth.dependencies import get_auth_service
+from src.modules.auth.dependencies import get_auth_service, get_current_user
+from src.modules.auth.domain import UserRecord
 from src.modules.auth.schemas import LoginRequest, RefreshView, SessionView, UserView
 from src.modules.auth.service import AuthService, SessionTokens
 
@@ -57,6 +58,11 @@ async def refresh_session(
     tokens = await service.refresh(refresh_token)
     set_session_cookies(response, tokens)
     return Envelope(data=RefreshView(expires_at=tokens.expires_at))
+
+
+@router.get("/sessions/current", response_model=Envelope[UserView])
+async def read_session(user: UserRecord = Depends(get_current_user)) -> Envelope[UserView]:
+    return Envelope(data=UserView(id=user.id, username=user.username))
 
 
 @router.delete("/sessions/current", status_code=204)

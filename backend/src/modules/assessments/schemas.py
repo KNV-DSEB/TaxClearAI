@@ -98,9 +98,20 @@ class ChecklistCounts(ApiModel):
     needs_verification: int
 
 
+CaseStatus = Literal["in_progress", "ready", "expired"]
+CaseFilter = Literal["all", "in_progress", "ready"]
+
+
+class StatusCounts(ApiModel):
+    all: int
+    in_progress: int
+    ready: int
+
+
 class AssessmentListItem(ApiModel):
     id: UUID
     scope: Literal["b2", "out_of_scope", "needs_confirmation"]
+    status: CaseStatus
     counts: ChecklistCounts
     created_at: datetime
     updated_at: datetime
@@ -113,3 +124,4 @@ class AssessmentPage(ApiModel):
     page: int
     page_size: int
     total: int
+    status_counts: StatusCounts

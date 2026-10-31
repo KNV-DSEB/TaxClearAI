@@ -12,6 +12,9 @@ export const authService = {
       body: JSON.stringify({ username, password }),
     });
   },
+  async current(signal?: AbortSignal): Promise<Session['user']> {
+    return apiData<Session['user']>('/api/v1/auth/sessions/current', { signal });
+  },
   async logout(): Promise<void> {
     await apiFetch<void>('/api/v1/auth/sessions/current', { method: 'DELETE' });
   },

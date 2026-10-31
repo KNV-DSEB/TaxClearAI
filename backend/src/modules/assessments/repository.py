@@ -1,15 +1,17 @@
 from datetime import UTC, datetime
 from uuid import UUID
 
-from sqlalchemy import case, delete, func, select, update
+from sqlalchemy import and_, case, delete, func, not_, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.models.assessment import Assessment, ChecklistItem
 from src.modules.assessments.domain import AssessmentRecord, AssessmentSummaryRecord
 from src.modules.assessments.schemas import (
     Answers,
+    CaseFilter,
     ChecklistItemView,
     ItemStatus,
+    StatusCounts,
     Summary,
 )
 
@@ -122,11 +124,8 @@ class AssessmentRepository:
             return item_view(item)
 
     async def list_page(
-        self, owner_id: UUID, offset: int, limit: int
-    ) -> tuple[list[AssessmentSummaryRecord], int]:
-        total = await self.session.scalar(
-            select(func.count()).select_from(Assessment).where(Assessment.owner_id == owner_id)
-        )
+        self, owner_id: UUID, offset: int, limit: int, case_filter: CaseFilter, now: datetime
+    ) -> tuple[list[AssessmentSummaryRecord], int, StatusCounts]:
         counts = (
             select(
                 ChecklistItem.assessment_id,
@@ -139,16 +138,42 @@ class AssessmentRepository:
             .group_by(ChecklistItem.assessment_id)
             .subquery()
         )
-        rows = await self.session.execute(
-            select(
-                Assessment,
-                func.coalesce(counts.c.available, 0),
-                func.coalesce(counts.c.missing, 0),
-                func.coalesce(counts.c.needs_verification, 0),
-            )
+        available = func.coalesce(counts.c.available, 0)
+        missing = func.coalesce(counts.c.missing, 0)
+        needs_verification = func.coalesce(counts.c.needs_verification, 0)
+        active = Assessment.expires_at > now
+        # Cùng định nghĩa với service.case_status(): hồ sơ B2 đủ giấy tờ khi mọi mục là "Đã có"
+        ready = and_(
+            active,
+            Assessment.summary_snapshot["scope"].astext == "b2",
+            available > 0,
+            missing == 0,
+            needs_verification == 0,
+        )
+        base = (
+            select(Assessment, available, missing, needs_verification)
             .outerjoin(counts, counts.c.assessment_id == Assessment.id)
             .where(Assessment.owner_id == owner_id)
-            .order_by(Assessment.updated_at.desc(), Assessment.id)
+        )
+        tally = (
+            await self.session.execute(
+                select(
+                    func.count(),
+                    func.count().filter(and_(active, not_(ready))),
+                    func.count().filter(ready),
+                )
+                .select_from(Assessment)
+                .outerjoin(counts, counts.c.assessment_id == Assessment.id)
+                .where(Assessment.owner_id == owner_id)
+            )
+        ).one()
+        filtered = base
+        if case_filter == "ready":
+            filtered = base.where(ready)
+        elif case_filter == "in_progress":
+            filtered = base.where(active, not_(ready))
+        rows = await self.session.execute(
+            filtered.order_by(Assessment.updated_at.desc(), Assessment.id)
             .offset(offset)
             .limit(limit)
         )
@@ -156,17 +181,19 @@ class AssessmentRepository:
             AssessmentSummaryRecord(
                 id=row.id,
                 scope=Summary.model_validate(row.summary_snapshot).scope,
-                available=available,
-                missing=missing,
-                needs_verification=needs_verification,
+                available=row_available,
+                missing=row_missing,
+                needs_verification=row_needs_verification,
                 created_at=row.created_at,
                 updated_at=row.updated_at,
                 expires_at=row.expires_at,
             )
-            for row, available, missing, needs_verification in rows.all()
+            for row, row_available, row_missing, row_needs_verification in rows.all()
         ]
         await self.session.rollback()
-        return records, total or 0
+        status_counts = StatusCounts(all=tally[0], in_progress=tally[1], ready=tally[2])
+        total = {"all": tally[0], "in_progress": tally[1], "ready": tally[2]}[case_filter]
+        return records, total, status_counts
 
     async def remove(self, owner_id: UUID, assessment_id: UUID) -> bool:
         # Chủ hồ sơ vẫn xóa được hồ sơ đã hết hạn: hết hạn chỉ chặn đọc/sửa, không chặn xóa

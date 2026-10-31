@@ -32,7 +32,7 @@ export function AssessmentLoader({ id }: { id: string }) {
 
   if (assessment) return <AssessmentWorkspace initial={assessment} />;
   return (
-    <section className="surface loading-panel">
+    <section className="card loading-panel">
       {error ? (
         <>
           <p role="alert">{error}</p>

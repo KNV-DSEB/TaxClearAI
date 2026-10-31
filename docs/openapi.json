@@ -117,6 +117,53 @@
       }
     },
     "/api/v1/auth/sessions/current": {
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Read Session",
+        "operationId": "read_session_api_v1_auth_sessions_current_get",
+        "parameters": [
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_UserView_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
       "delete": {
         "tags": [
           "auth"
@@ -294,6 +341,21 @@
               "minimum": 1,
               "default": 20,
               "title": "Pagesize"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "all",
+                "in_progress",
+                "ready"
+              ],
+              "type": "string",
+              "default": "all",
+              "title": "Status"
             }
           },
           {
@@ -732,6 +794,15 @@
             ],
             "title": "Scope"
           },
+          "status": {
+            "type": "string",
+            "enum": [
+              "in_progress",
+              "ready",
+              "expired"
+            ],
+            "title": "Status"
+          },
           "counts": {
             "$ref": "#/components/schemas/ChecklistCounts"
           },
@@ -760,6 +831,7 @@
         "required": [
           "id",
           "scope",
+          "status",
           "counts",
           "createdAt",
           "updatedAt",
@@ -788,6 +860,9 @@
           "total": {
             "type": "integer",
             "title": "Total"
+          },
+          "statusCounts": {
+            "$ref": "#/components/schemas/StatusCounts"
           }
         },
         "additionalProperties": false,
@@ -796,7 +871,8 @@
           "items",
           "page",
           "pageSize",
-          "total"
+          "total",
+          "statusCounts"
         ],
         "title": "AssessmentPage"
       },
@@ -1178,6 +1254,19 @@
         ],
         "title": "Envelope[SessionView]"
       },
+      "Envelope_UserView_": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/UserView"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "Envelope[UserView]"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -1361,6 +1450,30 @@
           "expiresAt"
         ],
         "title": "SessionView"
+      },
+      "StatusCounts": {
+        "properties": {
+          "all": {
+            "type": "integer",
+            "title": "All"
+          },
+          "inProgress": {
+            "type": "integer",
+            "title": "Inprogress"
+          },
+          "ready": {
+            "type": "integer",
+            "title": "Ready"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "all",
+          "inProgress",
+          "ready"
+        ],
+        "title": "StatusCounts"
       },
       "Summary": {
         "properties": {

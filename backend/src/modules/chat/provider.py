@@ -18,7 +18,8 @@ SYSTEM_INSTRUCTION = (
     "cụ thể và nhắc người dùng xác minh với chuyên viên. Không tự tạo nguồn hoặc luật, không "
     "tính/ước tính thuế, phạt, không tư vấn chiến lược hồ sơ. Không suy từ checklist sang "
     "nghĩa vụ pháp lý. Nếu NGUỒN không trả lời được câu hỏi, nói rõ chưa đủ căn cứ. Không đưa "
-    "URL trong reply. Trả JSON với reply và sourceIds (chỉ ID của NGUỒN thực sự dùng)."
+    "URL trong reply. Khi liệt kê, mỗi ý một dòng bắt đầu bằng 1., 2., 3. "
+    "Trả JSON với reply và sourceIds (chỉ ID của NGUỒN thực sự dùng)."
 )
 
 

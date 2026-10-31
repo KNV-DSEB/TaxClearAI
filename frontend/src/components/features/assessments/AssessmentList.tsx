@@ -7,22 +7,22 @@ import { useEffect, useState } from 'react';
 
 import { ApiError } from '@/services/api.client';
 import { assessmentsService } from '@/services/assessments.service';
-import type { AssessmentListItem, AssessmentPage } from '@/types/api.types';
+import type { AssessmentListItem, AssessmentPage, CaseFilter } from '@/types/api.types';
 
-const SCOPE_LABELS: Record<AssessmentListItem['scope'], string> = {
-  b2: 'Doanh nghiệp muốn giải thể',
-  needs_confirmation: 'Cần xác nhận phạm vi',
-  out_of_scope: 'Ngoài phạm vi bản thử',
+import { SCOPE_TITLES, STATUS_LABELS, formatDate } from './case-status';
+import { CaseSidebar, filterHref } from './CaseSidebar';
+
+const EMPTY_TEXT: Record<CaseFilter, string> = {
+  all: 'Chưa có hồ sơ nào được lưu.',
+  in_progress: 'Không có hồ sơ nào đang thực hiện.',
+  ready: 'Chưa có hồ sơ nào đủ giấy tờ.',
 };
-
-function formatDate(value: string): string {
-  return new Intl.DateTimeFormat('vi-VN', { dateStyle: 'medium' }).format(new Date(value));
-}
 
 function CaseCard({ item, onRemove }: { item: AssessmentListItem; onRemove: () => Promise<void> }) {
   const [confirming, setConfirming] = useState(false);
   const [busy, setBusy] = useState(false);
   const { available, missing, needsVerification } = item.counts;
+  const total = available + missing + needsVerification;
 
   async function remove(): Promise<void> {
     setBusy(true);
@@ -34,20 +34,31 @@ function CaseCard({ item, onRemove }: { item: AssessmentListItem; onRemove: () =
   }
 
   return (
-    <li className="surface case-card">
+    <li className="card case-card">
       <div className="case-card-main">
-        <span className="section-kicker">{SCOPE_LABELS[item.scope]}</span>
-        <h2>Hồ sơ tạo ngày {formatDate(item.createdAt)}</h2>
-        {item.scope === 'b2' && (
-          <p className="case-counts">
-            {available} đã có · {missing} còn thiếu · {needsVerification} cần xác minh
-          </p>
-        )}
+        <div className="case-card-title">
+          <h2>Hồ sơ: {SCOPE_TITLES[item.scope]}</h2>
+          <span className={`badge badge-${item.status}`}>{STATUS_LABELS[item.status]}</span>
+        </div>
         <p className="small muted">
+          Tạo {formatDate(item.createdAt)} ·{' '}
           {item.expired
-            ? 'Đã hết hạn truy cập. Bạn vẫn có thể xóa hồ sơ này.'
-            : `Cập nhật ${formatDate(item.updatedAt)} · lưu đến ${formatDate(item.expiresAt)}`}
+            ? 'đã hết hạn truy cập, bạn vẫn có thể xóa'
+            : `cập nhật ${formatDate(item.updatedAt, true)} · lưu đến ${formatDate(item.expiresAt)}`}
         </p>
+        {item.scope === 'b2' && total > 0 && (
+          <div className="case-progress">
+            <progress
+              className="progress"
+              value={available}
+              max={total}
+              aria-label="Giấy tờ đã có"
+            />
+            <span className="case-counts">
+              {available} đã có · {missing} còn thiếu · {needsVerification} cần xác minh
+            </span>
+          </div>
+        )}
       </div>
       <div className="case-card-actions">
         {!item.expired && (
@@ -84,7 +95,7 @@ function CaseCard({ item, onRemove }: { item: AssessmentListItem; onRemove: () =
   );
 }
 
-export function AssessmentList() {
+export function AssessmentList({ filter = 'all' }: { filter?: CaseFilter }) {
   const router = useRouter();
   const [page, setPage] = useState(1);
   const [data, setData] = useState<AssessmentPage | null>(null);
@@ -95,7 +106,7 @@ export function AssessmentList() {
     const controller = new AbortController();
     async function load(): Promise<void> {
       try {
-        setData(await assessmentsService.list(page, controller.signal));
+        setData(await assessmentsService.list(page, filter, controller.signal));
         setError('');
       } catch (error) {
         if (controller.signal.aborted) return;
@@ -106,7 +117,7 @@ export function AssessmentList() {
     }
     void load();
     return () => controller.abort();
-  }, [page, reload, router]);
+  }, [page, filter, reload, router]);
 
   async function remove(id: string): Promise<void> {
     try {
@@ -122,64 +133,74 @@ export function AssessmentList() {
   const lastPage = data ? Math.max(1, Math.ceil(data.total / data.pageSize)) : 1;
 
   return (
-    <>
-      <div className="workspace-heading">
-        <div>
-          <span className="section-kicker">Hồ sơ của tôi</span>
-          <h1>Tiếp tục từ chỗ bạn đã dừng.</h1>
-          <p className="muted">Các hồ sơ thử bạn đã lưu, mới cập nhật nằm trên cùng.</p>
-        </div>
-        <Link className="button button-primary" href="/khao-sat">
-          <Plus size={16} /> Chuẩn bị hồ sơ mới
-        </Link>
-      </div>
-      {error && (
-        <p role="alert" className="error-message">
-          {error}
-        </p>
-      )}
-      {!data && !error && (
-        <p role="status" className="muted case-loading">
-          Đang tải danh sách hồ sơ…
-        </p>
-      )}
-      {data && data.total === 0 && (
-        <section className="surface empty-state case-empty">
-          <h2>Chưa có hồ sơ nào được lưu.</h2>
-          <p>Trả lời 11 câu hỏi để có bản tổng hợp và checklist chuẩn bị khảo sát.</p>
+    <div className="case-layout">
+      <CaseSidebar active={filter} counts={data?.statusCounts ?? null} />
+      <section className="case-main">
+        <div className="page-heading">
+          <div>
+            <h1>Hồ sơ của tôi</h1>
+            <p className="muted">Tiếp tục từ chỗ bạn đã dừng. Hồ sơ mới cập nhật nằm trên cùng.</p>
+          </div>
           <Link className="button button-primary" href="/khao-sat">
-            Bắt đầu chuẩn bị hồ sơ <ArrowRight size={16} />
+            <Plus size={16} /> Chuẩn bị hồ sơ mới
           </Link>
-        </section>
-      )}
-      {data && data.items.length > 0 && (
-        <ul className="case-list" aria-label="Danh sách hồ sơ">
-          {data.items.map((item) => (
-            <CaseCard key={item.id} item={item} onRemove={() => remove(item.id)} />
-          ))}
-        </ul>
-      )}
-      {lastPage > 1 && (
-        <nav className="case-pagination" aria-label="Phân trang hồ sơ">
-          <button
-            className="button button-quiet"
-            disabled={page <= 1}
-            onClick={() => setPage(page - 1)}
-          >
-            Trang trước
-          </button>
-          <span className="small muted">
-            Trang {page}/{lastPage}
-          </span>
-          <button
-            className="button button-quiet"
-            disabled={page >= lastPage}
-            onClick={() => setPage(page + 1)}
-          >
-            Trang sau
-          </button>
-        </nav>
-      )}
-    </>
+        </div>
+        {error && (
+          <p role="alert" className="error-message">
+            {error}
+          </p>
+        )}
+        {!data && !error && (
+          <p role="status" className="muted">
+            Đang tải danh sách hồ sơ…
+          </p>
+        )}
+        {data && data.total === 0 && (
+          <div className="card empty-card">
+            <h2>{EMPTY_TEXT[filter]}</h2>
+            {filter === 'all' ? (
+              <>
+                <p>Trả lời 11 câu hỏi để có bản tổng hợp và checklist chuẩn bị khảo sát.</p>
+                <Link className="button button-primary" href="/khao-sat">
+                  Bắt đầu chuẩn bị hồ sơ <ArrowRight size={16} />
+                </Link>
+              </>
+            ) : (
+              <Link className="button button-secondary" href={filterHref('all')}>
+                Xem tất cả hồ sơ
+              </Link>
+            )}
+          </div>
+        )}
+        {data && data.items.length > 0 && (
+          <ul className="case-list" aria-label="Danh sách hồ sơ">
+            {data.items.map((item) => (
+              <CaseCard key={item.id} item={item} onRemove={() => remove(item.id)} />
+            ))}
+          </ul>
+        )}
+        {lastPage > 1 && (
+          <nav className="case-pagination" aria-label="Phân trang hồ sơ">
+            <button
+              className="button button-quiet"
+              disabled={page <= 1}
+              onClick={() => setPage(page - 1)}
+            >
+              Trang trước
+            </button>
+            <span className="small muted">
+              Trang {page}/{lastPage}
+            </span>
+            <button
+              className="button button-quiet"
+              disabled={page >= lastPage}
+              onClick={() => setPage(page + 1)}
+            >
+              Trang sau
+            </button>
+          </nav>
+        )}
+      </section>
+    </div>
   );
 }

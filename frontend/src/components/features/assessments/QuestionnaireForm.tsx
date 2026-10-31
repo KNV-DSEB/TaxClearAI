@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ClipboardCheck, Lightbulb, ShieldCheck } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -22,11 +22,34 @@ const initialAnswers: Answers = {
   receivablesPayablesStatus: 'unknown',
 };
 
+function SurveyProgress({
+  current,
+  total,
+  percent,
+}: {
+  current: number;
+  total: number;
+  percent: number;
+}) {
+  return (
+    <div className="survey-progress">
+      <div>
+        <span>
+          Câu {current} / {total}
+        </span>
+        <span>{percent}%</span>
+      </div>
+      <progress className="progress" value={percent} max={100} aria-label="Tiến độ câu hỏi" />
+    </div>
+  );
+}
+
 export function QuestionnaireForm() {
   const router = useRouter();
   const [questionnaire, setQuestionnaire] = useState<Questionnaire | null>(null);
   const [answers, setAnswers] = useState<Answers>(initialAnswers);
   const [step, setStep] = useState(0);
+  const [started, setStarted] = useState(false);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const [dirty, setDirty] = useState(false);
@@ -97,7 +120,7 @@ export function QuestionnaireForm() {
 
   if (!questionnaire)
     return (
-      <section className="surface loading-panel">
+      <section className="card loading-panel">
         {error ? (
           <>
             <p role="alert">{error}</p>
@@ -111,41 +134,52 @@ export function QuestionnaireForm() {
       </section>
     );
 
+  const total = questionnaire.questions.length;
+  if (!started)
+    return (
+      <section className="card survey-card survey-welcome" aria-labelledby="welcome-title">
+        <SurveyProgress current={1} total={total} percent={0} />
+        <span className="welcome-icon">
+          <ClipboardCheck size={34} />
+        </span>
+        <h1 id="welcome-title">
+          Chào mừng bạn đến với
+          <br />
+          khảo sát tình trạng doanh nghiệp
+        </h1>
+        <p className="survey-lead">
+          Bạn sẽ trả lời {total} câu hỏi ngắn. Câu nào chưa rõ, cứ chọn “Chưa biết” — đó là việc
+          chuyên viên sẽ giúp xác minh.
+        </p>
+        <div className="tip-box">
+          <Lightbulb size={20} />
+          <div>
+            <strong>Lưu ý quan trọng</strong>
+            <p>
+              Kết quả giúp bạn chuẩn bị làm việc với chuyên viên, không thay cho kết luận pháp lý.
+              Câu trả lời chỉ được lưu khi bạn chọn “Lưu và xem hồ sơ” ở câu cuối.
+            </p>
+          </div>
+        </div>
+        <button className="button button-primary button-large" onClick={() => setStarted(true)}>
+          Bắt đầu khảo sát <ArrowRight size={18} />
+        </button>
+        <p className="survey-foot">
+          <ShieldCheck size={15} /> Không nhập tên, mã số thuế, số tài khoản hay tải giấy tờ cá nhân
+        </p>
+      </section>
+    );
+
   const question = questionnaire.questions[step];
-  const last = step === questionnaire.questions.length - 1;
+  const last = step === total - 1;
   const value = answers[question.id];
   return (
-    <div className="survey-layout">
-      <aside className="survey-intro">
-        <span className="section-kicker">Chuẩn bị khảo sát</span>
-        <h1>
-          Bắt đầu từ điều
-          <br />
-          bạn biết.
-        </h1>
-        <p>
-          Không cần tìm đủ giấy tờ ngay. Câu trả lời “Chưa biết” giúp ghi nhận việc cần chuyên viên
-          xác minh.
-        </p>
-        <ol className="survey-outline">
-          <li className="current">Ghi nhận tình trạng</li>
-          <li>Xem danh mục hồ sơ</li>
-          <li>Lưu và bổ sung sau</li>
-        </ol>
-        <p className="small muted">Thông tin được lưu khi bạn chọn “Lưu và xem hồ sơ”.</p>
-      </aside>
-      <section className="surface question-panel" aria-labelledby="question-title">
-        <div className="question-progress">
-          <span>
-            Câu {step + 1} / {questionnaire.questions.length}
-          </span>
-          <span>Khảo sát doanh nghiệp</span>
-        </div>
-        <progress
-          className="progress"
-          value={step + 1}
-          max={questionnaire.questions.length}
-          aria-label="Tiến độ câu hỏi"
+    <div className="survey-stage">
+      <section className="card survey-card" aria-labelledby="question-title">
+        <SurveyProgress
+          current={step + 1}
+          total={total}
+          percent={Math.round((step / total) * 100)}
         />
         <form
           onSubmit={(event) => {
@@ -214,8 +248,8 @@ export function QuestionnaireForm() {
             </button>
           </div>
         </form>
-        <p className="question-privacy">
-          Không nhập tên, mã số thuế, số tài khoản hoặc tải giấy tờ cá nhân.
+        <p className="survey-foot">
+          <ShieldCheck size={15} /> Không nhập tên, mã số thuế, số tài khoản hay tải giấy tờ cá nhân
         </p>
       </section>
     </div>

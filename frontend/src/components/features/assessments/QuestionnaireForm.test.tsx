@@ -48,6 +48,7 @@ beforeEach(() => {
 });
 
 async function fillSurvey(): Promise<void> {
+  fireEvent.click(await screen.findByRole('button', { name: /Bắt đầu khảo sát/ }));
   await screen.findByRole('heading', { level: 2, name: 'Loại hình?' });
   fireEvent.click(screen.getByLabelText('Hộ kinh doanh'));
   fireEvent.click(screen.getByRole('button', { name: 'Câu tiếp theo' }));
@@ -56,6 +57,15 @@ async function fillSurvey(): Promise<void> {
 }
 
 describe('Khảo sát trước buổi làm việc', () => {
+  it('mở màn chào với số câu thật trước khi vào câu hỏi', async () => {
+    render(<QuestionnaireForm />);
+    expect(
+      await screen.findByRole('heading', { name: /khảo sát tình trạng doanh nghiệp/ }),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/Bạn sẽ trả lời 3 câu hỏi ngắn/)).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Loại hình?' })).not.toBeInTheDocument();
+  });
+
   it('giữ người dùng ở câu cần sửa khi năm doanh thu trước năm thành lập', async () => {
     vi.mocked(assessmentsService.questionnaire).mockResolvedValue({
       ...questionnaire,

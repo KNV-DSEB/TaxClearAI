@@ -7,6 +7,7 @@ from src.modules.assessments.dependencies import get_assessment_service
 from src.modules.assessments.schemas import (
     AssessmentPage,
     AssessmentView,
+    CaseFilter,
     ChecklistItemView,
     CreateAssessment,
     Questionnaire,
@@ -40,10 +41,11 @@ async def create_assessment(
 async def list_assessments(
     page: int = Query(default=1, ge=1, le=1000),
     page_size: int = Query(default=20, ge=1, le=100, alias="pageSize"),
+    status: CaseFilter = Query(default="all"),
     user: UserRecord = Depends(get_current_user),
     service: AssessmentService = Depends(get_assessment_service),
 ) -> Envelope[AssessmentPage]:
-    return Envelope(data=await service.list_page(user.id, page, page_size))
+    return Envelope(data=await service.list_page(user.id, page, page_size, status))
 
 
 @router.get("/assessments/{assessment_id}", response_model=Envelope[AssessmentView])

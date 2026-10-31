@@ -1,74 +1,75 @@
-import { ArrowRight, Check, FileCheck2, ListChecks, RotateCcw } from 'lucide-react';
+import { ArrowRight, FileText, ListChecks, MessagesSquare, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
 
-import { DocumentIllustration } from '@/components/features/assessments/DocumentIllustration';
+import { HeroIllustration } from '@/components/features/home/HeroIllustration';
 import { AppShell } from '@/components/features/navigation/AppShell';
+
+const START_POINTS = [
+  {
+    href: '/khao-sat',
+    icon: FileText,
+    title: 'Trả lời khảo sát',
+    text: '11 câu hỏi ngắn để ghi nhận tình trạng doanh nghiệp.',
+  },
+  {
+    href: '/ho-so',
+    icon: ListChecks,
+    title: 'Xem checklist',
+    text: 'Theo dõi giấy tờ đã có, còn thiếu và cần chuyên viên xác minh.',
+  },
+  {
+    href: '/hoi-dap',
+    icon: MessagesSquare,
+    title: 'Hỏi đáp cùng AI',
+    text: 'Giải thích tổng quát, kèm trích dẫn văn bản pháp luật.',
+  },
+];
 
 export default function HomePage() {
   return (
     <AppShell active="home">
-      <main id="main-content" className="home-main">
+      <main id="main-content" className="page home-page">
         <section className="hero">
           <div className="hero-copy">
-            <span className="section-kicker">Dành cho doanh nghiệp muốn giải thể</span>
+            <span className="pill">Trợ lý thủ tục giải thể &amp; thuế</span>
             <h1>
               Gỡ rối hồ sơ.
               <br />
               <span>Biết bước chuẩn bị tiếp theo.</span>
             </h1>
             <p className="hero-description">
-              Giấy tờ rải rác, tình trạng kê khai chưa rõ? Bắt đầu bằng một bộ câu hỏi để tổng hợp
-              thông tin và chuẩn bị cho buổi khảo sát với chuyên viên.
+              Tax Clear AI giúp doanh nghiệp từng hoạt động muốn giải thể ghi nhận tình trạng, sắp
+              xếp giấy tờ và chuẩn bị cho buổi làm việc với chuyên viên.
             </p>
-            <Link className="button button-primary" href="/khao-sat">
+            <Link className="button button-primary button-large" href="/khao-sat">
               Bắt đầu chuẩn bị hồ sơ <ArrowRight size={18} />
             </Link>
             <p className="hero-note">
-              <Check size={16} /> Chưa cần tải giấy tờ hay nhập số tiền thuế
+              <ShieldCheck size={16} /> Không cần tải giấy tờ hay nhập số thuế
             </p>
           </div>
           <div className="hero-visual">
-            <DocumentIllustration />
-            <span className="illustration-caption">Hình minh họa sắp xếp hồ sơ</span>
+            <HeroIllustration />
           </div>
         </section>
-        <section className="journey" aria-labelledby="journey-heading">
-          <div className="section-intro">
-            <h2 id="journey-heading">Một hồ sơ rõ ràng hơn, từ đâu?</h2>
-            <p>Đi từ thông tin bạn biết đến những điều cần xác minh.</p>
-          </div>
-          <ol className="journey-steps">
-            <li>
-              <span className="step-symbol">
-                <ListChecks size={22} />
-              </span>
-              <div>
-                <span className="step-caption">Bước 1 · Ghi nhận</span>
-                <h3>Trả lời về tình trạng hiện tại</h3>
-                <p>11 câu hỏi. Chưa biết câu nào, cứ ghi nhận đúng như vậy.</p>
-              </div>
-            </li>
-            <li>
-              <span className="step-symbol">
-                <FileCheck2 size={22} />
-              </span>
-              <div>
-                <span className="step-caption">Bước 2 · Sắp xếp</span>
-                <h3>Xem danh mục cần khảo sát</h3>
-                <p>Phân biệt giấy tờ đã có, còn thiếu và cần chuyên viên xác minh.</p>
-              </div>
-            </li>
-            <li>
-              <span className="step-symbol">
-                <RotateCcw size={22} />
-              </span>
-              <div>
-                <span className="step-caption">Bước 3 · Tiếp tục</span>
-                <h3>Lưu lại để bổ sung sau</h3>
-                <p>Mở lại hồ sơ và cập nhật khi bạn tìm thêm được giấy tờ.</p>
-              </div>
-            </li>
-          </ol>
+        <section className="start-section" aria-labelledby="start-heading">
+          <h2 id="start-heading">Bạn có thể bắt đầu với:</h2>
+          <ul className="start-cards">
+            {START_POINTS.map(({ href, icon: Icon, title, text }) => (
+              <li key={href}>
+                <Link className="card start-card" href={href}>
+                  <span className="icon-tile">
+                    <Icon size={22} />
+                  </span>
+                  <span className="start-card-copy">
+                    <strong>{title}</strong>
+                    <span>{text}</span>
+                  </span>
+                  <ArrowRight className="start-card-arrow" size={18} />
+                </Link>
+              </li>
+            ))}
+          </ul>
         </section>
       </main>
     </AppShell>

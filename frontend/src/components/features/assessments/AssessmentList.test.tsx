@@ -24,12 +24,19 @@ function item(changes: Partial<AssessmentListItem> = {}): AssessmentListItem {
     updatedAt: '2026-10-31T08:00:00Z',
     expiresAt: '2026-11-06T08:00:00Z',
     expired: false,
+    status: 'in_progress',
     ...changes,
   };
 }
 
 function page(items: AssessmentListItem[], total = items.length, pageNumber = 1) {
-  return { items, page: pageNumber, pageSize: 20, total };
+  return {
+    items,
+    page: pageNumber,
+    pageSize: 20,
+    total,
+    statusCounts: { all: total, inProgress: total, ready: 0 },
+  };
 }
 
 describe('Hồ sơ của tôi', () => {
@@ -45,11 +52,11 @@ describe('Hồ sơ của tôi', () => {
 
   it('hồ sơ hết hạn không mở được nhưng vẫn xóa được', async () => {
     vi.mocked(assessmentsService.list)
-      .mockResolvedValueOnce(page([item({ expired: true })]))
+      .mockResolvedValueOnce(page([item({ expired: true, status: 'expired' })]))
       .mockResolvedValueOnce(page([]));
     vi.mocked(assessmentsService.remove).mockResolvedValue();
     render(<AssessmentList />);
-    expect(await screen.findByText(/Đã hết hạn truy cập/)).toBeInTheDocument();
+    expect(await screen.findByText(/hết hạn truy cập/)).toBeInTheDocument();
     expect(screen.queryByRole('link', { name: /Mở hồ sơ/ })).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Xóa' }));
     fireEvent.click(screen.getByRole('button', { name: 'Xác nhận xóa hồ sơ' }));
@@ -87,6 +94,23 @@ describe('Hồ sơ của tôi', () => {
     expect(await screen.findByText('Trang 1/2')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Trang sau' }));
     expect(await screen.findByText('Trang 2/2')).toBeInTheDocument();
-    expect(assessmentsService.list).toHaveBeenLastCalledWith(2, expect.any(AbortSignal));
+    expect(assessmentsService.list).toHaveBeenLastCalledWith(2, 'all', expect.any(AbortSignal));
+  });
+
+  it('lọc theo trạng thái và hiển thị bộ đếm ở thanh bên', async () => {
+    vi.mocked(assessmentsService.list).mockResolvedValue({
+      ...page([
+        item({ status: 'ready', counts: { available: 19, missing: 0, needsVerification: 0 } }),
+      ]),
+      statusCounts: { all: 4, inProgress: 3, ready: 1 },
+    });
+    render(<AssessmentList filter="ready" />);
+    expect(await screen.findByText('Đã đủ giấy tờ', { selector: '.badge' })).toBeInTheDocument();
+    expect(assessmentsService.list).toHaveBeenCalledWith(1, 'ready', expect.any(AbortSignal));
+    expect(screen.getByRole('link', { name: /Đã đủ giấy tờ/ })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+    expect(screen.getByRole('link', { name: /Tất cả hồ sơ/ })).toHaveTextContent('4');
   });
 });

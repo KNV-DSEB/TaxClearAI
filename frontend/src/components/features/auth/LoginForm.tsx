@@ -43,7 +43,7 @@ export function LoginForm() {
         </Link>
       </section>
       <form
-        className="surface login-form"
+        className="card login-form"
         onSubmit={(event) => {
           void submit(event);
         }}

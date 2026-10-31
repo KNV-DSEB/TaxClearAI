@@ -1,24 +1,70 @@
 'use client';
 
-import { Check, ClipboardList, LogOut, Plus, Trash2 } from 'lucide-react';
+import {
+  ArrowRight,
+  Check,
+  CircleAlert,
+  CircleCheck,
+  ClipboardList,
+  Download,
+  PencilLine,
+  Plus,
+  Trash2,
+} from 'lucide-react';
 import Link from 'next/link';
-import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 import { assessmentsService } from '@/services/assessments.service';
-import { authService } from '@/services/auth.service';
 import type { Assessment, ItemStatus } from '@/types/api.types';
+
+import { CaseSidebar } from './CaseSidebar';
+import { SCOPE_TITLES, STATUS_LABELS, caseStatus, formatDate } from './case-status';
 
 type WorkspaceAssessment = Omit<Assessment, 'answers'>;
 
-const ChatPanel = dynamic(() => import('../chat/ChatPanel').then((module) => module.ChatPanel), {
-  loading: () => (
-    <p role="status" className="surface summary-panel">
-      Đang mở trợ lý…
-    </p>
-  ),
-});
+// Hồ sơ lưu từ phiên bản cũ còn nhãn cũ cho mục này
+function itemLabel(item: Assessment['checklist'][number]): string {
+  return item.code === 'purchase_schedules' ? 'Bảng kê mua hàng theo kỳ áp dụng' : item.label;
+}
+
+const STEPS = ['Trả lời khảo sát', 'Xem kết quả', 'Chuẩn bị hồ sơ', 'Đủ giấy tờ'];
+
+function Stepper({ reached }: { reached: number }) {
+  return (
+    <ol className="stepper" aria-label="Tiến trình hồ sơ">
+      {STEPS.map((label, index) => {
+        const state = index < reached ? 'done' : index === reached ? 'current' : 'todo';
+        return (
+          <li key={label} className={state} aria-current={state === 'current' ? 'step' : undefined}>
+            <span className="step-dot">{state === 'done' ? <Check size={16} /> : index + 1}</span>
+            <span className="step-label">{label}</span>
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
+
+function summaryHeadline(assessment: WorkspaceAssessment): { title: string; detail: string } {
+  const reasons = assessment.summary.reviewReasons.length;
+  if (assessment.summary.scope === 'b2')
+    return {
+      title: 'Doanh nghiệp từng hoạt động, muốn giải thể',
+      detail: reasons
+        ? `${reasons} điểm cần chuyên viên xác minh trước khi làm thủ tục.`
+        : 'Chuyên viên vẫn cần xác minh trước khi làm thủ tục.',
+    };
+  if (assessment.summary.scope === 'needs_confirmation')
+    return {
+      title: 'Chưa đủ thông tin để xác định phạm vi',
+      detail: 'Hãy trao đổi với chuyên viên hoặc làm lại khảo sát.',
+    };
+  return {
+    title: 'Tình huống nằm ngoài phạm vi bản thử',
+    detail: 'Bản thử chỉ hỗ trợ doanh nghiệp từng hoạt động muốn giải thể.',
+  };
+}
 
 export function AssessmentWorkspace({ initial }: { initial: WorkspaceAssessment }) {
   const router = useRouter();
@@ -28,16 +74,23 @@ export function AssessmentWorkspace({ initial }: { initial: WorkspaceAssessment 
   const [error, setError] = useState('');
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [busy, setBusy] = useState(false);
-  const available = assessment.checklist.filter((item) => item.status === 'available').length;
 
-  async function update(itemId: string, status: ItemStatus): Promise<void> {
+  const status = caseStatus(assessment);
+  const inScope = assessment.summary.scope === 'b2';
+  const remaining = assessment.checklist.filter((item) => item.status !== 'available').length;
+  const available = assessment.checklist.length - remaining;
+  const headline = summaryHeadline(assessment);
+  const reached = !inScope ? 1 : status === 'ready' ? 4 : 2;
+
+  async function update(itemId: string, value: ItemStatus): Promise<void> {
     setSaving(itemId);
     setNotice('');
     setError('');
     try {
-      const updated = await assessmentsService.updateItem(assessment.id, itemId, status);
+      const updated = await assessmentsService.updateItem(assessment.id, itemId, value);
       setAssessment((current) => ({
         ...current,
+        updatedAt: new Date().toISOString(),
         checklist: current.checklist.map((item) => (item.id === itemId ? updated : item)),
       }));
       setNotice('Đã lưu trạng thái hồ sơ.');
@@ -61,97 +114,114 @@ export function AssessmentWorkspace({ initial }: { initial: WorkspaceAssessment 
     }
   }
 
-  async function logout(): Promise<void> {
-    try {
-      await authService.logout();
-      router.replace('/dang-nhap');
-    } catch (error) {
-      setError(error instanceof Error ? error.message : 'Chưa đăng xuất được. Vui lòng thử lại.');
-    }
-  }
-
   return (
-    <>
-      <div className="workspace-heading">
-        <div>
-          <span className="section-kicker">Hồ sơ chuẩn bị khảo sát</span>
-          <h1>Đã rõ hơn. Cùng bổ sung từng mục.</h1>
-          <p className="muted">
-            Mở lại hồ sơ này bất cứ lúc nào từ trang{' '}
-            <Link className="inline-link" href="/ho-so">
-              Hồ sơ của tôi
-            </Link>
-            .
-          </p>
-        </div>
-        <button
-          className="button button-quiet"
-          onClick={() => {
-            void logout();
-          }}
-        >
-          <LogOut size={16} /> Đăng xuất
-        </button>
-      </div>
-      <div className="workspace-grid">
-        <section className="surface checklist-panel">
-          <div className="panel-heading">
-            <div>
-              <ClipboardList size={23} />
-              <h2>Danh mục chuẩn bị</h2>
+    <div className="case-layout">
+      <CaseSidebar />
+      <section className="case-main">
+        <div className="page-heading">
+          <div>
+            <div className="case-card-title">
+              <h1>Hồ sơ: {SCOPE_TITLES[assessment.summary.scope]}</h1>
+              <span className={`badge badge-${status}`}>{STATUS_LABELS[status]}</span>
             </div>
-            <span>
-              {available} / {assessment.checklist.length} đã có
-            </span>
+            <p className="small muted">Cập nhật: {formatDate(assessment.updatedAt, true)}</p>
+          </div>
+        </div>
+
+        <div className="card stepper-card">
+          <Stepper reached={reached} />
+        </div>
+
+        <div className="overview-grid">
+          <div className="card overview-card">
+            <h2>Tổng hợp tình trạng</h2>
+            <div className="overview-body">
+              {inScope ? (
+                <CircleCheck className="overview-icon ok" size={30} />
+              ) : (
+                <CircleAlert className="overview-icon warn" size={30} />
+              )}
+              <div>
+                <strong>{headline.title}</strong>
+                <p className="small muted">{headline.detail}</p>
+              </div>
+            </div>
+          </div>
+          <div className="card overview-card">
+            <h2>Checklist hồ sơ cần chuẩn bị</h2>
+            {inScope ? (
+              <>
+                <p>
+                  {remaining > 0
+                    ? `${remaining} mục cần chuẩn bị · ${available}/${assessment.checklist.length} đã có`
+                    : `Đã có đủ ${assessment.checklist.length} mục giấy tờ`}
+                </p>
+                <a className="text-link" href="#checklist">
+                  Xem chi tiết <ArrowRight size={14} />
+                </a>
+              </>
+            ) : (
+              <p className="small muted">Chưa áp dụng danh mục cho phạm vi này.</p>
+            )}
+          </div>
+        </div>
+
+        <div className="case-actions">
+          {inScope && (
+            <a className="button button-outline" href="#checklist">
+              <PencilLine size={16} /> Cập nhật giấy tờ
+            </a>
+          )}
+          <Link className="button button-primary" href={`/ho-so/${assessment.id}/ban-in`}>
+            <Download size={16} /> Tải bản tổng hợp
+          </Link>
+        </div>
+
+        <section className="card checklist-card" id="checklist" aria-labelledby="checklist-heading">
+          <div className="panel-heading">
+            <h2 id="checklist-heading">
+              <ClipboardList size={20} /> Danh mục chuẩn bị
+            </h2>
+            {inScope && (
+              <span className="small muted">
+                {available} / {assessment.checklist.length} đã có
+              </span>
+            )}
           </div>
           {assessment.checklist.length > 0 ? (
-            <>
-              <p className="muted small">Theo dõi giấy tờ đã có, còn thiếu hoặc cần xác minh.</p>
-              <progress
-                className="progress"
-                aria-label="Giấy tờ đã có"
-                value={available}
-                max={assessment.checklist.length}
-              />
-              <ul className="checklist">
-                {assessment.checklist.map((item) => {
-                  const label =
-                    item.code === 'purchase_schedules'
-                      ? 'Bảng kê mua hàng theo kỳ áp dụng'
-                      : item.label;
-                  return (
-                    <li key={item.id}>
-                      <span
-                        className={`check-indicator ${item.status === 'available' ? 'done' : ''}`}
-                        aria-hidden="true"
-                      >
-                        {item.status === 'available' ? <Check size={15} /> : null}
-                      </span>
-                      <div className="checklist-copy">
-                        <strong>{label}</strong>
-                      </div>
-                      <select
-                        name={item.code}
-                        aria-label={`Trạng thái: ${label}`}
-                        value={item.status}
-                        disabled={saving !== '' || busy}
-                        onChange={(event) => {
-                          void update(item.id, event.target.value as ItemStatus);
-                        }}
-                      >
-                        <option value="needs_verification">Cần xác minh</option>
-                        <option value="available">Đã có</option>
-                        <option value="missing">Còn thiếu</option>
-                      </select>
-                    </li>
-                  );
-                })}
-              </ul>
-            </>
+            <ul className="checklist">
+              {assessment.checklist.map((item) => {
+                const label = itemLabel(item);
+                return (
+                  <li key={item.id}>
+                    <span
+                      className={`check-indicator ${item.status === 'available' ? 'done' : ''}`}
+                      aria-hidden="true"
+                    >
+                      {item.status === 'available' ? <Check size={14} /> : null}
+                    </span>
+                    <strong>{label}</strong>
+                    <select
+                      name={item.code}
+                      aria-label={`Trạng thái: ${label}`}
+                      value={item.status}
+                      disabled={saving !== '' || busy}
+                      onChange={(event) => {
+                        void update(item.id, event.target.value as ItemStatus);
+                      }}
+                    >
+                      <option value="available">Đã có</option>
+                      <option value="missing">Còn thiếu</option>
+                      <option value="needs_verification">Cần xác minh</option>
+                    </select>
+                  </li>
+                );
+              })}
+            </ul>
           ) : (
-            <div className="empty-state">
+            <div className="empty-inline">
               <h3>Cần xác nhận phạm vi trước.</h3>
-              <p>
+              <p className="small muted">
                 Câu trả lời hiện chưa đủ để áp dụng danh mục doanh nghiệp từng hoạt động muốn giải
                 thể. Hãy trao đổi với chuyên viên hoặc mở khảo sát mới.
               </p>
@@ -171,9 +241,9 @@ export function AssessmentWorkspace({ initial }: { initial: WorkspaceAssessment 
             </p>
           )}
         </section>
-        <aside className="workspace-sidebar">
-          <ChatPanel />
-          <section className="surface summary-panel">
+
+        <div className="overview-grid">
+          <section className="card detail-card">
             <h2>Những điều cần làm rõ</h2>
             {assessment.summary.reviewReasons.length > 0 ? (
               <ul className="review-list">
@@ -182,7 +252,7 @@ export function AssessmentWorkspace({ initial }: { initial: WorkspaceAssessment 
                 ))}
               </ul>
             ) : (
-              <p className="muted">Mở thông tin đã ghi nhận để xem lại câu trả lời.</p>
+              <p className="small muted">Mở thông tin đã ghi nhận để xem lại câu trả lời.</p>
             )}
             <details>
               <summary>Thông tin chưa biết ({assessment.summary.unknownFacts.length})</summary>
@@ -201,22 +271,10 @@ export function AssessmentWorkspace({ initial }: { initial: WorkspaceAssessment 
               </ul>
             </details>
           </section>
-          <section className="next-step-panel">
-            <h2>Bước tiếp theo của bạn</h2>
-            <p>
-              Tìm lại các giấy tờ đang có và cập nhật trạng thái. Sau đó trao đổi bản tổng hợp này
-              với chuyên viên để xác minh.
-            </p>
-            <p className="small">Không cần nhập số thuế hay gửi chứng từ lên bản thử.</p>
-          </section>
-          <section className="surface summary-panel">
+          <section className="card detail-card">
             <h2>Quản lý hồ sơ thử</h2>
             <p className="small muted">
-              Lưu đến{' '}
-              {new Intl.DateTimeFormat('vi-VN', { dateStyle: 'medium' }).format(
-                new Date(assessment.expiresAt),
-              )}
-              . Chỉ sử dụng dữ liệu giả định.
+              Lưu đến {formatDate(assessment.expiresAt)}. Chỉ sử dụng dữ liệu giả định.
             </p>
             <Link className="text-link" href="/khao-sat">
               <Plus size={16} /> Chuẩn bị hồ sơ khác
@@ -246,8 +304,8 @@ export function AssessmentWorkspace({ initial }: { initial: WorkspaceAssessment 
               </div>
             )}
           </section>
-        </aside>
-      </div>
-    </>
+        </div>
+      </section>
+    </div>
   );
 }
