@@ -1194,3 +1194,25 @@ details li {
     justify-content: space-between;
   }
 }
+/* Link nằm trong câu văn; .text-link là dạng nút có icon nên tự xuống dòng */
+.inline-link {
+  color: var(--teal);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+@media (max-width: 600px) {
+  /* Ba mục điều hướng không vừa một hàng cạnh logo: đưa xuống hàng riêng, không gãy chữ */
+  .site-header {
+    flex-wrap: wrap;
+    row-gap: 12px;
+  }
+  .site-header nav {
+    width: 100%;
+    margin-left: 0;
+    gap: 20px;
+    font-size: 13px;
+  }
+  .site-header nav a {
+    white-space: nowrap;
+  }
+}

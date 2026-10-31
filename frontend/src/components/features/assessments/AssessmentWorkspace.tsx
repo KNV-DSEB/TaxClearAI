@@ -78,7 +78,7 @@ export function AssessmentWorkspace({ initial }: { initial: WorkspaceAssessment 
           <h1>Đã rõ hơn. Cùng bổ sung từng mục.</h1>
           <p className="muted">
             Mở lại hồ sơ này bất cứ lúc nào từ trang{' '}
-            <Link className="text-link" href="/ho-so">
+            <Link className="inline-link" href="/ho-so">
               Hồ sơ của tôi
             </Link>
             .
