@@ -9,6 +9,8 @@ python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
 python-multipart==0.0.32
 structlog==24.4.0
+anthropic==2.3.0
+google-genai==2.34.0
 
 # dev / test / lint — pin loosely on patch, tight on minor
 ruff==0.16.3
