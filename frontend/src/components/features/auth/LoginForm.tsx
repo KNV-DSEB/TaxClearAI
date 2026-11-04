@@ -49,7 +49,7 @@ export function LoginForm() {
         }}
       >
         <h2>Đăng nhập bản thử</h2>
-        <p className="muted">Chỉ sử dụng thông tin giả định trong giai đoạn này.</p>
+        <p className="muted">Tài khoản thử nghiệm: <strong>demo</strong> · Mật khẩu: <strong>nhập bất kỳ</strong>.</p>
         <label htmlFor="username">Tên đăng nhập</label>
         <input
           id="username"
@@ -66,6 +66,8 @@ export function LoginForm() {
           name="password"
           type="password"
           autoComplete="current-password"
+          defaultValue="123456"
+          placeholder="Nhập bất kỳ mật khẩu nào"
           required
           maxLength={72}
         />
@@ -79,7 +81,7 @@ export function LoginForm() {
           {!busy && <ArrowRight size={17} />}
         </button>
         <p className="small muted">
-          Chưa có tài khoản? Liên hệ trưởng nhóm để được cấp quyền thử nghiệm.
+          Chỉ cần dùng tài khoản demo (mật khẩu bất kỳ) để trải nghiệm toàn bộ hệ thống.
         </p>
       </form>
     </div>
