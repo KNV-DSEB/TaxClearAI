@@ -1,4 +1,4 @@
-"""Dựng toàn bộ tài sản thương hiệu Tax Clear AI từ một định nghĩa hình học.
+"""Dựng toàn bộ tài sản thương hiệu Tax Clear AI (khiên hồ sơ + chữ C vàng nghệ).
 
 Chạy: python docs/brand/tools/build_brand.py
 Cần: fontTools, Pillow, Playwright (Chromium) trong Python hệ thống.
@@ -39,81 +39,75 @@ COLORS = {
 }
 
 
-def _hex(c: str) -> tuple[int, int, int]:
-    c = c.lstrip("#")
-    return int(c[0:2], 16), int(c[2:4], 16), int(c[4:6], 16)
+# ---------------------------------------------------------------- Khiên hồ sơ + chữ C vàng nghệ
+# Thiết kế trên lưới 128, thu về 64 khi ghép lockup.
+SHIELD = "M64 8L90 15.5L108 33V60C108 90 90 109 64 120C38 109 20 90 20 60V21Z"
+FOLD = "M90 15.5L108 33L93 31Z"
+TICK = "M52 64L61 73L84 50"
 
 
-def mix(a: str, b: str, t: float) -> str:
-    ra, ga, ba = _hex(a)
-    rb, gb, bb = _hex(b)
-    return "#{:02x}{:02x}{:02x}".format(
-        round(ra + (rb - ra) * t), round(ga + (gb - ga) * t), round(ba + (bb - ba) * t)
+def c_shape(cx=62.0, cy=66.0, R=37.0, r=20.0, a_open=42.0) -> str:
+    """Chữ C dạng khối, hai đầu cắt vát song song nếp gấp giấy."""
+    a0, a1 = math.radians(a_open), math.radians(360 - a_open)
+
+    def po(rr, a):
+        return cx + rr * math.cos(a), cy + rr * math.sin(a)
+
+    o0, o1, i0, i1 = po(R, a0), po(R, a1), po(r, a0), po(r, a1)
+    cut = (R - r) * 0.55
+    i0 = (i0[0] + cut, i0[1] + cut * 0.15)
+    i1 = (i1[0] + cut, i1[1] - cut * 0.15)
+    return (
+        f"M{o1[0]:.2f} {o1[1]:.2f}A{R:g} {R:g} 0 1 0 {o0[0]:.2f} {o0[1]:.2f}"
+        f"L{i0[0]:.2f} {i0[1]:.2f}A{r:g} {r:g} 0 1 1 {i1[0]:.2f} {i1[1]:.2f}Z"
     )
 
 
-# ---------------------------------------------------------------- C pha lê
-CX = CY = 32.0
-R_OUT, R_IN = 28.0, 13.5
-ANGLES = [22.5 + 45 * k for k in range(8)]  # SVG: y hướng xuống, 22.5° = dưới phải
-LIGHT_FROM = 225.0  # ánh sáng từ góc trên trái
+C_PATH = c_shape()
+C_PATH_SMALL = c_shape(R=38.0, r=18.5)
 
 
-def _pt(r: float, deg: float) -> tuple[float, float]:
-    a = math.radians(deg)
-    return round(CX + r * math.cos(a), 2), round(CY + r * math.sin(a), 2)
+def mark_design(uid: str, small: bool = False, mono: str | None = None, gap: str | None = None) -> str:
+    """Biểu tượng trên lưới 128. mono: khiên một màu, chữ C và tick bằng màu gap (khoét rỗng)."""
+    c_path = C_PATH_SMALL if small else C_PATH
+    tick_w = 11 if small else 9
+    if mono:
+        return (
+            f'<path d="{SHIELD}" fill="{mono}"/>'
+            f'<path d="M90 15.5L93 31L108 33" fill="none" stroke="{gap}" stroke-width="2.4" stroke-linejoin="round"/>'
+            f'<path d="{c_path}" fill="{gap}"/>'
+            # Viền cùng màu khiên tách dấu tick khỏi chữ C khi cả hai cùng màu khoét
+            f'<path d="{TICK}" fill="none" stroke="{mono}" stroke-width="{tick_w + 6}" '
+            f'stroke-linecap="round" stroke-linejoin="round"/>'
+            f'<path d="{TICK}" fill="none" stroke="{gap}" stroke-width="{tick_w}" '
+            f'stroke-linecap="round" stroke-linejoin="round"/>'
+        )
+    shadow = "" if small else f' filter="url(#{uid}-sh)"'
+    return (
+        "<defs>"
+        f'<linearGradient id="{uid}-d" x1="20" y1="8" x2="64" y2="120" gradientUnits="userSpaceOnUse">'
+        '<stop offset="0" stop-color="#18a885"/><stop offset="1" stop-color="#0a3a33"/></linearGradient>'
+        f'<linearGradient id="{uid}-l" x1="64" y1="8" x2="108" y2="120" gradientUnits="userSpaceOnUse">'
+        '<stop offset="0" stop-color="#5ff0c0"/><stop offset="1" stop-color="#128c71"/></linearGradient>'
+        f'<linearGradient id="{uid}-y" x1="30" y1="30" x2="100" y2="100" gradientUnits="userSpaceOnUse">'
+        '<stop offset="0" stop-color="#ffd987"/><stop offset=".55" stop-color="#f7a535"/>'
+        '<stop offset="1" stop-color="#e2771a"/></linearGradient>'
+        f'<clipPath id="{uid}-c"><path d="{SHIELD}"/></clipPath>'
+        f'<filter id="{uid}-sh" x="-20%" y="-20%" width="140%" height="140%">'
+        '<feDropShadow dx="0" dy="3" stdDeviation="2.5" flood-color="#06302a" flood-opacity=".45"/></filter>'
+        "</defs>"
+        f'<path class="mk-shield" d="{SHIELD}" fill="url(#{uid}-d)"/>'
+        f'<g class="mk-shield" clip-path="url(#{uid}-c)"><rect x="64" y="0" width="64" height="128" fill="url(#{uid}-l)"/></g>'
+        f'<path class="mk-fold" d="{FOLD}" fill="#c9f0e2"/>'
+        f'<path class="mk-c" d="{c_path}" fill="url(#{uid}-y)"{shadow}/>'
+        f'<path class="mk-tick" d="{TICK}" pathLength="1" fill="none" stroke="#ffffff" '
+        f'stroke-width="{tick_w}" stroke-linecap="round" stroke-linejoin="round"/>'
+    )
 
 
-def _lightness(mid: float) -> float:
-    return (math.cos(math.radians(mid - LIGHT_FROM)) + 1) / 2
-
-
-# Mỗi bảng màu: (mặt ngoài tối, mặt ngoài sáng, mặt trong tối, mặt trong sáng)
-PALETTES = {
-    "light": ("#0f5a4c", "#8fe0c4", "#0a3a33", "#2fae8a"),
-    "dark": ("#1f8f73", "#c9f0e2", "#15705c", "#4cc39f"),
-}
-WARM = {"light": ("#f6b04c", "#e07f1f"), "dark": ("#f8bd63", "#ea8c2a")}
-
-
-def facets(variant: str = "light", simple: bool = False) -> list[dict]:
-    """Danh sách mặt cắt: {points, fill, role}. simple=True: 7 mặt cho cỡ nhỏ."""
-    o_dark, o_light, i_dark, i_light = PALETTES[variant]
-    warm_outer, warm_inner = WARM[variant]
-    out = []
-    for i in range(7):
-        a0, a1 = ANGLES[i], ANGLES[i + 1]
-        o0, o1, i0, i1 = _pt(R_OUT, a0), _pt(R_OUT, a1), _pt(R_IN, a0), _pt(R_IN, a1)
-        light = _lightness((a0 + a1) / 2)
-        warm = i == 6  # mép trên của khe mở bắt ánh sáng ấm
-        if simple:
-            fill = warm_outer if warm else mix(o_dark, o_light, light * 0.85)
-            out.append({"points": [o0, o1, i1, i0], "fill": fill, "role": "warm" if warm else "facet"})
-            continue
-        outer = warm_outer if warm else mix(o_dark, o_light, light)
-        inner = warm_inner if warm else mix(i_dark, i_light, light)
-        role = "warm" if warm else "facet"
-        out.append({"points": [o0, o1, i0], "fill": outer, "role": role})
-        out.append({"points": [o1, i1, i0], "fill": inner, "role": role})
-    return out
-
-
-def _d(points) -> str:
-    return "M" + "L".join(f"{x:g} {y:g}" for x, y in points) + "Z"
-
-
-def mark_body(variant="light", simple=False, mono: str | None = None, gap_color: str | None = None) -> str:
-    parts = []
-    for f in facets(variant, simple):
-        fill = mono or f["fill"]
-        if mono and gap_color:
-            parts.append(
-                f'<path d="{_d(f["points"])}" fill="{fill}" stroke="{gap_color}" '
-                f'stroke-width="1.4" stroke-linejoin="round"/>'
-            )
-        else:
-            parts.append(f'<path d="{_d(f["points"])}" fill="{fill}"/>')
-    return "".join(parts)
+def mark_body(uid: str = "tc", small: bool = False, mono: str | None = None, gap_color: str | None = None) -> str:
+    """Biểu tượng thu về hệ toạ độ 64×64 để ghép lockup."""
+    return f'<g transform="scale(.5)">{mark_design(uid, small, mono, gap_color)}</g>'
 
 
 # ---------------------------------------------------------------- wordmark
@@ -174,16 +168,16 @@ def wordmark(ink, accent, warm, size=30.0, x=0.0, baseline=0.0, mono=False):
 
 # ---------------------------------------------------------------- lockups
 THEMES = {
-    "color": dict(variant="light", ink=COLORS["ink"], accent=COLORS["teal-700"], warm=COLORS["saffron-500"]),
-    "on-dark": dict(variant="dark", ink=COLORS["white"], accent=COLORS["teal-300"], warm=COLORS["saffron-500"]),
-    "mono-dark": dict(variant="light", ink=COLORS["ink"], accent=COLORS["ink"], warm=COLORS["ink"], mono=COLORS["ink"]),
-    "mono-white": dict(variant="dark", ink=COLORS["white"], accent=COLORS["white"], warm=COLORS["white"], mono=COLORS["white"]),
+    "color": dict(ink=COLORS["ink"], accent=COLORS["teal-700"], warm=COLORS["saffron-500"]),
+    "on-dark": dict(ink=COLORS["white"], accent=COLORS["teal-300"], warm=COLORS["saffron-500"]),
+    "mono-dark": dict(ink=COLORS["ink"], accent=COLORS["ink"], warm=COLORS["ink"], mono=COLORS["ink"]),
+    "mono-white": dict(ink=COLORS["white"], accent=COLORS["white"], warm=COLORS["white"], mono=COLORS["white"]),
 }
 
 
-def _mark_for(theme: dict, simple=False, gap="#ffffff") -> str:
+def _mark_for(theme: dict, simple=False, gap="#ffffff", uid="tc") -> str:
     mono = theme.get("mono")
-    return mark_body(theme["variant"], simple, mono=mono, gap_color=(gap if mono else None))
+    return mark_body(uid, simple, mono=mono, gap_color=(gap if mono else None))
 
 
 def svg_doc(body: str, w: float, h: float, title: str) -> str:
@@ -230,31 +224,22 @@ def wordmark_only(theme_name: str) -> tuple[str, float, float]:
 
 # ---------------------------------------------------------------- animated
 def animated_svg() -> str:
-    paths = []
-    for idx, f in enumerate(facets("light")):
-        cls = "f warm" if f["role"] == "warm" else "f"
-        paths.append(
-            f'<path class="{cls}" style="animation-delay:{idx * 45}ms" d="{_d(f["points"])}" fill="{f["fill"]}"/>'
-        )
     style = (
-        "<style>.f{transform-box:fill-box;transform-origin:center;animation:in .7s cubic-bezier(.2,.8,.2,1) both}"
-        ".warm{animation:in .7s cubic-bezier(.2,.8,.2,1) both,glint 1.2s ease-in-out .9s both}"
-        "@keyframes in{from{opacity:0;transform:scale(.4) rotate(-20deg)}to{opacity:1;transform:none}}"
-        "@keyframes glint{0%,100%{filter:none}45%{filter:brightness(1.35) drop-shadow(0 0 2px #f6b04c)}}"
-        "@media (prefers-reduced-motion:reduce){.f,.warm{animation:none}}</style>"
+        "<style>.mk-shield,.mk-fold{transform-box:fill-box;transform-origin:center bottom;"
+        "animation:shield .6s cubic-bezier(.2,.8,.2,1) both}"
+        ".mk-c{transform-box:fill-box;transform-origin:center;animation:sweep .7s cubic-bezier(.2,.8,.2,1) .25s both}"
+        ".mk-tick{stroke-dasharray:1;stroke-dashoffset:1;animation:draw .45s ease-out .8s forwards}"
+        "@keyframes shield{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:none}}"
+        "@keyframes sweep{from{opacity:0;transform:rotate(-120deg) scale(.6)}to{opacity:1;transform:none}}"
+        "@keyframes draw{to{stroke-dashoffset:0}}"
+        "@media (prefers-reduced-motion:reduce){.mk-shield,.mk-fold,.mk-c{animation:none}"
+        ".mk-tick{animation:none;stroke-dashoffset:0}}</style>"
     )
-    return svg_doc(style + "".join(paths), 64, 64, "Tax Clear AI")
+    return svg_doc(style + mark_body("tca"), 64, 64, "Tax Clear AI")
 
 
 # ---------------------------------------------------------------- web geometry (TS)
 def write_geometry() -> None:
-    def facet_list(variant, simple):
-        rows = [
-            f"  {{ d: '{_d(f['points'])}', fill: '{f['fill']}', warm: {str(f['role'] == 'warm').lower()} }},"
-            for f in facets(variant, simple)
-        ]
-        return "[\n" + "\n".join(rows) + "\n]"
-
     def words(theme):
         t = THEMES[theme]
         size = 31.0
@@ -265,11 +250,10 @@ def write_geometry() -> None:
     color_words, width = words("color")
     dark_words, _ = words("on-dark")
     ts = (
-        "// Tệp sinh tự động bởi docs/brand/tools/build_brand.py — không sửa tay.\n\n"
-        "export interface Facet {\n  d: string;\n  fill: string;\n  warm: boolean;\n}\n\n"
-        f"export const FACETS: Facet[] = {facet_list('light', False)};\n\n"
-        f"export const FACETS_ON_DARK: Facet[] = {facet_list('dark', False)};\n\n"
-        f"export const FACETS_SMALL: Facet[] = {facet_list('light', True)};\n\n"
+        "// Tệp sinh tự động bởi docs/brand/tools/build_brand.py — không sửa tay.\n"
+        "// Markup biểu tượng trên lưới 128; __ID__ được thay bằng mã riêng của mỗi lần hiển thị.\n\n"
+        f"export const MARK_SVG = `{mark_design('__ID__')}`;\n\n"
+        f"export const MARK_SMALL_SVG = `{mark_design('__ID__', small=True)}`;\n\n"
         f"export const LOGO_WIDTH = {width:.1f};\n\n"
         f"export const WORDMARK_SVG = `{color_words}`;\n\n"
         f"export const WORDMARK_ON_DARK_SVG = `{dark_words}`;\n"
@@ -298,7 +282,7 @@ def build_svgs() -> dict[str, Path]:
         p = logo / f"tax-clear-ai-mark-{theme}.svg"
         write(p, mark)
         out[p.stem] = p
-    small = svg_doc(mark_body("light", simple=True), 64, 64, "Tax Clear AI")
+    small = svg_doc(mark_body("tcs", small=True), 64, 64, "Tax Clear AI")
     write(logo / "tax-clear-ai-mark-small.svg", small)
     out["tax-clear-ai-mark-small"] = logo / "tax-clear-ai-mark-small.svg"
     write(BRAND / "animated" / "tax-clear-ai-mark-animated.svg", animated_svg())

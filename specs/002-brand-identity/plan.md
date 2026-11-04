@@ -3,15 +3,19 @@
 Trạng thái: **Approved** (2026-11-04). Đầu vào: `spec.md`, `.specify/memory/constitution.md`.
 
 ## Nghiên cứu và quyết định thiết kế
-Bốn vòng phác, ảnh so sánh lưu tại `docs/brand/exploration/`:
+Tám vòng phác, ảnh so sánh lưu tại `docs/brand/exploration/`:
 
 | Vòng | Hướng | Kết quả |
 |---|---|---|
 | 1 | Nét gỡ, dòng hồ sơ, vòng mở (nét mảnh, có tick) | Khách: quá đơn giản, nhạt |
 | 2–3 | Nút gỡ đan, bìa hồ sơ, hai tờ chồng (khối đặc, có tick) | Khách: tick quá quen, màu và chữ chưa có cá tính |
-| 4 | C pha lê, lăng kính, bình minh (trừu tượng, teal + vàng nghệ) | **Chốt C2 — C pha lê** |
+| 4 | C pha lê, lăng kính, bình minh (trừu tượng, teal + vàng nghệ) | Chốt C2, đã áp dụng; sau đó khách: chưa đặc sắc, chưa cuốn mắt |
+| 5 | Tia sáng C, C kính, monogram T–C, nút gỡ bứt phá, dải giấy gấp (màu chuyển, phát quang) | Khách đưa brief mới: C + khiên + tick/đường đi lên |
+| 6 | Khiên mở + tick, khiên mở + đường đi lên, khiên đặc + C + tick | Khách: thiếu đặc sắc |
+| 7 | Tick khép khiên, khiên hồ sơ (vát hai mặt, góc gấp giấy), khiên hồ sơ tick bứt phá | Khách: chữ C nhạt nhòa |
+| 8 | C trắng nổi khối, **C vàng nghệ**, C ôm khiên, rãnh C | **Chốt C2 vòng 8 — khiên hồ sơ, chữ C vàng nghệ** |
 
-**Ý tưởng:** chữ C của *Clear* dựng từ 14 mặt cắt như một viên pha lê. Ánh sáng chiếu từ góc trên trái nên mỗi mặt có độ sáng theo hướng của nó; ánh vàng nghệ bắt ở mép khe mở. Hồ sơ rối được "mài" thành một khối rõ ràng, có giá trị. Nguyên lý tham chiếu: biểu tượng hình học nhiều lớp như Mastercard, Chase; một điểm nhấn màu duy nhất.
+**Ý tưởng (bản chốt):** một chiếc **khiên** teal vát hai mặt (niềm tin), góc trên phải gấp như tờ giấy (hồ sơ); giữa khiên là **chữ C** khối đặc màu vàng nghệ, hai đầu cắt vát song song nếp gấp (Clear, nhân vật chính, hút mắt đầu tiên); trong lòng chữ C là **dấu tick trắng** (xử lý chính xác, minh bạch). Thứ tự đọc: khiên → C → tick. Màu nóng duy nhất dồn vào chữ C.
 
 **Wordmark:** Be Vietnam Pro SemiBold (OFL, font do người Việt thiết kế), chuyển thành đường vector. Chữ **x** vẽ riêng: hai nét đan chéo, một nét màu vàng nghệ. "AI" viết nhỏ, màu teal.
 

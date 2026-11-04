@@ -18,7 +18,7 @@ Sản phẩm đang dùng tạm biểu tượng "Files" của thư viện icon l�
 | Phạm vi | Bộ logo đầy đủ · Trang hướng dẫn thương hiệu · Áp vào web · Logo động và ấn phẩm |
 
 ## Yêu cầu
-- **FR-1** Biểu tượng (mark) riêng, kể ý "gỡ rối → rõ ràng", không dùng khiên/cán cân/cột trụ mặc định của ngành.
+- **FR-1** Biểu tượng (mark) riêng, cuốn mắt, nhận ra ngay ở 16 px. *Cập nhật 2026-11-04 theo yêu cầu khách:* kết hợp chữ C (Clear), hình khiên (tin cậy) và dấu tick (xử lý chính xác, minh bạch).
 - **FR-2** Wordmark "Tax Clear AI" bằng chữ chuyển thành đường vector (không phụ thuộc font khi dùng).
 - **FR-3** Lockup ngang, lockup dọc, bản chỉ biểu tượng; mỗi bản có màu, một màu tối, một màu sáng (đảo).
 - **FR-4** Favicon (SVG + 16/32/48 px), icon ứng dụng 180/192/512 px, ảnh Open Graph 1200×630.

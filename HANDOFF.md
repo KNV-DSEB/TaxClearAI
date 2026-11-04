@@ -147,7 +147,7 @@ Chưa biết tên thành viên và phạm vi sản phẩm, nên dùng nhãn **Tr
 
 ## 14. Bộ nhận diện thương hiệu — 2026-11-04
 
-- Làm theo Spec Kit: `.specify/memory/constitution.md`, `specs/002-brand-identity/{spec,plan,tasks}.md`. Bốn vòng phác; khách chốt **C2 — C pha lê** (biểu tượng trừu tượng, không dùng dấu tick, teal + vàng nghệ).
+- Làm theo Spec Kit: `.specify/memory/constitution.md`, `specs/002-brand-identity/{spec,plan,tasks}.md`. Tám vòng phác; bản chốt cuối là **khiên hồ sơ + chữ C vàng nghệ + tick trắng** (vòng 8, theo brief khách: C + khiên + tick). Bản "C pha lê" vòng 4 đã bị thay.
 - Tài sản: `docs/brand/` (SVG/PNG/ICO, ấn phẩm, logo động, font Be Vietnam Pro OFL, script `tools/build_brand.py`). Hướng dẫn thương hiệu: artifact "Tax Clear AI Brand" https://claude.ai/artifact/D2E1ZH8ANWJZV6JsSTVUqR (riêng tư, cần chia sẻ qua menu Share).
 - Web: logo mới ở header và bản in, logo động ở trang đăng nhập, favicon/apple-icon/manifest/Open Graph, font Be Vietnam Pro qua `next/font/google` (cần mạng lúc build), token `--saffron*`. Frontend 156 test, lint 0 lỗi, build pass.
-- Còn mở: chưa tra cứu nhãn hiệu; ảnh minh họa trang chủ (tờ khai có khiên và dấu tick) chưa đổi theo hướng không-tick; một asset cũ (banner LinkedIn trước khi chỉnh màu) còn trong kho tài sản artifact, không được tham chiếu.
+- Còn mở: chưa tra cứu nhãn hiệu; kho tài sản artifact còn các file của bản C pha lê (không được tham chiếu, lệnh xóa bị chặn — xóa tay trong mục Files của trang).

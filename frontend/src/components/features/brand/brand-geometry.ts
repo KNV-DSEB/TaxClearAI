@@ -1,54 +1,9 @@
 // Tệp sinh tự động bởi docs/brand/tools/build_brand.py — không sửa tay.
+// Markup biểu tượng trên lưới 128; __ID__ được thay bằng mã riêng của mỗi lần hiển thị.
 
-export interface Facet {
-  d: string;
-  fill: string;
-  warm: boolean;
-}
+export const MARK_SVG = `<defs><linearGradient id="__ID__-d" x1="20" y1="8" x2="64" y2="120" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#18a885"/><stop offset="1" stop-color="#0a3a33"/></linearGradient><linearGradient id="__ID__-l" x1="64" y1="8" x2="108" y2="120" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#5ff0c0"/><stop offset="1" stop-color="#128c71"/></linearGradient><linearGradient id="__ID__-y" x1="30" y1="30" x2="100" y2="100" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffd987"/><stop offset=".55" stop-color="#f7a535"/><stop offset="1" stop-color="#e2771a"/></linearGradient><clipPath id="__ID__-c"><path d="M64 8L90 15.5L108 33V60C108 90 90 109 64 120C38 109 20 90 20 60V21Z"/></clipPath><filter id="__ID__-sh" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="3" stdDeviation="2.5" flood-color="#06302a" flood-opacity=".45"/></filter></defs><path class="mk-shield" d="M64 8L90 15.5L108 33V60C108 90 90 109 64 120C38 109 20 90 20 60V21Z" fill="url(#__ID__-d)"/><g class="mk-shield" clip-path="url(#__ID__-c)"><rect x="64" y="0" width="64" height="128" fill="url(#__ID__-l)"/></g><path class="mk-fold" d="M90 15.5L108 33L93 31Z" fill="#c9f0e2"/><path class="mk-c" d="M89.50 41.24A37 37 0 1 0 89.50 90.76L86.21 80.79A20 20 0 1 1 86.21 51.21Z" fill="url(#__ID__-y)" filter="url(#__ID__-sh)"/><path class="mk-tick" d="M52 64L61 73L84 50" pathLength="1" fill="none" stroke="#ffffff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>`;
 
-export const FACETS: Facet[] = [
-  { d: 'M57.87 42.72L42.72 57.87L44.47 37.17Z', fill: '#0f5a4c', warm: false },
-  { d: 'M42.72 57.87L37.17 44.47L44.47 37.17Z', fill: '#0a3a33', warm: false },
-  { d: 'M42.72 57.87L21.28 57.87L37.17 44.47Z', fill: '#226e5e', warm: false },
-  { d: 'M21.28 57.87L26.83 44.47L37.17 44.47Z', fill: '#0f4b40', warm: false },
-  { d: 'M21.28 57.87L6.13 42.72L26.83 44.47Z', fill: '#4f9d88', warm: false },
-  { d: 'M6.13 42.72L19.53 37.17L26.83 44.47Z', fill: '#1c745e', warm: false },
-  { d: 'M6.13 42.72L6.13 21.28L19.53 37.17Z', fill: '#7cccb2', warm: false },
-  { d: 'M6.13 21.28L19.53 26.83L19.53 37.17Z', fill: '#2a9d7d', warm: false },
-  { d: 'M6.13 21.28L21.28 6.13L19.53 26.83Z', fill: '#8fe0c4', warm: false },
-  { d: 'M21.28 6.13L26.83 19.53L19.53 26.83Z', fill: '#2fae8a', warm: false },
-  { d: 'M21.28 6.13L42.72 6.13L26.83 19.53Z', fill: '#7cccb2', warm: false },
-  { d: 'M42.72 6.13L37.17 19.53L26.83 19.53Z', fill: '#2a9d7d', warm: false },
-  { d: 'M42.72 6.13L57.87 21.28L37.17 19.53Z', fill: '#f6b04c', warm: true },
-  { d: 'M57.87 21.28L44.47 26.83L37.17 19.53Z', fill: '#e07f1f', warm: true },
-];
-
-export const FACETS_ON_DARK: Facet[] = [
-  { d: 'M57.87 42.72L42.72 57.87L44.47 37.17Z', fill: '#1f8f73', warm: false },
-  { d: 'M42.72 57.87L37.17 44.47L44.47 37.17Z', fill: '#15705c', warm: false },
-  { d: 'M42.72 57.87L21.28 57.87L37.17 44.47Z', fill: '#389d83', warm: false },
-  { d: 'M21.28 57.87L26.83 44.47L37.17 44.47Z', fill: '#1d7c66', warm: false },
-  { d: 'M21.28 57.87L6.13 42.72L26.83 44.47Z', fill: '#74c0aa', warm: false },
-  { d: 'M6.13 42.72L19.53 37.17L26.83 44.47Z', fill: '#309a7e', warm: false },
-  { d: 'M6.13 42.72L6.13 21.28L19.53 37.17Z', fill: '#b0e2d2', warm: false },
-  { d: 'M6.13 21.28L19.53 26.83L19.53 37.17Z', fill: '#44b795', warm: false },
-  { d: 'M6.13 21.28L21.28 6.13L19.53 26.83Z', fill: '#c9f0e2', warm: false },
-  { d: 'M21.28 6.13L26.83 19.53L19.53 26.83Z', fill: '#4cc39f', warm: false },
-  { d: 'M21.28 6.13L42.72 6.13L26.83 19.53Z', fill: '#b0e2d2', warm: false },
-  { d: 'M42.72 6.13L37.17 19.53L26.83 19.53Z', fill: '#44b795', warm: false },
-  { d: 'M42.72 6.13L57.87 21.28L37.17 19.53Z', fill: '#f8bd63', warm: true },
-  { d: 'M57.87 21.28L44.47 26.83L37.17 19.53Z', fill: '#ea8c2a', warm: true },
-];
-
-export const FACETS_SMALL: Facet[] = [
-  { d: 'M57.87 42.72L42.72 57.87L37.17 44.47L44.47 37.17Z', fill: '#0f5a4c', warm: false },
-  { d: 'M42.72 57.87L21.28 57.87L26.83 44.47L37.17 44.47Z', fill: '#1f6b5b', warm: false },
-  { d: 'M21.28 57.87L6.13 42.72L19.53 37.17L26.83 44.47Z', fill: '#45937f', warm: false },
-  { d: 'M6.13 42.72L6.13 21.28L19.53 26.83L19.53 37.17Z', fill: '#6cbba3', warm: false },
-  { d: 'M6.13 21.28L21.28 6.13L26.83 19.53L19.53 26.83Z', fill: '#7cccb2', warm: false },
-  { d: 'M21.28 6.13L42.72 6.13L37.17 19.53L26.83 19.53Z', fill: '#6cbba3', warm: false },
-  { d: 'M42.72 6.13L57.87 21.28L44.47 26.83L37.17 19.53Z', fill: '#f6b04c', warm: true },
-];
+export const MARK_SMALL_SVG = `<defs><linearGradient id="__ID__-d" x1="20" y1="8" x2="64" y2="120" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#18a885"/><stop offset="1" stop-color="#0a3a33"/></linearGradient><linearGradient id="__ID__-l" x1="64" y1="8" x2="108" y2="120" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#5ff0c0"/><stop offset="1" stop-color="#128c71"/></linearGradient><linearGradient id="__ID__-y" x1="30" y1="30" x2="100" y2="100" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffd987"/><stop offset=".55" stop-color="#f7a535"/><stop offset="1" stop-color="#e2771a"/></linearGradient><clipPath id="__ID__-c"><path d="M64 8L90 15.5L108 33V60C108 90 90 109 64 120C38 109 20 90 20 60V21Z"/></clipPath><filter id="__ID__-sh" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="3" stdDeviation="2.5" flood-color="#06302a" flood-opacity=".45"/></filter></defs><path class="mk-shield" d="M64 8L90 15.5L108 33V60C108 90 90 109 64 120C38 109 20 90 20 60V21Z" fill="url(#__ID__-d)"/><g class="mk-shield" clip-path="url(#__ID__-c)"><rect x="64" y="0" width="64" height="128" fill="url(#__ID__-l)"/></g><path class="mk-fold" d="M90 15.5L108 33L93 31Z" fill="#c9f0e2"/><path class="mk-c" d="M90.24 40.57A38 38 0 1 0 90.24 91.43L86.47 79.99A18.5 18.5 0 1 1 86.47 52.01Z" fill="url(#__ID__-y)"/><path class="mk-tick" d="M52 64L61 73L84 50" pathLength="1" fill="none" stroke="#ffffff" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>`;
 
 export const LOGO_WIDTH = 250.1;
 

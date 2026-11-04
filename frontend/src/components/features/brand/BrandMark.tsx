@@ -1,43 +1,28 @@
-import { FACETS, FACETS_ON_DARK, FACETS_SMALL, type Facet } from './brand-geometry';
+'use client';
 
-export function Facets({ facets, className }: { facets: Facet[]; className?: string }) {
-  return (
-    <>
-      {facets.map((facet, index) => (
-        <path
-          key={facet.d}
-          d={facet.d}
-          fill={facet.fill}
-          className={className}
-          style={className ? { animationDelay: `${index * 45}ms` } : undefined}
-          data-warm={facet.warm || undefined}
-        />
-      ))}
-    </>
-  );
+import { useId } from 'react';
+
+import { MARK_SMALL_SVG, MARK_SVG } from './brand-geometry';
+
+// Mã gradient riêng cho mỗi lần hiển thị để nhiều logo trên một trang không dùng chung id
+export function useMarkMarkup(small = false): string {
+  const id = `tc${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
+  return (small ? MARK_SMALL_SVG : MARK_SVG).replaceAll('__ID__', id);
 }
 
-// Biểu tượng "C pha lê"; dưới 32 px dùng bản 7 mặt để không nhòe
-export function BrandMark({
-  size = 40,
-  onDark = false,
-  title,
-}: {
-  size?: number;
-  onDark?: boolean;
-  title?: string;
-}) {
-  const facets = size <= 32 ? FACETS_SMALL : onDark ? FACETS_ON_DARK : FACETS;
+// Khiên hồ sơ + chữ C vàng nghệ; từ 32 px trở xuống dùng bản bỏ đổ bóng, tick dày hơn
+export function BrandMark({ size = 40, title }: { size?: number; title?: string }) {
+  const markup = useMarkMarkup(size <= 32);
   return (
     <svg
-      viewBox="0 0 64 64"
+      viewBox="0 0 128 128"
       width={size}
       height={size}
       role={title ? 'img' : undefined}
       aria-label={title}
       aria-hidden={title ? undefined : true}
-    >
-      <Facets facets={facets} />
-    </svg>
+      // Markup sinh sẵn từ build_brand.py, không có dữ liệu người dùng
+      dangerouslySetInnerHTML={{ __html: markup }}
+    />
   );
 }

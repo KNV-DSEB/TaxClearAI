@@ -1,17 +1,18 @@
-import { FACETS } from './brand-geometry';
-import { Facets } from './BrandMark';
+'use client';
 
-// Các mặt cắt ghép lại rồi ánh vàng nghệ lóe lên; tắt khi người dùng chọn giảm chuyển động
+import { useMarkMarkup } from './BrandMark';
+
+// Khiên hiện lên, chữ C xoay vào, rồi dấu tick tự vẽ; tắt khi người dùng chọn giảm chuyển động
 export function AnimatedMark({ size = 72 }: { size?: number }) {
+  const markup = useMarkMarkup();
   return (
     <svg
-      viewBox="0 0 64 64"
+      viewBox="0 0 128 128"
       width={size}
       height={size}
       aria-hidden="true"
       className="animated-mark"
-    >
-      <Facets facets={FACETS} className="facet-in" />
-    </svg>
+      dangerouslySetInnerHTML={{ __html: markup }}
+    />
   );
 }
