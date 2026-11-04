@@ -1,11 +1,13 @@
 'use client';
 
-import { ArrowRight, LockKeyhole } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 import { authService } from '@/services/auth.service';
+
+import { AnimatedMark } from '../brand/AnimatedMark';
 
 export function LoginForm() {
   const router = useRouter();
@@ -31,7 +33,7 @@ export function LoginForm() {
   return (
     <div className="login-layout">
       <section className="login-intro">
-        <LockKeyhole size={30} />
+        <AnimatedMark size={76} />
         <h1>
           Giữ phần chuẩn bị
           <br />

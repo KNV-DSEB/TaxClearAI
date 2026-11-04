@@ -144,3 +144,10 @@ Chưa biết tên thành viên và phạm vi sản phẩm, nên dùng nhãn **Tr
 - Câu chữ của mẫu đã đổi cho đúng thực tế: không ghi "đủ điều kiện giải thể", "hồ sơ đã sẵn sàng" hay "thông tin được bảo mật"; ghi đúng 11 câu hỏi.
 - Backend thêm `GET /api/v1/auth/sessions/current` và `status` + `statusCounts` cho `GET /api/v1/assessments` (lọc `status=all|in_progress|ready`).
 - Kiểm tra: backend pytest 55 passed, ruff/mypy sạch; frontend 153 test, lint 0 lỗi, type-check, build pass. Ảnh chụp kiểm tra ở `docs/screenshots/2026-10-31-redesign/` (chưa commit).
+
+## 14. Bộ nhận diện thương hiệu — 2026-11-04
+
+- Làm theo Spec Kit: `.specify/memory/constitution.md`, `specs/002-brand-identity/{spec,plan,tasks}.md`. Bốn vòng phác; khách chốt **C2 — C pha lê** (biểu tượng trừu tượng, không dùng dấu tick, teal + vàng nghệ).
+- Tài sản: `docs/brand/` (SVG/PNG/ICO, ấn phẩm, logo động, font Be Vietnam Pro OFL, script `tools/build_brand.py`). Hướng dẫn thương hiệu: artifact "Tax Clear AI Brand" https://claude.ai/artifact/D2E1ZH8ANWJZV6JsSTVUqR (riêng tư, cần chia sẻ qua menu Share).
+- Web: logo mới ở header và bản in, logo động ở trang đăng nhập, favicon/apple-icon/manifest/Open Graph, font Be Vietnam Pro qua `next/font/google` (cần mạng lúc build), token `--saffron*`. Frontend 156 test, lint 0 lỗi, build pass.
+- Còn mở: chưa tra cứu nhãn hiệu; ảnh minh họa trang chủ (tờ khai có khiên và dấu tick) chưa đổi theo hướng không-tick; một asset cũ (banner LinkedIn trước khi chỉnh màu) còn trong kho tài sản artifact, không được tham chiếu.

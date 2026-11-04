@@ -9,6 +9,8 @@ import { ApiError } from '@/services/api.client';
 import { assessmentsService } from '@/services/assessments.service';
 import type { Assessment, ItemStatus } from '@/types/api.types';
 
+import { BrandLogo } from '../brand/BrandLogo';
+
 import { SCOPE_TITLES, STATUS_LABELS, caseStatus, formatDate } from './case-status';
 
 const ITEM_STATUS: Record<ItemStatus, string> = {
@@ -66,7 +68,10 @@ export function PrintSummary({ id }: { id: string }) {
             Chọn “In bản tổng hợp”. Muốn lưu file, chọn “Lưu dưới dạng PDF” trong hộp thoại in.
           </p>
         </div>
-        <h2 className="print-only">Tax Clear AI — Bản tổng hợp hồ sơ</h2>
+        <div className="print-only print-brand">
+          <BrandLogo height={34} />
+          <h2>Bản tổng hợp hồ sơ</h2>
+        </div>
         <section>
           <h3>Thông tin hồ sơ</h3>
           <dl className="print-facts">

@@ -1,5 +1,7 @@
-import { ArrowUpRight, Files, House } from 'lucide-react';
+import { ArrowUpRight, House } from 'lucide-react';
 import Link from 'next/link';
+
+import { BrandLogo } from '../brand/BrandLogo';
 
 import { UserMenu } from './UserMenu';
 
@@ -20,12 +22,7 @@ export function AppShell({
       </a>
       <header className="site-header">
         <Link href="/" className="brand" aria-label="Tax Clear AI — Trang chủ">
-          <span className="brand-icon">
-            <Files size={20} strokeWidth={1.8} />
-          </span>
-          <span>
-            Tax Clear<span className="brand-ai"> AI</span>
-          </span>
+          <BrandLogo height={44} />
         </Link>
         <nav aria-label="Điều hướng chính">
           <Link href="/" aria-current={current('home')}>
