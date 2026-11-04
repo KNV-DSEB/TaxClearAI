@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     'Ghi nhận tình trạng doanh nghiệp, sắp xếp checklist và chuẩn bị khảo sát với chuyên viên.',
   applicationName: 'Tax Clear AI',
   openGraph: {
-    title: 'Tax Clear AI — Gỡ rối hồ sơ. Biết bước chuẩn bị tiếp theo.',
+    title: 'Tax Clear AI — Giải thể gọn gàng. An tâm sang trang.',
     description: 'Trợ lý chuẩn bị hồ sơ giải thể cho doanh nghiệp. Bản thử nghiệm.',
     locale: 'vi_VN',
     type: 'website',

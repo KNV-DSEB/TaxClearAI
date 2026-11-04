@@ -361,7 +361,7 @@ def social(page, svgs: dict[str, Path]) -> None:
         f"""<div class="canvas light" style="padding:72px 80px;display:grid;align-content:space-between">
         {big_ghost}{fit(logo_h, 430)}
         <div><span class="tag" style="font-size:22px">Trợ lý chuẩn bị hồ sơ giải thể</span>
-        <h1 style="font-size:64px;line-height:1.08;letter-spacing:-.03em;margin:22px 0 0;max-width:1040px">Gỡ rối hồ sơ.<br><span style="color:#17705f">Biết bước chuẩn bị tiếp theo.</span></h1></div>
+        <h1 style="font-size:64px;line-height:1.08;letter-spacing:-.03em;margin:22px 0 0;max-width:1040px">Giải thể gọn gàng.<br><span style="color:#17705f">An tâm sang trang.</span></h1></div>
         <p style="margin:0;font-size:22px;color:#4d6764">Khảo sát 11 câu · Checklist giấy tờ · Hỏi đáp có trích dẫn văn bản</p></div>""",
     )
     shot(
@@ -382,7 +382,7 @@ def social(page, svgs: dict[str, Path]) -> None:
         624,
         f"""<div class="canvas dark" style="padding:0 120px;display:flex;align-items:center;justify-content:space-between">
         <div style="display:grid;gap:26px">{fit(logo_h_dark, 520)}
-        <p style="margin:0;font-size:40px;font-weight:600;letter-spacing:-.02em;max-width:820px">Gỡ rối hồ sơ giải thể. <span class="saffron">Từng bước, rõ ràng.</span></p></div>
+        <p style="margin:0;font-size:40px;font-weight:600;letter-spacing:-.02em;max-width:820px">Giải thể gọn gàng. <span class="saffron">An tâm sang trang.</span></p></div>
         {sized(mark_dark, 380, 380)}</div>""",
     )
     shot(
@@ -392,7 +392,7 @@ def social(page, svgs: dict[str, Path]) -> None:
         f"""<div class="canvas light" style="padding:0 96px;display:flex;align-items:center">
         {sized(mark, 560, 560).replace('<svg ', '<svg style="position:absolute;right:-90px;top:-82px" ', 1)}
         <div style="display:grid;gap:16px;max-width:980px">{fit(logo_h, 300)}
-        <p style="margin:0;font-size:46px;font-weight:600;letter-spacing:-.02em;line-height:1.15">Chuẩn bị hồ sơ giải thể, <span class="saffron">rõ ràng từng bước.</span></p></div></div>""",
+        <p style="margin:0;font-size:46px;font-weight:600;letter-spacing:-.02em;line-height:1.15">Giải thể gọn gàng. <span class="saffron">An tâm sang trang.</span></p></div></div>""",
     )
     shot(
         "slide-cover-1920x1080",
@@ -402,7 +402,7 @@ def social(page, svgs: dict[str, Path]) -> None:
         {sized(mark_dark, 1400, 1400).replace('<svg ', '<svg style="position:absolute;right:-420px;top:-160px;opacity:.16" ', 1)}
         {fit(logo_h_dark, 560)}
         <div style="display:grid;gap:30px"><span class="tag" style="font-size:26px;justify-self:start">Giới thiệu sản phẩm</span>
-        <h1 style="margin:0;font-size:120px;line-height:1;letter-spacing:-.04em;max-width:1300px">Gỡ rối hồ sơ.<br><span class="saffron">Biết bước tiếp theo.</span></h1></div>
+        <h1 style="margin:0;font-size:120px;line-height:1;letter-spacing:-.04em;max-width:1300px">Giải thể gọn gàng.<br><span class="saffron">An tâm sang trang.</span></h1></div>
         <p style="margin:0;font-size:28px;color:#c9f0e2">Trợ lý chuẩn bị hồ sơ giải thể cho doanh nghiệp · Bản thử nghiệm</p></div>""",
     )
 

@@ -33,9 +33,9 @@ export default function HomePage() {
           <div className="hero-copy">
             <span className="pill">Trợ lý thủ tục giải thể &amp; thuế</span>
             <h1>
-              Gỡ rối hồ sơ.
+              Giải thể gọn gàng.
               <br />
-              <span>Biết bước chuẩn bị tiếp theo.</span>
+              <span>An tâm sang trang.</span>
             </h1>
             <p className="hero-description">
               Tax Clear AI giúp doanh nghiệp từng hoạt động muốn giải thể ghi nhận tình trạng, sắp
