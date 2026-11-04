@@ -13,7 +13,7 @@ vi.mock('@/services/assessments.service', () => ({ assessmentsService: { get: vi
 
 const assessment = {
   id: 'case-1',
-  questionnaireVersion: 'b2-draft-1',
+  questionnaireVersion: 'groups-draft-2',
   contentStatus: 'draft',
   answers: {},
   summary: {

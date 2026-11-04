@@ -1,0 +1,123 @@
+[
+  {
+    "slug": "giai-the-doanh-nghiep-2002023",
+    "categories": ["company_dissolution", "tax_closure"],
+    "documentType": "Thủ tục hành chính",
+    "documentNumber": "2.002023",
+    "documentTitle": "Giải thể doanh nghiệp; giải thể theo quyết định của Tòa án hoặc khi bị thu hồi giấy chứng nhận",
+    "authority": "Cơ quan đăng ký kinh doanh cấp tỉnh; cơ quan thuế phối hợp",
+    "summary": "Trình tự giải thể doanh nghiệp và trường hợp bị thu hồi giấy chứng nhận hoặc theo quyết định của Tòa án. Mã 2.002023 không phải mã thủ tục chấm dứt hiệu lực mã số thuế.",
+    "appliesTo": ["Doanh nghiệp B1, B2", "Doanh nghiệp bị thu hồi giấy chứng nhận", "Doanh nghiệp theo quyết định của Tòa án"],
+    "overview": "Doanh nghiệp chỉ được giải thể khi bảo đảm thanh toán hết các khoản nợ và nghĩa vụ tài sản, đồng thời không đang giải quyết tranh chấp tại Tòa án hoặc Trọng tài. Hồ sơ đi qua cơ quan đăng ký kinh doanh và cơ quan thuế; việc hoàn tất nghĩa vụ thuế là một phần của quy trình.",
+    "legalBasis": ["Luật Doanh nghiệp 59/2020/QH14, Điều 207–210 (đã được sửa đổi, bổ sung).", "Nghị định 168/2025/NĐ-CP về đăng ký doanh nghiệp.", "Quyết định 2354/QĐ-BTC công bố thủ tục hành chính mã 2.002023."],
+    "processSteps": [
+      {"title": "Thông qua và gửi thông báo giải thể", "description": "Thông qua nghị quyết hoặc quyết định giải thể, gửi thông báo cùng nghị quyết/quyết định và biên bản họp (nếu có). Cơ quan đăng ký kinh doanh công bố tình trạng đang làm thủ tục giải thể và chuyển thông tin cho cơ quan thuế.", "authority": "Cơ quan đăng ký kinh doanh cấp tỉnh", "timing": "Thông báo kết quả xử lý hồ sơ hợp lệ trong 03 ngày làm việc."},
+      {"title": "Hoàn thành nghĩa vụ và chấm dứt đơn vị phụ thuộc", "description": "Thanh lý tài sản, thanh toán nợ và nghĩa vụ với người lao động; hoàn tất nghĩa vụ thuế, bảo hiểm và chấm dứt hoạt động chi nhánh, văn phòng đại diện, địa điểm kinh doanh trước khi nộp hồ sơ giải thể cuối cùng.", "authority": "Cơ quan thuế, cơ quan bảo hiểm và cơ quan đăng ký kinh doanh", "timing": "Phụ thuộc tình trạng nghĩa vụ và hồ sơ thực tế."},
+      {"title": "Nộp hồ sơ đăng ký giải thể", "description": "Nộp báo cáo thanh lý tài sản, danh sách chủ nợ và số nợ đã thanh toán cùng các giấy tờ theo loại hình doanh nghiệp. Cơ quan đăng ký kinh doanh phối hợp cơ quan thuế kiểm tra nghĩa vụ.", "authority": "Cơ quan đăng ký kinh doanh cấp tỉnh", "timing": "Thủ tục công bố kết quả đăng ký giải thể: 05 ngày làm việc kể từ khi nhận hồ sơ hợp lệ theo thủ tục công bố."}
+    ],
+    "checklist": ["Nghị quyết hoặc quyết định giải thể; biên bản họp nếu loại hình doanh nghiệp yêu cầu.", "Thông báo giải thể theo biểu mẫu hiện hành.", "Báo cáo thanh lý tài sản và danh sách chủ nợ, khoản nợ đã thanh toán.", "Xác nhận/hoàn tất nghĩa vụ thuế, bảo hiểm và chấm dứt đơn vị phụ thuộc.", "Giấy ủy quyền và giấy tờ pháp lý của người được ủy quyền, nếu có."],
+    "timeline": "03 ngày làm việc cho thông báo kết quả xử lý hồ sơ hợp lệ; thủ tục đăng ký giải thể có thời hạn công bố theo nội dung thủ tục hành chính. Nghĩa vụ thuế có thể làm thay đổi thời gian thực tế.",
+    "notes": ["Muốn tra cứu riêng thủ tục chấm dứt hiệu lực mã số thuế của tổ chức, xem thủ tục mã 9995; trường hợp hộ kinh doanh, cơ quan đăng ký kinh doanh cấp xã xử lý chấm dứt hoạt động.", "Mã thủ tục 2.002023 là thủ tục giải thể doanh nghiệp. Không áp dụng thời hạn 03 ngày như một cam kết hoàn tất toàn bộ nghĩa vụ thuế.", "Thành phần hồ sơ có thể thay đổi theo tình trạng hồ sơ và văn bản đang có hiệu lực; kiểm tra biểu mẫu tại cổng dịch vụ công trước khi nộp."],
+    "sources": [
+      {"label": "Cổng Dịch vụ công Quốc gia — thủ tục 2.002023", "url": "https://vpcp.dichvucong.gov.vn/p/home/dvc-tthc-thu-tuc-hanh-chinh-chi-tiet.html?ma_thu_tuc=7179", "sourceType": "official"},
+      {"label": "Cổng Dịch vụ công Quốc gia — chấm dứt hiệu lực MST tổ chức, mã 9995", "url": "https://vpcp.dichvucong.gov.vn/p/home/dvc-tthc-thu-tuc-hanh-chinh-chi-tiet.html?ma_thu_tuc=9995", "sourceType": "official"},
+      {"label": "Nghị định 168/2025/NĐ-CP — Công báo điện tử", "url": "https://congbao.chinhphu.vn/van-ban/nghi-dinh-so-168-2025-nd-cp-45354/57297.htm", "sourceType": "official"}
+    ]
+  },
+  {
+    "slug": "cong-van-16148-btc-dntn",
+    "categories": ["company_dissolution", "guidance"],
+    "documentType": "Công văn hướng dẫn",
+    "documentNumber": "16148/BTC-DNTN",
+    "documentTitle": "Đẩy nhanh tiến độ xử lý thủ tục giải thể doanh nghiệp",
+    "authority": "Bộ Tài chính",
+    "summary": "Công văn ngày 12/10/2026 đề nghị cơ quan đăng ký kinh doanh cấp tỉnh phối hợp cơ quan thuế và xử lý, chuyển thông tin hồ sơ trong thời hạn 01 ngày làm việc.",
+    "appliesTo": ["Doanh nghiệp đang làm thủ tục giải thể", "Cơ quan đăng ký kinh doanh", "Cơ quan thuế"],
+    "overview": "Văn bản đôn đốc, điều phối xử lý giữa cơ quan đăng ký kinh doanh và cơ quan thuế nhằm rút ngắn thời gian giải quyết hồ sơ. Công văn không xóa bỏ điều kiện giải thể, không thay thế nghĩa vụ thanh toán nợ hoặc quyết toán thuế theo luật.",
+    "legalBasis": ["Luật Doanh nghiệp 59/2020/QH14, Điều 207–210.", "Nghị định 168/2025/NĐ-CP về đăng ký doanh nghiệp."],
+    "processSteps": [
+      {"title": "Nộp hồ sơ đăng ký giải thể", "description": "Doanh nghiệp nộp hồ sơ tại cơ quan đăng ký kinh doanh cấp tỉnh có thẩm quyền.", "authority": "Cơ quan đăng ký kinh doanh cấp tỉnh"},
+      {"title": "Chuyển thông tin phối hợp", "description": "Cơ quan đăng ký kinh doanh xử lý hồ sơ và gửi thông tin cho cơ quan thuế trong thời hạn được công văn yêu cầu.", "authority": "Cơ quan đăng ký kinh doanh cấp tỉnh", "timing": "01 ngày làm việc theo chỉ đạo tại công văn."},
+      {"title": "Rà soát nghĩa vụ thuế và phản hồi", "description": "Cơ quan thuế phối hợp rà soát, phản hồi tình trạng hoàn thành nghĩa vụ để cơ quan đăng ký kinh doanh xử lý bước tiếp theo theo quy định hiện hành.", "authority": "Cơ quan thuế"}
+    ],
+    "checklist": ["Kiểm tra tình trạng pháp lý của doanh nghiệp và đơn vị phụ thuộc.", "Chuẩn bị hồ sơ theo thủ tục 2.002023 và văn bản hiện hành.", "Đối chiếu nghĩa vụ thuế, bảo hiểm và các khoản nợ trước khi nộp."],
+    "timeline": "Công văn nêu thời hạn phối hợp 01 ngày làm việc ở bước xử lý, chuyển thông tin; đây không phải thời hạn bảo đảm hoàn tất toàn bộ thủ tục giải thể.",
+    "notes": [],
+    "sources": [
+      {"label": "Bộ Tài chính — thông tin về Công văn 16148/BTC-DNTN", "url": "https://www.mof.gov.vn/tin-tuc-tai-chinh/tin-tuc-su-kien-8/bo-tai-chinh-yeu-cau-rut-ngan-toi-da-thoi-gian-thuc-hien-thu-tuc-giai-the-doanh-nghiep", "sourceType": "official"},
+      {"label": "Bản tra cứu Công văn 16148/BTC-DNTN", "url": "https://thuvienphapluat.vn/cong-van/Doanh-nghiep/Cong-van-16148-BTC-DNTN-2026-day-nhanh-tien-do-xu-ly-thu-tuc-giai-the-doanh-nghiep-728759.aspx", "sourceType": "reference"}
+    ]
+  },
+  {
+    "slug": "cong-van-5527-tct-kk",
+    "categories": ["company_dissolution", "guidance"],
+    "documentType": "Công văn tham khảo",
+    "documentNumber": "5527/TCT-KK",
+    "documentTitle": "Trả lời kiến nghị về hồ sơ giải thể doanh nghiệp",
+    "authority": "Tổng cục Thuế (Bộ Tài chính), ban hành ngày 26/12/2019",
+    "summary": "Công văn trả lời kiến nghị của một doanh nghiệp theo Luật Doanh nghiệp 2014. Đây là tài liệu tham khảo lịch sử cho tình huống cụ thể, không phải danh mục hồ sơ hiện hành áp dụng chung.",
+    "appliesTo": ["Người cần tham khảo cách cơ quan thuế từng giải đáp hồ sơ giải thể", "Không dùng thay checklist hiện hành"],
+    "overview": "Công văn được ban hành trong bối cảnh Luật Doanh nghiệp 2014 và trả lời kiến nghị riêng. Khi chuẩn bị hồ sơ hiện nay, ưu tiên Luật Doanh nghiệp 2020 đã sửa đổi, Nghị định 168/2025/NĐ-CP và nội dung thủ tục 2.002023 trên Cổng Dịch vụ công Quốc gia.",
+    "legalBasis": ["Luật Doanh nghiệp 68/2014/QH13 (văn bản được công văn viện dẫn; đã được thay thế).", "Luật Doanh nghiệp 59/2020/QH14 và Nghị định 168/2025/NĐ-CP cho thủ tục hiện hành."],
+    "processSteps": [
+      {"title": "Xác định bối cảnh văn bản", "description": "Đọc công văn như một văn bản trả lời một kiến nghị cụ thể, được phát hành theo pháp luật năm 2014.", "authority": "Tài liệu tham khảo"},
+      {"title": "Đối chiếu quy định đang áp dụng", "description": "So sánh từng yêu cầu với luật, nghị định và thành phần hồ sơ thủ tục 2.002023 hiện hành trước khi áp dụng.", "authority": "Cơ quan đăng ký kinh doanh cấp tỉnh và cơ quan thuế"}
+    ],
+    "checklist": ["Không dùng công văn này làm danh mục hồ sơ duy nhất.", "Kiểm tra thủ tục 2.002023 và văn bản hiện hành tại Cổng Dịch vụ công Quốc gia.", "Liên hệ cơ quan thuế nếu hồ sơ có tình tiết hoặc nghĩa vụ riêng."],
+    "timeline": "Không đặt thời hạn hiện hành dựa trên công văn năm 2019.",
+    "notes": ["Nội dung của công văn viện dẫn Luật Doanh nghiệp 2014; phần quy định đó đã được thay thế.", "Trang thư viện gắn nhãn lịch sử để tránh nhầm hướng dẫn cũ với quy trình hiện hành."],
+    "sources": [
+      {"label": "Bản tra cứu Công văn 5527/TCT-KK do người dùng cung cấp", "url": "https://thuvienphapluat.vn/cong-van/Doanh-nghiep/Cong-van-5527-TCT-KK-2019-huong-dan-ho-so-giai-the-doanh-nghiep-512017.aspx", "sourceType": "reference"},
+      {"label": "Cổng Dịch vụ công Quốc gia — thủ tục 2.002023 hiện hành", "url": "https://vpcp.dichvucong.gov.vn/p/home/dvc-tthc-thu-tuc-hanh-chinh-chi-tiet.html?ma_thu_tuc=7179", "sourceType": "official"}
+    ]
+  },
+  {
+    "slug": "cham-dut-ho-kinh-doanh",
+    "categories": ["household", "tax_closure"],
+    "documentType": "Thủ tục hành chính",
+    "documentNumber": "Điều 104 Nghị định 168/2025/NĐ-CP",
+    "documentTitle": "Chấm dứt hoạt động hộ kinh doanh",
+    "authority": "Cơ quan đăng ký kinh doanh cấp xã; cơ quan thuế phối hợp",
+    "summary": "Hộ kinh doanh hoàn tất nợ, nộp thông báo chấm dứt hoạt động tại cấp xã; cơ quan đăng ký kinh doanh trao đổi thông tin với cơ quan thuế.",
+    "appliesTo": ["Hộ kinh doanh A1–A3", "Chủ hộ kinh doanh", "Thành viên hộ gia đình cùng đăng ký"],
+    "overview": "Nghị định 168/2025/NĐ-CP chuyển thủ tục chấm dứt hoạt động hộ kinh doanh về cơ quan đăng ký kinh doanh cấp xã. Hộ kinh doanh cần thanh toán nghĩa vụ, gồm nợ thuế, trước khi nộp hồ sơ, trừ khi có thỏa thuận khác với chủ nợ.",
+    "legalBasis": ["Nghị định 168/2025/NĐ-CP, Điều 104.", "Thông tư 86/2024/TT-BTC và các văn bản sửa đổi về đăng ký thuế."],
+    "processSteps": [
+      {"title": "Hoàn tất nghĩa vụ và khoản nợ", "description": "Thanh toán các khoản nợ, gồm nợ thuế và nghĩa vụ tài chính khác; trường hợp có thỏa thuận khác với chủ nợ thì lưu lại tài liệu chứng minh.", "authority": "Cơ quan thuế và chủ nợ"},
+      {"title": "Nộp thông báo chấm dứt", "description": "Gửi hồ sơ đăng ký chấm dứt hoạt động hộ kinh doanh đến cơ quan đăng ký kinh doanh cấp xã nơi đăng ký.", "authority": "Cơ quan đăng ký kinh doanh cấp xã", "timing": "Trong 05 ngày làm việc kể từ ngày thanh toán hết các khoản nợ."},
+      {"title": "Đối chiếu nghĩa vụ thuế", "description": "Cơ quan đăng ký kinh doanh chuyển thông tin cho cơ quan thuế; cơ quan thuế gửi ý kiến về việc hoàn thành nghĩa vụ thuế. Cơ quan đăng ký cập nhật tình trạng chấm dứt theo quy định.", "authority": "Cơ quan đăng ký kinh doanh cấp xã và cơ quan thuế", "timing": "Cơ quan thuế phản hồi trong 02 ngày làm việc; cơ quan đăng ký xử lý trong thời hạn theo Điều 104."}
+    ],
+    "checklist": ["Thông báo chấm dứt hoạt động hộ kinh doanh theo mẫu hiện hành.", "Biên bản họp thành viên hộ gia đình nếu các thành viên cùng đăng ký hộ kinh doanh.", "Tài liệu chứng minh việc hoàn thành nghĩa vụ thuế, khoản nợ hoặc thỏa thuận với chủ nợ khi được yêu cầu.", "Giấy ủy quyền nếu người nộp hồ sơ không phải chủ hộ."],
+    "timeline": "Nộp trong 05 ngày làm việc sau khi thanh toán hết nợ; cơ quan thuế có 02 ngày làm việc để phản hồi thông tin nghĩa vụ theo Điều 104.",
+    "notes": ["Thủ tục hiện hành nộp tại cơ quan đăng ký kinh doanh cấp xã; hướng dẫn cũ yêu cầu nộp ở cấp huyện không còn phù hợp với cơ cấu hiện nay.", "Mẫu giấy và thành phần hồ sơ có thể được cập nhật; kiểm tra cổng dịch vụ công nơi hộ kinh doanh đăng ký."],
+    "sources": [
+      {"label": "Nghị định 168/2025/NĐ-CP — Công báo điện tử", "url": "https://congbao.chinhphu.vn/van-ban/nghi-dinh-so-168-2025-nd-cp-45354/57297.htm", "sourceType": "official"},
+      {"label": "Cổng Dịch vụ công Quốc gia — thủ tục chấm dứt hoạt động hộ kinh doanh", "url": "https://vpcp.dichvucong.gov.vn/p/home/dvc-chi-tiet-thu-tuc-dung-chung.html?ma_thu_tuc=1.001266", "sourceType": "official"}
+    ]
+  },
+  {
+    "slug": "huy-bo-quyet-dinh-giai-the",
+    "categories": ["company_dissolution", "guidance"],
+    "documentType": "Thủ tục hành chính",
+    "documentNumber": "Nghị định 168/2025/NĐ-CP, sửa đổi bởi Nghị định 296/2026/NĐ-CP",
+    "documentTitle": "Thông báo hủy bỏ nghị quyết, quyết định giải thể doanh nghiệp",
+    "authority": "Cơ quan đăng ký kinh doanh cấp tỉnh",
+    "summary": "Doanh nghiệp có thể thông báo hủy bỏ quyết định giải thể khi chưa bị chuyển tình trạng pháp lý sang đã giải thể và còn trong thời hạn luật định.",
+    "appliesTo": ["Doanh nghiệp đã thông báo giải thể nhưng quyết định tiếp tục hoạt động", "Chủ sở hữu, hội đồng thành viên hoặc đại hội đồng cổ đông"],
+    "overview": "Theo quy trình hiện hành, doanh nghiệp gửi thông báo và quyết định/nghị quyết hủy bỏ đến cơ quan đăng ký kinh doanh cấp tỉnh trong thời hạn 180 ngày kể từ khi cơ quan này nhận quyết định giải thể, nếu trạng thái doanh nghiệp chưa là đã giải thể. Cơ quan đăng ký khôi phục tình trạng pháp lý và gửi thông tin cho cơ quan thuế.",
+    "legalBasis": ["Luật Doanh nghiệp 59/2020/QH14, Điều 208.", "Nghị định 168/2025/NĐ-CP về đăng ký doanh nghiệp, được sửa đổi bởi Nghị định 296/2026/NĐ-CP có hiệu lực từ 23/07/2026.", "Thông tư 68/2025/TT-BTC về biểu mẫu đăng ký doanh nghiệp."],
+    "processSteps": [
+      {"title": "Thông qua việc hủy bỏ", "description": "Cơ quan có thẩm quyền trong doanh nghiệp ban hành nghị quyết hoặc quyết định hủy bỏ nghị quyết/quyết định giải thể.", "authority": "Chủ doanh nghiệp, chủ sở hữu, hội đồng thành viên hoặc đại hội đồng cổ đông"},
+      {"title": "Gửi hồ sơ trong thời hạn", "description": "Nộp thông báo hủy bỏ cùng nghị quyết/quyết định hủy bỏ tại cơ quan đăng ký kinh doanh cấp tỉnh nơi đặt trụ sở chính.", "authority": "Cơ quan đăng ký kinh doanh cấp tỉnh", "timing": "Trong 180 ngày, khi doanh nghiệp chưa bị chuyển trạng thái sang đã giải thể."},
+      {"title": "Khôi phục tình trạng pháp lý", "description": "Cơ quan đăng ký đăng tải thông báo, khôi phục trạng thái doanh nghiệp trên hệ thống đăng ký và gửi thông tin cho cơ quan thuế.", "authority": "Cơ quan đăng ký kinh doanh cấp tỉnh", "timing": "01 ngày làm việc kể từ khi nhận thông báo hợp lệ theo quy định hiện hành."}
+    ],
+    "checklist": ["Thông báo về việc hủy bỏ nghị quyết, quyết định giải thể theo mẫu hiện hành.", "Nghị quyết/quyết định của đúng cơ quan có thẩm quyền về việc hủy bỏ.", "Giấy ủy quyền và giấy tờ của người được ủy quyền, nếu nộp thay.", "Kiểm tra doanh nghiệp chưa chuyển tình trạng pháp lý sang đã giải thể."],
+    "timeline": "Mốc 180 ngày tính từ ngày cơ quan đăng ký nhận quyết định giải thể; cơ quan đăng ký xử lý khôi phục theo thời hạn 01 ngày làm việc được quy định.",
+    "notes": ["Không thể dùng thủ tục này nếu tình trạng pháp lý đã chuyển sang đã giải thể.", "Mẫu hồ sơ phải theo biểu mẫu hiện hành; kiểm tra phiên bản mới nhất tại cơ quan đăng ký kinh doanh."],
+    "sources": [
+      {"label": "Nghị định 296/2026/NĐ-CP — Công báo điện tử", "url": "https://congbao.chinhphu.vn/van-ban/nghi-dinh-so-296-2026-nd-cp-470177/67429.htm", "sourceType": "official"},
+      {"label": "Nghị định 168/2025/NĐ-CP — Công báo điện tử", "url": "https://congbao.chinhphu.vn/van-ban/nghi-dinh-so-168-2025-nd-cp-45354/57297.htm", "sourceType": "official"},
+      {"label": "Hướng dẫn thành phần hồ sơ và thời hạn", "url": "https://thuvienphapluat.vn/phap-luat-doanh-nghiep/cong-viec-phap-ly/thong-bao-huy-bo-nghi-quyet-quyet-dinh-giai-the-doanh-nghiep-tu-23-07-2026-495.html", "sourceType": "reference"}
+    ]
+  }
+]

@@ -32,14 +32,57 @@ def test_unknown_answers_remain_unknown_in_summary():
     assert "tổng hợp câu trả lời" in summary.notice.lower()
 
 
-def test_household_receives_scope_notice_and_no_company_checklist():
-    data = answers(businessType="household")
-    assert build_summary(data).scope == "out_of_scope"
-    assert prepare_checklist(data, uuid4()) == []
+def test_registered_household_defaults_to_a2_checklist_and_unregistered_maps_to_a1():
+    registered = answers(businessType="household", registrationStatus="yes")
+    assert build_summary(registered).scope == "a2"
+    assert len(prepare_checklist(registered, uuid4())) == 5
+
+    unregistered = answers(businessType="household", registrationStatus="no")
+    assert build_summary(unregistered).scope == "a1"
+    assert len(prepare_checklist(unregistered, uuid4())) == 3
 
 
 def test_missing_revenue_evidence_is_not_classified_as_b2():
     assert build_summary(answers(revenueStatus="unknown")).scope == "needs_confirmation"
+
+
+def test_classification_all_five_groups():
+    cases = [
+        (answers(businessType="household", registrationStatus="no"), "a1", 3),
+        (
+            answers(
+                businessType="household",
+                registrationStatus="yes",
+                filingStatus="incomplete",
+            ),
+            "a2",
+            5,
+        ),
+        (
+            answers(
+                businessType="household",
+                registrationStatus="yes",
+                filingStatus="complete",
+                taxNoticeStatus="yes",
+            ),
+            "a3",
+            4,
+        ),
+        (
+            answers(
+                businessType="company",
+                revenueStatus="no",
+                revenueStartedYear=None,
+            ),
+            "b1",
+            5,
+        ),
+        (answers(businessType="company", revenueStatus="yes"), "b2", 19),
+    ]
+
+    for data, expected_scope, expected_count in cases:
+        assert build_summary(data).scope == expected_scope
+        assert len(prepare_checklist(data, uuid4())) == expected_count
 
 
 def test_draft_checklist_does_not_claim_documents_are_mandatory_or_available():

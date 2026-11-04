@@ -19,7 +19,7 @@ from src.modules.auth.repository import AuthRepository
 
 ORIGIN = {"Origin": "http://localhost:3000"}
 PAYLOAD = {
-    "questionnaireVersion": "b2-draft-1",
+    "questionnaireVersion": "groups-draft-2",
     "answers": {
         "businessType": "company",
         "goal": "dissolution",
@@ -82,7 +82,7 @@ def test_real_postgres_flow_saves_and_reopens_checklist(live_client):
     client, username, password = live_client
     login(client, username, password)
     questions = client.get("/api/v1/questionnaires/b2")
-    assert len(questions.json()["data"]["questions"]) == 11
+    assert len(questions.json()["data"]["questions"]) == 14
     created = client.post("/api/v1/assessments", headers=ORIGIN, json=PAYLOAD)
     assert created.status_code == 201, created.text
     case = created.json()["data"]

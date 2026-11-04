@@ -2,11 +2,14 @@ export type TriState = 'yes' | 'no' | 'unknown';
 export type ItemStatus = 'available' | 'missing' | 'needs_verification';
 export interface Answers {
   businessType: 'company' | 'household' | 'unknown';
+  registrationStatus: TriState;
+  householdGoal: 'new_household' | 'stop' | 'continue' | 'unknown';
   goal: 'dissolution' | 'other' | 'unknown';
   establishedYear: number | null;
   revenueStatus: TriState;
   revenueStartedYear: number | null;
   filingStatus: 'complete' | 'incomplete' | 'never' | 'unknown';
+  discrepancyStatus: TriState;
   recordsStatus: 'complete' | 'partial' | 'missing' | 'unknown';
   taxNoticeStatus: TriState;
   laborInsuranceStatus: 'none' | 'obligations' | 'unknown';
@@ -39,7 +42,7 @@ export interface Assessment {
   contentStatus: 'draft' | 'approved';
   answers: Answers;
   summary: {
-    scope: 'b2' | 'out_of_scope' | 'needs_confirmation';
+    scope: 'a1' | 'a2' | 'a3' | 'b1' | 'b2' | 'out_of_scope' | 'needs_confirmation';
     knownFacts: string[];
     unknownFacts: string[];
     reviewReasons: string[];

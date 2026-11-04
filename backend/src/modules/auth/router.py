@@ -11,14 +11,15 @@ router = APIRouter(prefix="/api/v1/auth", tags=["auth"])
 
 
 def set_session_cookies(response: Response, tokens: SessionTokens) -> None:
-    secure = get_settings().environment != "development"
+    is_prod = get_settings().environment != "development"
+    samesite = "none" if is_prod else "lax"
     response.set_cookie(
         "access_token",
         tokens.access_token,
         max_age=900,
         httponly=True,
-        secure=secure,
-        samesite="strict",
+        secure=is_prod,
+        samesite=samesite,
         path="/api/v1",
     )
     response.set_cookie(
@@ -26,8 +27,8 @@ def set_session_cookies(response: Response, tokens: SessionTokens) -> None:
         tokens.refresh_token,
         max_age=604800,
         httponly=True,
-        secure=secure,
-        samesite="strict",
+        secure=is_prod,
+        samesite=samesite,
         path="/api/v1/auth",
     )
 
@@ -72,6 +73,8 @@ async def delete_session(
 ) -> Response:
     await service.logout(refresh_token)
     response = Response(status_code=204)
-    response.delete_cookie("access_token", path="/api/v1")
-    response.delete_cookie("refresh_token", path="/api/v1/auth")
+    is_prod = get_settings().environment != "development"
+    samesite = "none" if is_prod else "lax"
+    response.delete_cookie("access_token", path="/api/v1", httponly=True, secure=is_prod, samesite=samesite)
+    response.delete_cookie("refresh_token", path="/api/v1/auth", httponly=True, secure=is_prod, samesite=samesite)
     return response

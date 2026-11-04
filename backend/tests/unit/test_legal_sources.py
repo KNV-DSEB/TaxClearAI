@@ -62,7 +62,7 @@ def test_source_rejected_when_hash_domain_scheme_or_freshness_fails(changes, now
 
 def test_bundled_b2_sources_keep_original_text_hashes():
     provisions = LegalSourceRepository(DATA_FILE).list_provisions()
-    assert len(provisions) == 25
+    assert len(provisions) == 31
     assert all(is_usable(item, item.fetched_at) for item in provisions)
 
 

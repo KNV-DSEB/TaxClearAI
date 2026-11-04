@@ -60,7 +60,17 @@ class ApiSecurityMiddleware:
             await response(scope, receive, send)
             return
         if scope["method"] in {"POST", "PATCH", "DELETE", "PUT"}:
-            if headers.get("origin") != get_settings().frontend_origin:
+            origin = headers.get("origin")
+            configured = get_settings().frontend_origin
+            is_allowed = (
+                not origin
+                or configured == "*"
+                or origin == configured
+                or origin.endswith(".vercel.app")
+                or origin.startswith("http://localhost:")
+                or origin.startswith("http://127.0.0.1:")
+            )
+            if not is_allowed:
                 await _problem(403, "Không thể gửi yêu cầu", "Nguồn truy cập chưa hợp lệ.", path)(
                     scope, receive, send
                 )
@@ -73,15 +83,15 @@ class ApiSecurityMiddleware:
                 await _problem(
                     413,
                     "Dữ liệu quá lớn hoặc chưa đầy đủ",
-                    "Vui lòng rút gọn nội dung và thử lại.",
+                    "Yêu cầu vượt quá giới hạn 8 KB hoặc bị ngắt kết nối.",
                     path,
                 )(scope, receive, send)
                 return
 
-            async def replay() -> Message:
+            async def replay_receive() -> Message:
                 return {"type": "http.request", "body": body, "more_body": False}
 
-            await self.app(scope, replay, send)
+            await self.app(scope, replay_receive, send)
             return
         await self.app(scope, receive, send)
 
@@ -114,8 +124,8 @@ def register_middleware(app: FastAPI) -> None:
     app.middleware("http")(_request_id_middleware)
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=[get_settings().frontend_origin],
+        allow_origin_regex=r"^https://.*\.vercel\.app$|^http://(localhost|127\.0\.0\.1)(:\d+)?$",
         allow_credentials=True,
         allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
-        allow_headers=["Content-Type"],
+        allow_headers=["*"],
     )

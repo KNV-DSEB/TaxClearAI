@@ -1,6 +1,10 @@
 import type { Assessment, CaseStatus } from '@/types/api.types';
 
 export const SCOPE_TITLES: Record<Assessment['summary']['scope'], string> = {
+  a1: 'Hộ kinh doanh chưa đăng ký',
+  a2: 'Hộ kinh doanh cần hoàn tất kê khai',
+  a3: 'Hộ kinh doanh cần rà soát kê khai',
+  b1: 'Doanh nghiệp chưa phát sinh doanh số',
   b2: 'Giải thể doanh nghiệp',
   needs_confirmation: 'Cần xác nhận phạm vi',
   out_of_scope: 'Ngoài phạm vi bản thử',
@@ -19,7 +23,7 @@ export function caseStatus(
   if (new Date(assessment.expiresAt).getTime() <= Date.now()) return 'expired';
   const { checklist, summary } = assessment;
   const ready =
-    summary.scope === 'b2' &&
+    ['a1', 'a2', 'a3', 'b1', 'b2'].includes(summary.scope) &&
     checklist.length > 0 &&
     checklist.every((item) => item.status === 'available');
   return ready ? 'ready' : 'in_progress';

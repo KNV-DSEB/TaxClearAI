@@ -15,7 +15,7 @@ vi.mock('@/services/assessments.service', () => ({
 
 const questionnaire: Questionnaire = {
   id: 'b2',
-  version: 'b2-draft-1',
+  version: 'groups-draft-2',
   contentStatus: 'draft',
   questions: [
     {
@@ -107,7 +107,7 @@ describe('Khảo sát trước buổi làm việc', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Lưu và xem hồ sơ' }));
     await waitFor(() =>
       expect(assessmentsService.create).toHaveBeenCalledWith(
-        'b2-draft-1',
+        'groups-draft-2',
         expect.objectContaining({
           businessType: 'household',
           revenueStatus: 'yes',
