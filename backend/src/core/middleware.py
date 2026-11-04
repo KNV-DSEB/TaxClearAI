@@ -15,6 +15,12 @@ from src.core.config import get_settings
 from src.core.exceptions import _problem
 
 MAX_BODY = 8192
+LOGIN_PATHS = {"/api/v1/auth/sessions", "/api/v1/auth/guest-sessions"}
+
+
+def allowed_origins() -> list[str]:
+    """FRONTEND_ORIGIN có thể liệt kê nhiều nguồn, phân tách bằng dấu phẩy."""
+    return [item.strip() for item in get_settings().frontend_origin.split(",") if item.strip()]
 
 
 class ApiSecurityMiddleware:
@@ -53,14 +59,15 @@ class ApiSecurityMiddleware:
         headers = Headers(scope=scope)
         client = scope.get("client")
         key = str(client[0]) if client else "local"
-        is_login = path == "/api/v1/auth/sessions" and scope["method"] == "POST"
+        is_login = path in LOGIN_PATHS and scope["method"] == "POST"
         if self.limited(f"{'login' if is_login else 'api'}:{key}", 5 if is_login else 120):
             response = _problem(429, "Quá nhiều yêu cầu", "Vui lòng chờ một phút.", path)
             response.headers["Retry-After"] = "60"
             await response(scope, receive, send)
             return
         if scope["method"] in {"POST", "PATCH", "DELETE", "PUT"}:
-            if headers.get("origin") != get_settings().frontend_origin:
+            # Chỉ nguồn trong FRONTEND_ORIGIN; không ký tự đại diện, không bỏ qua khi thiếu Origin
+            if headers.get("origin") not in allowed_origins():
                 await _problem(403, "Không thể gửi yêu cầu", "Nguồn truy cập chưa hợp lệ.", path)(
                     scope, receive, send
                 )
@@ -73,15 +80,15 @@ class ApiSecurityMiddleware:
                 await _problem(
                     413,
                     "Dữ liệu quá lớn hoặc chưa đầy đủ",
-                    "Vui lòng rút gọn nội dung và thử lại.",
+                    "Yêu cầu vượt quá giới hạn 8 KB hoặc bị ngắt kết nối.",
                     path,
                 )(scope, receive, send)
                 return
 
-            async def replay() -> Message:
+            async def replay_receive() -> Message:
                 return {"type": "http.request", "body": body, "more_body": False}
 
-            await self.app(scope, replay, send)
+            await self.app(scope, replay_receive, send)
             return
         await self.app(scope, receive, send)
 
@@ -114,7 +121,7 @@ def register_middleware(app: FastAPI) -> None:
     app.middleware("http")(_request_id_middleware)
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=[get_settings().frontend_origin],
+        allow_origins=allowed_origins(),
         allow_credentials=True,
         allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
         allow_headers=["Content-Type"],

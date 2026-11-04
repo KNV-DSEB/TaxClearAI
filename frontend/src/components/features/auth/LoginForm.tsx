@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -9,25 +9,36 @@ import { authService } from '@/services/auth.service';
 
 import { AnimatedMark } from '../brand/AnimatedMark';
 
+function nextDestination(): string {
+  const destination = new URLSearchParams(window.location.search).get('returnTo') ?? '';
+  return /^\/ho-so(\/[a-f0-9-]{36})?$/.test(destination) ? destination : '/ho-so';
+}
+
 export function LoginForm() {
   const router = useRouter();
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
 
-  async function submit(event: React.FormEvent<HTMLFormElement>): Promise<void> {
-    event.preventDefault();
+  async function run(action: () => Promise<unknown>, fallback: string): Promise<void> {
     setBusy(true);
     setError('');
-    const values = new FormData(event.currentTarget);
     try {
-      await authService.login(String(values.get('username')), String(values.get('password')));
-      const destination = new URLSearchParams(window.location.search).get('returnTo') ?? '';
-      router.replace(/^\/ho-so(\/[a-f0-9-]{36})?$/.test(destination) ? destination : '/ho-so');
+      await action();
+      router.replace(nextDestination());
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'Chưa đăng nhập được. Vui lòng thử lại.');
+      setError(error instanceof Error ? error.message : fallback);
     } finally {
       setBusy(false);
     }
+  }
+
+  function submit(event: React.FormEvent<HTMLFormElement>): void {
+    event.preventDefault();
+    const values = new FormData(event.currentTarget);
+    void run(
+      () => authService.login(String(values.get('username')), String(values.get('password'))),
+      'Chưa đăng nhập được. Vui lòng thử lại.',
+    );
   }
 
   return (
@@ -39,51 +50,58 @@ export function LoginForm() {
           <br />
           của bạn ở một nơi.
         </h1>
-        <p>Đăng nhập bằng tài khoản nhóm đã cấp để lưu và mở lại hồ sơ thử nghiệm.</p>
+        <p>Dùng thử ngay không cần tài khoản, hoặc đăng nhập bằng tài khoản nhóm đã cấp.</p>
         <Link href="/">
           Tìm hiểu cách chuẩn bị <ArrowRight size={16} />
         </Link>
       </section>
-      <form
-        className="card login-form"
-        onSubmit={(event) => {
-          void submit(event);
-        }}
-      >
-        <h2>Đăng nhập bản thử</h2>
-        <p className="muted">Chỉ sử dụng thông tin giả định trong giai đoạn này.</p>
-        <label htmlFor="username">Tên đăng nhập</label>
-        <input
-          id="username"
-          name="username"
-          autoComplete="username"
-          defaultValue="demo"
-          required
-          maxLength={100}
-          spellCheck={false}
-        />
-        <label htmlFor="password">Mật khẩu</label>
-        <input
-          id="password"
-          name="password"
-          type="password"
-          autoComplete="current-password"
-          required
-          maxLength={72}
-        />
+      <div className="card login-form">
+        <h2>Dùng thử ngay</h2>
+        <p className="muted">
+          Mỗi lượt dùng thử có tài khoản tạm riêng; hồ sơ của bạn không ai khác xem được. Chỉ dùng
+          thông tin giả định.
+        </p>
+        <button
+          className="button button-primary"
+          type="button"
+          disabled={busy}
+          onClick={() => {
+            void run(() => authService.guest(), 'Chưa mở được phiên dùng thử. Vui lòng thử lại.');
+          }}
+        >
+          <Sparkles size={17} /> {busy ? 'Đang mở…' : 'Dùng thử không cần tài khoản'}
+        </button>
+        <form className="login-account" onSubmit={submit}>
+          <h3>Đã có tài khoản</h3>
+          <label htmlFor="username">Tên đăng nhập</label>
+          <input
+            id="username"
+            name="username"
+            autoComplete="username"
+            required
+            maxLength={100}
+            spellCheck={false}
+          />
+          <label htmlFor="password">Mật khẩu</label>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            autoComplete="current-password"
+            required
+            maxLength={72}
+          />
+          <button className="button button-outline" type="submit" disabled={busy}>
+            {busy ? 'Đang đăng nhập…' : 'Đăng nhập'}
+            {!busy && <ArrowRight size={17} />}
+          </button>
+        </form>
         {error && (
           <p className="error-message" role="alert">
             {error}
           </p>
         )}
-        <button className="button button-primary" type="submit" disabled={busy}>
-          {busy ? 'Đang đăng nhập…' : 'Đăng nhập để chuẩn bị hồ sơ'}
-          {!busy && <ArrowRight size={17} />}
-        </button>
-        <p className="small muted">
-          Chưa có tài khoản? Liên hệ trưởng nhóm để được cấp quyền thử nghiệm.
-        </p>
-      </form>
+      </div>
     </div>
   );
 }

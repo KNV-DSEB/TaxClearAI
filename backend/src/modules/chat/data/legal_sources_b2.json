@@ -326,6 +326,84 @@
       "fetchedAt": "2026-10-31T10:12:52.780360+00:00",
       "contentSha256": "67c10a14c12751ad126da92c6e731ea921443d040a6c4dd3e4208920c4aa847a",
       "amendedBy": null
+    },
+    {
+      "id": "L20261104TTHC2002023",
+      "documentNumber": "2.002023",
+      "documentTitle": "Thủ tục giải thể doanh nghiệp",
+      "article": "Thủ tục hành chính",
+      "clause": "Phạm vi áp dụng",
+      "point": "",
+      "text": "Mã TTHC 2.002023 là thủ tục giải thể doanh nghiệp, giải thể khi bị thu hồi giấy chứng nhận đăng ký doanh nghiệp hoặc theo quyết định của Tòa án; đây không phải mã thủ tục chấm dứt hiệu lực mã số thuế. Hồ sơ giải thể gồm các bước thông báo, hoàn thành nghĩa vụ tài chính và đăng ký giải thể theo Luật Doanh nghiệp và Nghị định 168/2025/NĐ-CP.",
+      "sourceUrl": "https://vpcp.dichvucong.gov.vn/p/home/dvc-tthc-thu-tuc-hanh-chinh-chi-tiet.html?ma_thu_tuc=7179",
+      "fetchedAt": "2026-11-04T10:00:00+00:00",
+      "contentSha256": "104cc764facc4f31af0c1f1232f190c8d92588aba846ba009702466acb527382",
+      "amendedBy": null
+    },
+    {
+      "id": "L20261104CV16148",
+      "documentNumber": "16148/BTC-DNTN",
+      "documentTitle": "Đẩy nhanh tiến độ xử lý thủ tục giải thể doanh nghiệp",
+      "article": "Nội dung công văn",
+      "clause": "Chỉ đạo phối hợp",
+      "point": "",
+      "text": "Công văn 16148/BTC-DNTN ngày 12/10/2026 đề nghị cơ quan đăng ký kinh doanh cấp tỉnh phối hợp cơ quan thuế, xử lý hồ sơ và chuyển thông tin trong thời hạn 01 ngày làm việc. Đây là chỉ đạo đôn đốc phối hợp, không miễn điều kiện giải thể, nghĩa vụ thuế hay nghĩa vụ thanh toán nợ theo Luật Doanh nghiệp.",
+      "sourceUrl": "https://www.mof.gov.vn/tin-tuc-tai-chinh/tin-tuc-su-kien-8/bo-tai-chinh-yeu-cau-rut-ngan-toi-da-thoi-gian-thuc-hien-thu-tuc-giai-the-doanh-nghiep",
+      "fetchedAt": "2026-11-04T10:00:00+00:00",
+      "contentSha256": "baebbfb69560876dad454200048a475fa71ee64c7857addd70d99e0b7d7f27e2",
+      "amendedBy": null
+    },
+    {
+      "id": "L20261104CV5527",
+      "documentNumber": "5527/TCT-KK",
+      "documentTitle": "Trả lời kiến nghị về hồ sơ giải thể doanh nghiệp",
+      "article": "Nội dung công văn",
+      "clause": "Hướng dẫn theo vụ việc",
+      "point": "",
+      "text": "Công văn 5527/TCT-KK ngày 26/12/2019 trả lời kiến nghị của một doanh nghiệp và viện dẫn Luật Doanh nghiệp 2014. Đây là tài liệu lịch sử theo vụ việc, không phải danh mục hồ sơ hiện hành dùng chung; cần đối chiếu Luật Doanh nghiệp 2020, Nghị định 168/2025/NĐ-CP và thủ tục 2.002023.",
+      "sourceUrl": "https://thuvienphapluat.vn/cong-van/Doanh-nghiep/Cong-van-5527-TCT-KK-2019-huong-dan-ho-so-giai-the-doanh-nghiep-512017.aspx",
+      "fetchedAt": "2026-11-04T10:00:00+00:00",
+      "contentSha256": "ae2d6f48523ec2555df404e68b470a58b89a0e4479a9506aeda9847325974713",
+      "amendedBy": null
+    },
+    {
+      "id": "L20261104ND168HKD",
+      "documentNumber": "168/2025/NĐ-CP",
+      "documentTitle": "Đăng ký chấm dứt hoạt động hộ kinh doanh",
+      "article": "Điều 104",
+      "clause": "Khoản 1",
+      "point": "",
+      "text": "Theo Điều 104 Nghị định 168/2025/NĐ-CP, hộ kinh doanh thanh toán các khoản nợ, gồm nợ thuế và nghĩa vụ tài chính, trước khi nộp hồ sơ (trừ thỏa thuận khác với chủ nợ). Trong 05 ngày làm việc từ ngày thanh toán hết nợ, hộ kinh doanh gửi hồ sơ đến cơ quan đăng ký kinh doanh cấp xã. Cơ quan này chuyển thông tin cho cơ quan thuế; cơ quan thuế phản hồi tình trạng nghĩa vụ thuế trong 02 ngày làm việc.",
+      "sourceUrl": "https://congbao.chinhphu.vn/van-ban/nghi-dinh-so-168-2025-nd-cp-45354/57297.htm",
+      "fetchedAt": "2026-11-04T10:00:00+00:00",
+      "contentSha256": "67a615665340467ce330b20b7871c1fa62b588ddc30fd2f4184ac1e805b8cf09",
+      "amendedBy": null
+    },
+    {
+      "id": "L20261104TTHC9995",
+      "documentNumber": "TTHC 9995",
+      "documentTitle": "Chấm dứt hiệu lực mã số thuế của tổ chức",
+      "article": "Thủ tục hành chính",
+      "clause": "Thông tư 86/2024/TT-BTC",
+      "point": "",
+      "text": "Theo thủ tục 9995 trên Cổng Dịch vụ công Quốc gia, cơ quan thuế thông báo người nộp thuế đang làm thủ tục chấm dứt hiệu lực mã số thuế trong 02 ngày làm việc kể từ khi nhận đủ hồ sơ. Sau khi hoàn thành nghĩa vụ thuế, cơ quan thuế ban hành thông báo chấm dứt hiệu lực mã số thuế theo thời hạn và biểu mẫu hiện hành. Thủ tục này khác mã giải thể doanh nghiệp 2.002023.",
+      "sourceUrl": "https://vpcp.dichvucong.gov.vn/p/home/dvc-tthc-thu-tuc-hanh-chinh-chi-tiet.html?ma_thu_tuc=9995",
+      "fetchedAt": "2026-11-04T10:00:00+00:00",
+      "contentSha256": "2f4b6ba52a6c0db7cc251fea239a5e6f9ea4e0626651e999548d14a39cccfbdc",
+      "amendedBy": null
+    },
+    {
+      "id": "L20261104ND296",
+      "documentNumber": "296/2026/NĐ-CP",
+      "documentTitle": "Sửa đổi Nghị định 168/2025/NĐ-CP về đăng ký doanh nghiệp",
+      "article": "Quy định sửa đổi",
+      "clause": "Hủy bỏ nghị quyết, quyết định giải thể",
+      "point": "",
+      "text": "Quy định hiện hành cho phép doanh nghiệp gửi thông báo hủy bỏ nghị quyết hoặc quyết định giải thể trong 180 ngày kể từ khi cơ quan đăng ký kinh doanh nhận quyết định giải thể, nếu tình trạng pháp lý chưa chuyển sang đã giải thể. Hồ sơ gồm thông báo và nghị quyết hoặc quyết định hủy bỏ; cơ quan đăng ký cập nhật lại tình trạng pháp lý và chuyển thông tin cho cơ quan thuế theo Nghị định 168/2025/NĐ-CP đã được sửa đổi bởi Nghị định 296/2026/NĐ-CP.",
+      "sourceUrl": "https://congbao.chinhphu.vn/van-ban/nghi-dinh-so-296-2026-nd-cp-470177/67429.htm",
+      "fetchedAt": "2026-11-04T10:00:00+00:00",
+      "contentSha256": "d77dc12dcbd05bfbc02c5b49c2e73b5b4ddaa763e313cf769d39baaf485ebb34",
+      "amendedBy": null
     }
   ]
 }

@@ -10,25 +10,35 @@ from src.modules.auth.service import AuthService, SessionTokens
 router = APIRouter(prefix="/api/v1/auth", tags=["auth"])
 
 
+def secure_cookies() -> bool:
+    return get_settings().environment != "development"
+
+
+# Frontend chuyển tiếp /api/v1 qua cùng tên miền nên giữ SameSite=Strict cả khi deploy
 def set_session_cookies(response: Response, tokens: SessionTokens) -> None:
-    secure = get_settings().environment != "development"
-    response.set_cookie(
-        "access_token",
-        tokens.access_token,
-        max_age=900,
-        httponly=True,
-        secure=secure,
-        samesite="strict",
-        path="/api/v1",
-    )
-    response.set_cookie(
-        "refresh_token",
-        tokens.refresh_token,
-        max_age=604800,
-        httponly=True,
-        secure=secure,
-        samesite="strict",
-        path="/api/v1/auth",
+    for name, value, max_age, path in (
+        ("access_token", tokens.access_token, 900, "/api/v1"),
+        ("refresh_token", tokens.refresh_token, 604800, "/api/v1/auth"),
+    ):
+        response.set_cookie(
+            name,
+            value,
+            max_age=max_age,
+            path=path,
+            httponly=True,
+            secure=secure_cookies(),
+            samesite="strict",
+        )
+
+
+def session_view(response: Response, tokens: SessionTokens) -> Envelope[SessionView]:
+    set_session_cookies(response, tokens)
+    response.headers["Location"] = "/api/v1/auth/sessions/current"
+    return Envelope(
+        data=SessionView(
+            user=UserView(id=tokens.user.id, username=tokens.user.username),
+            expires_at=tokens.expires_at,
+        )
     )
 
 
@@ -38,15 +48,15 @@ async def create_session(
     response: Response,
     service: AuthService = Depends(get_auth_service),
 ) -> Envelope[SessionView]:
-    tokens = await service.login(data.username, data.password)
-    set_session_cookies(response, tokens)
-    response.headers["Location"] = "/api/v1/auth/sessions/current"
-    return Envelope(
-        data=SessionView(
-            user=UserView(id=tokens.user.id, username=tokens.user.username),
-            expires_at=tokens.expires_at,
-        )
-    )
+    return session_view(response, await service.login(data.username, data.password))
+
+
+@router.post("/guest-sessions", status_code=201, response_model=Envelope[SessionView])
+async def create_guest_session(
+    response: Response,
+    service: AuthService = Depends(get_auth_service),
+) -> Envelope[SessionView]:
+    return session_view(response, await service.guest())
 
 
 @router.post("/refreshes", response_model=Envelope[RefreshView])
@@ -72,6 +82,8 @@ async def delete_session(
 ) -> Response:
     await service.logout(refresh_token)
     response = Response(status_code=204)
-    response.delete_cookie("access_token", path="/api/v1")
-    response.delete_cookie("refresh_token", path="/api/v1/auth")
+    for name, path in (("access_token", "/api/v1"), ("refresh_token", "/api/v1/auth")):
+        response.delete_cookie(
+            name, path=path, httponly=True, secure=secure_cookies(), samesite="strict"
+        )
     return response

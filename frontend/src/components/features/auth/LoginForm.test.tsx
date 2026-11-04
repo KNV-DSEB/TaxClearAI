@@ -7,7 +7,7 @@ import { LoginForm } from './LoginForm';
 
 const navigation = vi.hoisted(() => ({ replace: vi.fn() }));
 vi.mock('next/navigation', () => ({ useRouter: () => navigation }));
-vi.mock('@/services/auth.service', () => ({ authService: { login: vi.fn() } }));
+vi.mock('@/services/auth.service', () => ({ authService: { login: vi.fn(), guest: vi.fn() } }));
 
 beforeEach(() => vi.resetAllMocks());
 
@@ -23,8 +23,9 @@ describe('Đăng nhập bản thử', () => {
       expiresAt: '',
     });
     render(<LoginForm />);
+    fireEvent.change(screen.getByLabelText('Tên đăng nhập'), { target: { value: 'demo' } });
     fireEvent.change(screen.getByLabelText('Mật khẩu'), { target: { value: crypto.randomUUID() } });
-    fireEvent.click(screen.getByRole('button', { name: 'Đăng nhập để chuẩn bị hồ sơ' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Đăng nhập' }));
     await waitFor(() => expect(navigation.replace).toHaveBeenCalledWith(expected));
     window.history.replaceState(null, '', '/');
   });
@@ -36,8 +37,9 @@ describe('Đăng nhập bản thử', () => {
     });
     render(<LoginForm />);
     const password = crypto.randomUUID();
+    fireEvent.change(screen.getByLabelText('Tên đăng nhập'), { target: { value: 'demo' } });
     fireEvent.change(screen.getByLabelText('Mật khẩu'), { target: { value: password } });
-    fireEvent.click(screen.getByRole('button', { name: 'Đăng nhập để chuẩn bị hồ sơ' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Đăng nhập' }));
     await waitFor(() => expect(authService.login).toHaveBeenCalledWith('demo', password));
     expect(navigation.replace).toHaveBeenCalledWith('/ho-so');
   });
@@ -47,11 +49,24 @@ describe('Đăng nhập bản thử', () => {
       new Error('Tên đăng nhập hoặc mật khẩu chưa đúng.'),
     );
     render(<LoginForm />);
+    fireEvent.change(screen.getByLabelText('Tên đăng nhập'), { target: { value: 'demo' } });
     fireEvent.change(screen.getByLabelText('Mật khẩu'), { target: { value: crypto.randomUUID() } });
-    fireEvent.click(screen.getByRole('button', { name: 'Đăng nhập để chuẩn bị hồ sơ' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Đăng nhập' }));
     expect(await screen.findByRole('alert')).toHaveTextContent(
       'Tên đăng nhập hoặc mật khẩu chưa đúng.',
     );
     expect(navigation.replace).not.toHaveBeenCalled();
+  });
+
+  it('dùng thử mở phiên khách riêng và không đòi mật khẩu', async () => {
+    vi.mocked(authService.guest).mockResolvedValue({
+      user: { id: 'g1', username: 'khach-abc' },
+      expiresAt: '',
+    });
+    render(<LoginForm />);
+    fireEvent.click(screen.getByRole('button', { name: /Dùng thử không cần tài khoản/ }));
+    await waitFor(() => expect(navigation.replace).toHaveBeenCalledWith('/ho-so'));
+    expect(authService.login).not.toHaveBeenCalled();
+    expect(screen.queryByText(/mật khẩu bất kỳ/i)).not.toBeInTheDocument();
   });
 });

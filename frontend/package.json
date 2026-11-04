@@ -1,5 +1,5 @@
 {
-  "name": "[PROJECT_NAME]-frontend",
+  "name": "tax-clear-ai-frontend",
   "version": "0.1.0",
   "private": true,
   "scripts": {

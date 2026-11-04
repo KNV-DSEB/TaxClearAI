@@ -12,9 +12,21 @@ vi.mock('@/services/assessments.service', () => ({
   assessmentsService: { updateItem: vi.fn(), remove: vi.fn(), list: vi.fn() },
 }));
 
+vi.mock('@/components/features/experts/RecommendedExpertsSection', () => ({
+  RecommendedExpertsSection: ({
+    initialNotes,
+  }: {
+    initialNotes: string;
+  }) => (
+    <div data-testid="expert-consultation-notes">
+      {initialNotes}
+    </div>
+  ),
+}));
+
 const assessment = {
   id: 'case-1',
-  questionnaireVersion: 'b2-draft-1',
+  questionnaireVersion: 'groups-draft-2',
   contentStatus: 'draft' as const,
   answers: {},
   summary: {
@@ -97,7 +109,7 @@ describe('Chuẩn bị hồ sơ khảo sát', () => {
     fireEvent.change(screen.getByLabelText('Trạng thái: Giấy đăng ký kinh doanh'), {
       target: { value: 'available' },
     });
-    expect(await screen.findByRole('alert')).toHaveTextContent('Không lưu được.');
+    expect(await screen.findByText('Không lưu được.')).toBeInTheDocument();
     expect(screen.getByLabelText('Trạng thái: Giấy đăng ký kinh doanh')).toHaveValue(
       'needs_verification',
     );
@@ -125,7 +137,7 @@ describe('Chuẩn bị hồ sơ khảo sát', () => {
     render(<AssessmentWorkspace initial={assessment} />);
     fireEvent.click(screen.getByRole('button', { name: 'Xóa hồ sơ thử này' }));
     fireEvent.click(screen.getByRole('button', { name: 'Xác nhận xóa hồ sơ' }));
-    expect(await screen.findByRole('alert')).toHaveTextContent('Chưa xóa được.');
+    expect(await screen.findByText('Chưa xóa được.')).toBeInTheDocument();
     expect(navigation.replace).not.toHaveBeenCalled();
   });
 
@@ -171,7 +183,43 @@ describe('Chuẩn bị hồ sơ khảo sát', () => {
         }}
       />,
     );
-    expect(screen.getByText('Cần xác nhận phạm vi trước.')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Hồ sơ chưa có checklist.' })).toBeInTheDocument();
     expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
+  });
+
+  it('đưa cả hai CTA xác nhận phạm vi tới trang chuyên gia và giữ ghi chú tư vấn', () => {
+    render(
+      <AssessmentWorkspace
+        initial={{
+          ...assessment,
+          checklist: [],
+          summary: {
+            ...assessment.summary,
+            scope: 'needs_confirmation',
+            unknownFacts: ['Loại hình doanh nghiệp chưa xác định', 'Tình trạng doanh thu chưa biết'],
+            reviewReasons: ['Cần chuyên gia tra cứu tình trạng mã số thuế thực tế.'],
+          },
+        }}
+      />,
+    );
+
+    expect(screen.getByText('Cần xác nhận phạm vi hồ sơ')).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'Cần xác nhận phạm vi trước khi lập checklist' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: 'Kết nối chuyên gia để xác định phạm vi' }),
+    ).toHaveAttribute('href', '/chuyen-gia?assessmentId=case-1');
+    expect(screen.getByRole('link', { name: 'Đặt lịch tư vấn ngay' })).toHaveAttribute(
+      'href',
+      '/chuyen-gia?assessmentId=case-1',
+    );
+    expect(screen.getByTestId('expert-consultation-notes')).toHaveTextContent(
+      'Các thông tin khách hàng chưa rõ cần tra cứu:',
+    );
+    expect(screen.getByTestId('expert-consultation-notes')).toHaveTextContent(
+      'Loại hình doanh nghiệp chưa xác định',
+    );
+    expect(screen.getByTestId('expert-consultation-notes')).toHaveTextContent('Lưu ý chuyên viên:');
   });
 });

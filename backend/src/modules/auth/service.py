@@ -70,6 +70,21 @@ class AuthService:
         )
         return self.tokens(user, refresh)
 
+    async def guest(self) -> SessionTokens:
+        """Mỗi lượt dùng thử một tài khoản riêng; mật khẩu ngẫu nhiên, không ai biết."""
+        require_secret()
+        username = f"khach-{secrets.token_hex(6)}"
+        unusable = await asyncio.to_thread(hash_password, secrets.token_urlsafe(32))
+        await self.repository.bootstrap(username, unusable)
+        user = await self.repository.find_user(username)
+        if user is None:
+            raise ApplicationError(503, "Chưa tạo được phiên dùng thử. Vui lòng thử lại.")
+        refresh = secrets.token_urlsafe(48)
+        await self.repository.add_refresh(
+            user.id, digest_token(refresh), datetime.now(UTC) + timedelta(days=7)
+        )
+        return self.tokens(user, refresh)
+
     async def current_user(self, token: str | None) -> UserRecord:
         require_secret()
         claims = decode_access_token(token) if token else None

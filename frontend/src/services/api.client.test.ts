@@ -9,11 +9,14 @@ import { authService } from './auth.service';
 const transport = vi.fn<typeof fetch>();
 const answers: Answers = {
   businessType: 'company',
+  registrationStatus: 'unknown',
+  householdGoal: 'unknown',
   goal: 'dissolution',
   establishedYear: null,
   revenueStatus: 'yes',
   revenueStartedYear: null,
   filingStatus: 'unknown',
+  discrepancyStatus: 'unknown',
   recordsStatus: 'unknown',
   taxNoticeStatus: 'unknown',
   laborInsuranceStatus: 'unknown',

@@ -20,6 +20,9 @@ ALLOWED_DOMAINS = frozenset(
         "datafiles.chinhphu.vn",
         "vbpl.vn",
         "hue.gov.vn",
+        "vpcp.dichvucong.gov.vn",
+        "www.mof.gov.vn",
+        "thuvienphapluat.vn",
     }
 )
 # Chưa có công cụ đồng bộ lại trong repo, nên nguồn quá hạn sẽ tự ngừng được dùng

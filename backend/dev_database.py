@@ -13,7 +13,11 @@ from dotenv import dotenv_values
 ROOT = Path(__file__).resolve().parent
 LOCAL = ROOT / ".local"
 DATA = LOCAL / "postgres"
-BIN = Path("C:/Program Files/PostgreSQL/18/bin")
+BIN = (
+    Path("C:/Program Files/PostgreSQL/17/bin")
+    if Path("C:/Program Files/PostgreSQL/17/bin").exists()
+    else Path("C:/Program Files/PostgreSQL/18/bin")
+)
 PORT = 5543
 
 
@@ -109,7 +113,8 @@ async def provision() -> None:
                 "start",
             ],
             check=True,
-            capture_output=True,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
         )
     connection = await asyncpg.connect(
         host="127.0.0.1",

@@ -10,7 +10,10 @@ from src.modules.chat.legal_sources import LegalSourceSelector
 from src.modules.chat.provider import GeminiProvider
 from src.modules.chat.router import router as chat_router
 from src.modules.chat.service import ChatService
+from src.modules.community.router import router as community_router
+from src.modules.experts.router import router as experts_router
 from src.modules.health.router import router as health_router
+from src.modules.legal.router import router as legal_router
 
 
 def create_app() -> FastAPI:
@@ -23,10 +26,23 @@ def create_app() -> FastAPI:
     )
     register_middleware(application)
     register_exception_handlers(application)
+
+    @application.get("/")
+    async def root() -> dict[str, str]:
+        return {
+            "status": "ok",
+            "name": "Tax Clear AI Backend API",
+            "docs": "/docs",
+            "health": "/health",
+        }
+
     application.include_router(health_router)
     application.include_router(auth_router)
     application.include_router(assessments_router)
     application.include_router(chat_router)
+    application.include_router(community_router)
+    application.include_router(experts_router)
+    application.include_router(legal_router)
     return application
 
 

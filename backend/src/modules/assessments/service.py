@@ -6,6 +6,11 @@ from src.core.errors import ApplicationError
 from src.modules.assessments.content import (
     CHECKLIST_NOTE,
     DOCUMENTS,
+    DOCUMENTS_A1,
+    DOCUMENTS_A2,
+    DOCUMENTS_A3,
+    DOCUMENTS_B1,
+    DOCUMENTS_B2,
     NOTICE,
     VERSION,
     get_questionnaire,
@@ -43,8 +48,9 @@ def get_approved_chat_sources() -> list[SourceRecord]:
             title="Hướng dẫn sử dụng Tax Clear AI",
             url="/huong-dan",
             text=(
-                "Bản thử dành cho doanh nghiệp từng hoạt động muốn chuẩn bị khảo sát giải thể. "
-                "Đăng nhập bằng tài khoản được cấp. Trả lời 11 câu; có thể chọn chưa biết hoặc "
+                "Bản thử hỗ trợ hộ kinh doanh và doanh nghiệp chuẩn bị khảo sát hồ sơ. "
+                "Đăng nhập bằng tài khoản được cấp. Trả lời câu hỏi chẩn đoán; "
+                "có thể chọn chưa biết hoặc "
                 "để trống năm. Chọn Lưu và xem hồ sơ ở cuối để lưu. "
                 "Checklist giúp theo dõi giấy tờ đã có, còn thiếu hoặc cần xác minh. "
                 "Có ba trạng thái: "
@@ -63,10 +69,28 @@ def get_approved_chat_sources() -> list[SourceRecord]:
 
 
 def build_summary(data: Answers) -> Summary:
-    scope: Literal["b2", "out_of_scope", "needs_confirmation"] = "b2"
-    if data.business_type == "household" or data.goal == "other" or data.revenue_status == "no":
-        scope = "out_of_scope"
-    elif "unknown" in (data.business_type, data.goal, data.revenue_status):
+    scope: Literal["a1", "a2", "a3", "b1", "b2", "needs_confirmation"]
+    if data.business_type == "household":
+        if data.registration_status == "no":
+            scope = "a1"
+        elif data.registration_status == "unknown":
+            scope = "needs_confirmation"
+        elif data.filing_status in ("incomplete", "never"):
+            scope = "a2"
+        elif data.filing_status == "complete" and (
+            data.tax_notice_status == "yes" or data.discrepancy_status == "yes"
+        ):
+            scope = "a3"
+        else:
+            scope = "a2"
+    elif data.business_type == "company":
+        if data.revenue_status == "no":
+            scope = "b1"
+        elif data.revenue_status == "yes":
+            scope = "b2"
+        else:
+            scope = "needs_confirmation"
+    else:
         scope = "needs_confirmation"
     questions = {question.id: question for question in get_questionnaire().questions}
     known, unknown = [], []
@@ -80,18 +104,49 @@ def build_summary(data: Answers) -> Summary:
             )
             known.append(f"{question.label} — {label}")
     reasons = []
-    if data.filing_status != "complete":
+    if scope == "a1":
+        reasons.append(
+            "Cần xác minh tình trạng đăng ký và nghĩa vụ phát sinh với cơ quan có thẩm quyền."
+        )
+    elif scope == "a2":
+        reasons.append("Ưu tiên xác nhận quy trình chấm dứt hộ hiện tại trước khi đăng ký hộ mới.")
+        if data.filing_status != "complete":
+            reasons.append("Cần rà soát các kỳ kê khai còn thiếu hoặc chưa thực hiện.")
+    elif scope == "a3":
+        reasons.append(
+            "Có dấu hiệu cần đối chiếu kê khai và số liệu; nên trao đổi với chuyên gia thuế."
+        )
+    elif scope == "b1":
+        reasons.append(
+            "Cần xác minh tình trạng doanh thu, hóa đơn và nghĩa vụ còn lại trước khi chọn thủ tục."
+        )
+    elif scope == "needs_confirmation":
+        reasons.append(
+            "Hồ sơ còn thông tin chưa xác định (loại hình, đăng ký hoặc doanh thu). "
+            "Cần trao đổi với chuyên gia để tra cứu tình trạng mã số thuế thực tế."
+        )
+    if data.filing_status != "complete" and scope not in ("a1", "a2", "a3"):
         reasons.append("Tình trạng kê khai cần được chuyên viên xác minh.")
-    if data.tax_notice_status != "no":
+    if data.tax_notice_status != "no" and scope not in ("a3",):
         reasons.append("Cần xác minh thông báo hoặc nghĩa vụ thuế với chuyên viên.")
     return Summary(
-        scope=scope, known_facts=known, unknown_facts=unknown, review_reasons=reasons, notice=NOTICE
+        scope=scope,
+        known_facts=known,
+        unknown_facts=unknown,
+        review_reasons=reasons,
+        notice=NOTICE,
     )
 
 
 def prepare_checklist(data: Answers, assessment_id: UUID) -> list[ChecklistItemView]:
-    if build_summary(data).scope != "b2":
-        return []
+    documents_by_scope = {
+        "a1": DOCUMENTS_A1,
+        "a2": DOCUMENTS_A2,
+        "a3": DOCUMENTS_A3,
+        "b1": DOCUMENTS_B1,
+        "b2": DOCUMENTS_B2,
+    }
+    documents = documents_by_scope.get(build_summary(data).scope, [])
     return [
         ChecklistItemView(
             id=uuid4(),
@@ -101,7 +156,7 @@ def prepare_checklist(data: Answers, assessment_id: UUID) -> list[ChecklistItemV
             review_status="draft",
             note=CHECKLIST_NOTE,
         )
-        for code, label in DOCUMENTS
+        for code, label in documents
     ]
 
 
@@ -114,7 +169,7 @@ def case_status(record: AssessmentSummaryRecord, now: datetime) -> CaseStatus:
     if record.expires_at <= now:
         return "expired"
     if (
-        record.scope == "b2"
+        record.scope in {"a1", "a2", "a3", "b1", "b2"}
         and record.available > 0
         and record.missing == 0
         and record.needs_verification == 0

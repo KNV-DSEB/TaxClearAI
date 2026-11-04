@@ -12,6 +12,9 @@ export const authService = {
       body: JSON.stringify({ username, password }),
     });
   },
+  async guest(): Promise<Session> {
+    return apiData<Session>('/api/v1/auth/guest-sessions', { method: 'POST' });
+  },
   async current(signal?: AbortSignal): Promise<Session['user']> {
     return apiData<Session['user']>('/api/v1/auth/sessions/current', { signal });
   },

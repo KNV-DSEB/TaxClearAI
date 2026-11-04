@@ -21,7 +21,7 @@ class AssessmentRecord:
 @dataclass(frozen=True)
 class AssessmentSummaryRecord:
     id: UUID
-    scope: Literal["b2", "out_of_scope", "needs_confirmation"]
+    scope: Literal["a1", "a2", "a3", "b1", "b2", "out_of_scope", "needs_confirmation"]
     available: int
     missing: int
     needs_verification: int

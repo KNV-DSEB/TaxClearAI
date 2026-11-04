@@ -12,11 +12,14 @@ ItemStatus = Literal["available", "missing", "needs_verification"]
 
 class Answers(ApiModel):
     business_type: Literal["company", "household", "unknown"]
+    registration_status: TriState = "unknown"
+    household_goal: Literal["new_household", "stop", "continue", "unknown"] = "unknown"
     goal: Literal["dissolution", "other", "unknown"]
     established_year: int | None = Field(ge=1900, le=datetime.now(UTC).year)
     revenue_status: TriState
     revenue_started_year: int | None = Field(ge=1900, le=datetime.now(UTC).year)
     filing_status: Literal["complete", "incomplete", "never", "unknown"]
+    discrepancy_status: TriState = "unknown"
     records_status: Literal["complete", "partial", "missing", "unknown"]
     tax_notice_status: TriState
     labor_insurance_status: Literal["none", "obligations", "unknown"]
@@ -55,7 +58,7 @@ class Questionnaire(ApiModel):
 
 
 class Summary(ApiModel):
-    scope: Literal["b2", "out_of_scope", "needs_confirmation"]
+    scope: Literal["a1", "a2", "a3", "b1", "b2", "out_of_scope", "needs_confirmation"]
     known_facts: list[str]
     unknown_facts: list[str]
     review_reasons: list[str]
@@ -110,7 +113,7 @@ class StatusCounts(ApiModel):
 
 class AssessmentListItem(ApiModel):
     id: UUID
-    scope: Literal["b2", "out_of_scope", "needs_confirmation"]
+    scope: Literal["a1", "a2", "a3", "b1", "b2", "out_of_scope", "needs_confirmation"]
     status: CaseStatus
     counts: ChecklistCounts
     created_at: datetime

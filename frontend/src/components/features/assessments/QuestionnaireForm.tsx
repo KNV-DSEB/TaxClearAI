@@ -10,11 +10,14 @@ import type { Answers, Questionnaire } from '@/types/api.types';
 
 const initialAnswers: Answers = {
   businessType: 'company',
+  registrationStatus: 'unknown',
+  householdGoal: 'unknown',
   goal: 'dissolution',
   establishedYear: null,
   revenueStatus: 'unknown',
   revenueStartedYear: null,
   filingStatus: 'unknown',
+  discrepancyStatus: 'unknown',
   recordsStatus: 'unknown',
   taxNoticeStatus: 'unknown',
   laborInsuranceStatus: 'unknown',

@@ -223,13 +223,13 @@ fieldset {
   display: flex;
   align-items: center;
 }
-.site-header nav {
+.site-header nav.desktop-navigation {
   display: flex;
   gap: 28px;
   margin-left: auto;
   font-size: 14px;
 }
-.site-header nav a {
+.site-header nav.desktop-navigation a {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -238,13 +238,17 @@ fieldset {
   border-bottom: 2px solid transparent;
   white-space: nowrap;
 }
-.site-header nav a:hover {
+.site-header nav.desktop-navigation a:hover {
   color: var(--teal);
 }
-.site-header nav a[aria-current='page'] {
+.site-header nav.desktop-navigation a[aria-current='page'] {
   color: var(--teal);
   font-weight: 600;
   border-bottom-color: var(--teal);
+}
+.mobile-navigation-toggle,
+.mobile-navigation-layer {
+  display: none;
 }
 .user-menu-placeholder {
   width: 64px;
@@ -1233,6 +1237,33 @@ fieldset {
   gap: 8px;
   padding: 16px 0;
 }
+.scope-confirmation-banner {
+  display: grid;
+  justify-items: start;
+  gap: 18px;
+  padding: 20px 22px;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--amber);
+  border-radius: var(--radius-card);
+  background: var(--paper);
+}
+.scope-confirmation-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+.scope-confirmation-content h3 {
+  margin: 0 0 6px;
+  color: var(--ink);
+  text-wrap: balance;
+}
+.scope-confirmation-content p {
+  margin: 0;
+  color: var(--subtle);
+}
+.experts-anchor {
+  scroll-margin-top: 24px;
+}
 .review-list {
   list-style: disc;
   padding-left: 18px;
@@ -1369,6 +1400,16 @@ fieldset {
 .login-form .button {
   margin-top: 12px;
 }
+.login-account {
+  display: grid;
+  gap: 10px;
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+.login-account h3 {
+  font-size: 0.95rem;
+}
 .guide-article {
   max-width: 760px;
   margin: 8px auto;
@@ -1439,20 +1480,156 @@ fieldset {
     gap: 28px;
   }
 }
+@media (max-width: 767px) {
+  .site-header {
+    flex-wrap: nowrap;
+    gap: 10px;
+    padding: 12px 18px;
+  }
+  .site-header > .brand {
+    flex: 1 1 auto;
+    min-width: 0;
+    margin-right: auto;
+  }
+  .site-header nav.desktop-navigation {
+    display: none;
+  }
+  .mobile-navigation-toggle {
+    position: relative;
+    z-index: 50;
+    display: grid;
+    place-items: center;
+    flex: 0 0 48px;
+    width: 48px;
+    height: 48px;
+    margin-left: 0;
+    padding: 0;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    color: var(--ink);
+    background: white;
+  }
+  .mobile-navigation-toggle:hover {
+    border-color: var(--teal);
+    color: var(--teal);
+    background: var(--teal-soft);
+  }
+  .mobile-menu-icon {
+    position: absolute;
+    transition:
+      opacity 180ms ease,
+      transform 220ms ease;
+  }
+  .mobile-menu-icon.is-hidden {
+    opacity: 0;
+    transform: rotate(-90deg) scale(0.72);
+  }
+  .mobile-navigation-layer {
+    position: fixed;
+    z-index: 40;
+    inset: 72px 0 0;
+    display: block;
+    visibility: hidden;
+    pointer-events: none;
+    transition: visibility 220ms ease;
+  }
+  .mobile-navigation-layer.is-open {
+    visibility: visible;
+    pointer-events: auto;
+  }
+  .mobile-navigation-backdrop {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    background: rgba(13, 39, 35, 0.38);
+    opacity: 0;
+    transition: opacity 220ms ease;
+  }
+  .mobile-navigation-layer.is-open .mobile-navigation-backdrop {
+    opacity: 1;
+  }
+  .site-header nav.mobile-navigation-drawer {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    display: grid;
+    align-content: start;
+    gap: 8px;
+    width: min(88vw, 360px);
+    margin: 0;
+    padding: 18px 16px calc(24px + env(safe-area-inset-bottom));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    border-left: 1px solid var(--line);
+    background: white;
+    box-shadow: -16px 0 36px rgba(23, 63, 59, 0.14);
+    font-size: 16px;
+    transform: translateX(102%);
+    transition: transform 240ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .mobile-navigation-layer.is-open .mobile-navigation-drawer {
+    transform: translateX(0);
+  }
+  .site-header nav.mobile-navigation-drawer a {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-height: 56px;
+    padding: 12px 14px;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    color: #425e59;
+    font-size: 16px;
+    font-weight: 550;
+    white-space: normal;
+  }
+  .site-header nav.mobile-navigation-drawer a:hover,
+  .site-header nav.mobile-navigation-drawer a[aria-current='page'] {
+    border-color: #d2e8de;
+    color: var(--teal-deep);
+    background: var(--mint);
+  }
+  .site-header nav.mobile-navigation-drawer a[aria-current='page'] {
+    font-weight: 700;
+  }
+  .mobile-navigation-link svg {
+    flex: 0 0 auto;
+    color: var(--teal);
+  }
+  .site-header > .button,
+  .site-header .user-menu,
+  .site-header .user-menu-placeholder {
+    margin-left: 0;
+  }
+}
+@media (max-width: 420px) {
+  .site-header {
+    gap: 8px;
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+  .brand {
+    gap: 7px;
+    font-size: 18px;
+  }
+  .user-trigger {
+    padding-right: 10px;
+    padding-left: 10px;
+  }
+  .mobile-navigation-toggle {
+    flex-basis: 44px;
+    width: 44px;
+    height: 44px;
+  }
+}
 @media (max-width: 640px) {
   .site-header {
-    flex-wrap: wrap;
     padding: 14px 16px;
-    row-gap: 10px;
-    gap: 12px;
-  }
-  .site-header nav {
-    order: 3;
-    width: 100%;
-    margin-left: 0;
-    gap: 18px;
-    font-size: 13px;
-    overflow-x: auto;
+    gap: 10px;
   }
   .brand svg {
     height: 32px;
@@ -1461,7 +1638,7 @@ fieldset {
   .user-menu,
   .user-menu-placeholder,
   .site-header > .button {
-    margin-left: auto;
+    margin-left: 0;
   }
   .page {
     padding: 12px 16px 40px;
@@ -1488,6 +1665,14 @@ fieldset {
   }
   .page-heading {
     flex-direction: column;
+  }
+  .scope-confirmation-banner {
+    padding: 18px 16px;
+  }
+  .scope-confirmation-banner > .button {
+    width: 100%;
+    white-space: normal;
+    text-align: center;
   }
   .stepper-card {
     padding: 18px 12px;

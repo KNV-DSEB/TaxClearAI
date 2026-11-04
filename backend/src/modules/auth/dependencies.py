@@ -21,3 +21,19 @@ async def get_current_user(
     request.state.user_id = str(user.id)
     bind_contextvars(user_id=str(user.id))
     return user
+
+
+async def get_optional_user(
+    request: Request,
+    access_token: str | None = Cookie(default=None),
+    service: AuthService = Depends(get_auth_service),
+) -> UserRecord | None:
+    if not access_token:
+        return None
+    try:
+        user = await service.current_user(access_token)
+        request.state.user_id = str(user.id)
+        bind_contextvars(user_id=str(user.id))
+        return user
+    except Exception:
+        return None

@@ -1,4 +1,13 @@
-import { ArrowRight, FileText, ListChecks, MessagesSquare, ShieldCheck } from 'lucide-react';
+import {
+  ArrowRight,
+  BookOpenText,
+  BriefcaseBusiness,
+  FileText,
+  ListChecks,
+  MessagesSquare,
+  ShieldCheck,
+  UsersRound,
+} from 'lucide-react';
 import Link from 'next/link';
 
 import { HeroIllustration } from '@/components/features/home/HeroIllustration';
@@ -9,7 +18,7 @@ const START_POINTS = [
     href: '/khao-sat',
     icon: FileText,
     title: 'Trả lời khảo sát',
-    text: '11 câu hỏi ngắn để ghi nhận tình trạng doanh nghiệp.',
+    text: '14 câu hỏi ngắn để ghi nhận tình trạng hộ kinh doanh hoặc doanh nghiệp.',
   },
   {
     href: '/ho-so',
@@ -22,6 +31,24 @@ const START_POINTS = [
     icon: MessagesSquare,
     title: 'Hỏi đáp cùng AI',
     text: 'Giải thích tổng quát, kèm trích dẫn văn bản pháp luật.',
+  },
+  {
+    href: '/cong-dong',
+    icon: UsersRound,
+    title: 'Cộng đồng hỏi đáp',
+    text: 'Tìm tình huống thực tế và chia sẻ câu hỏi với cộng đồng.',
+  },
+  {
+    href: '/chuyen-gia',
+    icon: BriefcaseBusiness,
+    title: 'Chuyên gia hỗ trợ',
+    text: 'Tìm chuyên gia pháp lý, thuế phù hợp và đặt lịch tư vấn.',
+  },
+  {
+    href: '/phap-luat',
+    icon: BookOpenText,
+    title: 'Tra cứu pháp luật',
+    text: 'Tìm thủ tục hiện hành, xem checklist và mở nguồn văn bản gốc.',
   },
 ];
 

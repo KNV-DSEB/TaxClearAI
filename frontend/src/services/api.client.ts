@@ -1,7 +1,7 @@
 // The ONE place that reads the API base URL — see AGENTS.md "Frontend
 // specifics". Every other file calls a service in this folder, never fetch
 // directly from a component.
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000';
+const API_BASE_URL = '';
 
 export class ApiError extends Error {
   constructor(

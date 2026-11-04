@@ -22,6 +22,11 @@ __pycache__/
 venv/
 *.egg-info/
 .pytest_cache/
+.pytest-local-tmp/
+backend/.pytest-local-tmp/
+.pytest-tmp*
+backend/.pytest-tmp*
+*.pytest-tmp*
 .mypy_cache/
 .ruff_cache/
 htmlcov/
