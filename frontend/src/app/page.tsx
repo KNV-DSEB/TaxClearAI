@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 
-import { HeroIllustration } from '@/components/features/home/HeroIllustration';
+import { HeroPhoto } from '@/components/features/home/HeroPhoto';
 import { AppShell } from '@/components/features/navigation/AppShell';
 
 const START_POINTS = [
@@ -76,7 +76,7 @@ export default function HomePage() {
             </p>
           </div>
           <div className="hero-visual">
-            <HeroIllustration />
+            <HeroPhoto />
           </div>
         </section>
         <section className="start-section" aria-labelledby="start-heading">

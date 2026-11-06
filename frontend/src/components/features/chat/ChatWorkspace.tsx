@@ -10,6 +10,7 @@ import {
   Info,
   Lightbulb,
   Link2,
+  RotateCcw,
   Sparkles,
   Timer,
 } from 'lucide-react';
@@ -22,6 +23,7 @@ import { chatService } from '@/services/chat.service';
 import type { ChatReply, Citation } from '@/types/api.types';
 
 import { AssistantIllustration } from './AssistantIllustration';
+import { PendingReply } from './PendingReply';
 
 const TOPICS = [
   {
@@ -151,6 +153,7 @@ export function ChatWorkspace() {
   const [error, setError] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
+  const nextTurnId = useRef(0);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ block: 'end' });
@@ -160,6 +163,27 @@ export function ChatWorkspace() {
     setMessage(question);
     setError('');
     inputRef.current?.focus();
+  }
+
+  async function ask(question: string, id: number, clearInput: boolean): Promise<void> {
+    setBusy(true);
+    try {
+      const reply = await chatService.send(question);
+      setTurns((current) => current.map((turn) => (turn.id === id ? { ...turn, reply } : turn)));
+      if (clearInput) setMessage('');
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 401) {
+        router.replace(`/dang-nhap?returnTo=${encodeURIComponent('/hoi-dap')}`);
+        return;
+      }
+      const text =
+        error instanceof Error ? error.message : 'Chưa nhận được phản hồi. Vui lòng thử lại.';
+      setTurns((current) =>
+        current.map((turn) => (turn.id === id ? { ...turn, error: text } : turn)),
+      );
+    } finally {
+      setBusy(false);
+    }
   }
 
   async function submit(event: React.FormEvent<HTMLFormElement>): Promise<void> {
@@ -174,26 +198,24 @@ export function ChatWorkspace() {
       setError('Vui lòng xác nhận chỉ gửi câu hỏi tổng quát hoặc dữ liệu giả định.');
       return;
     }
-    const id = Date.now();
+    nextTurnId.current += 1;
+    const id = nextTurnId.current;
     setTurns((current) => [...current, { id, question }]);
-    setBusy(true);
-    try {
-      const reply = await chatService.send(question);
-      setTurns((current) => current.map((turn) => (turn.id === id ? { ...turn, reply } : turn)));
-      setMessage('');
-    } catch (error) {
-      if (error instanceof ApiError && error.status === 401) {
-        router.replace(`/dang-nhap?returnTo=${encodeURIComponent('/hoi-dap')}`);
-        return;
-      }
-      const text =
-        error instanceof Error ? error.message : 'Chưa nhận được phản hồi. Vui lòng thử lại.';
-      setTurns((current) =>
-        current.map((turn) => (turn.id === id ? { ...turn, error: text } : turn)),
-      );
-    } finally {
-      setBusy(false);
+    await ask(question, id, true);
+  }
+
+  function retry(turn: Turn): void {
+    setError('');
+    if (!accepted) {
+      setError('Vui lòng xác nhận chỉ gửi câu hỏi tổng quát hoặc dữ liệu giả định.');
+      return;
     }
+    setTurns((current) =>
+      current.map((item) =>
+        item.id === turn.id ? { id: item.id, question: item.question } : item,
+      ),
+    );
+    void ask(turn.question, turn.id, false);
   }
 
   return (
@@ -250,13 +272,21 @@ export function ChatWorkspace() {
                 {turn.reply ? (
                   <Answer reply={turn.reply} />
                 ) : turn.error ? (
-                  <p role="alert" className="error-message">
-                    {turn.error}
-                  </p>
+                  <div className="chat-failed">
+                    <p role="alert" className="error-message">
+                      {turn.error}
+                    </p>
+                    <button
+                      className="button button-outline"
+                      disabled={busy}
+                      onClick={() => retry(turn)}
+                      type="button"
+                    >
+                      <RotateCcw aria-hidden="true" size={15} /> Thử lại câu này
+                    </button>
+                  </div>
                 ) : (
-                  <p role="status" className="muted">
-                    Đang hỏi trợ lý…
-                  </p>
+                  <PendingReply />
                 )}
               </div>
             </div>
