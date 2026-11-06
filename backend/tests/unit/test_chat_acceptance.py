@@ -1,10 +1,11 @@
+import json
 from uuid import uuid4
 
 import httpx
 import pytest
 
 from src.core.errors import ApplicationError
-from src.modules.chat.provider import GeminiProvider
+from src.modules.chat.provider import MAX_ATTEMPTS, GeminiProvider
 from src.modules.chat.schemas import GeneratedAnswer
 from src.modules.chat.service import ChatService
 
@@ -130,6 +131,119 @@ async def test_quota_is_reported_without_provider_body_or_secret():
         await provider.generate("Cách dùng checklist?", [])
     assert caught.value.status == 429
     assert "private" not in caught.value.detail
+
+
+GOOD_BODY = {
+    "candidates": [
+        {
+            "content": {
+                "parts": [
+                    {"text": '{"reply":"Chọn trạng thái giấy tờ.","sourceIds":["product-guide"]}'}
+                ]
+            },
+            "finishReason": "STOP",
+        }
+    ]
+}
+
+
+def flaky_provider(monkeypatch, *outcomes):
+    """Trả lần lượt các kết quả (Response hoặc Exception); đếm số lần gọi."""
+    monkeypatch.setattr("src.modules.chat.provider.RETRY_DELAY", 0)
+    calls = []
+
+    def handle(request: httpx.Request):
+        outcome = outcomes[min(len(calls), len(outcomes) - 1)]
+        calls.append(request)
+        if isinstance(outcome, Exception):
+            raise outcome
+        return outcome
+
+    provider = GeminiProvider(
+        "unit-test-only", "gemini-3.5-flash-lite", httpx.MockTransport(handle)
+    )
+    return provider, calls
+
+
+async def test_provider_retries_once_after_model_overload(monkeypatch):
+    overloaded = httpx.Response(503, json={"error": {"status": "UNAVAILABLE"}})
+    provider, calls = flaky_provider(monkeypatch, overloaded, httpx.Response(200, json=GOOD_BODY))
+    result = await provider.generate("Cách dùng checklist?", [])
+    assert result.source_ids == ["product-guide"]
+    assert len(calls) == 2
+
+
+async def test_provider_retries_when_answer_is_cut_off(monkeypatch):
+    cut_off = {
+        "candidates": [
+            {"content": {"parts": [{"text": '{"reply":"Bước'}]}, "finishReason": "MAX_TOKENS"}
+        ]
+    }
+    provider, calls = flaky_provider(
+        monkeypatch, httpx.Response(200, json=cut_off), httpx.Response(200, json=GOOD_BODY)
+    )
+    assert (await provider.generate("Cách dùng checklist?", [])).source_ids == ["product-guide"]
+    assert len(calls) == 2
+
+
+async def test_retry_after_recitation_asks_for_paraphrase_with_more_variety(monkeypatch):
+    recited = {"candidates": [{"finishReason": "RECITATION"}]}
+    provider, calls = flaky_provider(
+        monkeypatch, httpx.Response(200, json=recited), httpx.Response(200, json=GOOD_BODY)
+    )
+    await provider.generate("Thủ tục giải thể?", [])
+    first, second = (json.loads(call.content) for call in calls)
+    assert "không chép lại nguyên văn" not in first["systemInstruction"]["parts"][0]["text"]
+    assert "không chép lại nguyên văn" in second["systemInstruction"]["parts"][0]["text"]
+    assert second["generationConfig"]["temperature"] > first["generationConfig"]["temperature"]
+
+
+async def test_provider_retries_when_candidate_has_no_content(monkeypatch):
+    blocked = {"candidates": [{"finishReason": "SAFETY"}]}
+    provider, calls = flaky_provider(
+        monkeypatch, httpx.Response(200, json=blocked), httpx.Response(200, json=GOOD_BODY)
+    )
+    assert (await provider.generate("Cách dùng checklist?", [])).source_ids == ["product-guide"]
+    assert len(calls) == 2
+
+
+async def test_provider_retries_after_read_timeout(monkeypatch):
+    provider, calls = flaky_provider(
+        monkeypatch, httpx.ReadTimeout("slow"), httpx.Response(200, json=GOOD_BODY)
+    )
+    assert (await provider.generate("Cách dùng checklist?", [])).source_ids == ["product-guide"]
+    assert len(calls) == 2
+
+
+async def test_provider_reports_slow_assistant_after_two_timeouts(monkeypatch):
+    provider, calls = flaky_provider(monkeypatch, httpx.ReadTimeout("slow"))
+    with pytest.raises(ApplicationError) as caught:
+        await provider.generate("Cách dùng checklist?", [])
+    assert caught.value.status == 504
+    assert len(calls) == MAX_ATTEMPTS
+
+
+async def test_provider_reports_unclear_answer_after_two_invalid_replies(monkeypatch):
+    provider, calls = flaky_provider(monkeypatch, httpx.Response(200, json={"candidates": []}))
+    with pytest.raises(ApplicationError) as caught:
+        await provider.generate("Cách dùng checklist?", [])
+    assert caught.value.status == 503
+    assert len(calls) == MAX_ATTEMPTS
+
+
+async def test_provider_does_not_retry_when_quota_is_exhausted(monkeypatch):
+    provider, calls = flaky_provider(monkeypatch, httpx.Response(429, json={}))
+    with pytest.raises(ApplicationError) as caught:
+        await provider.generate("Cách dùng checklist?", [])
+    assert caught.value.status == 429
+    assert len(calls) == 1
+
+
+def test_total_wait_stays_below_browser_timeout():
+    from src.modules.chat import provider as module
+
+    # api.client.ts hủy yêu cầu sau 25 giây; backend phải báo lỗi trước đó
+    assert module.TOTAL_DEADLINE < 25
 
 
 @pytest.mark.parametrize(
