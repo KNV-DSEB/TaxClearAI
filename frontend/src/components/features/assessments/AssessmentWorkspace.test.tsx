@@ -48,7 +48,8 @@ const assessment = {
   ],
   createdAt: '2026-10-30T00:00:00Z',
   updatedAt: '2026-10-30T00:00:00Z',
-  expiresAt: '2026-11-06T00:00:00Z',
+  // Tính từ lúc chạy test: caseStatus() so hạn với Date.now(), mốc ngày cứng sẽ tự hết hạn theo thời gian
+  expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
 };
 
 beforeEach(() => {
