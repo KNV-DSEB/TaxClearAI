@@ -1,17 +1,23 @@
+from collections.abc import Callable
 from datetime import UTC, date, datetime, timedelta
-from typing import Literal
+from typing import Any
 from uuid import UUID, uuid4
 
 from src.core.errors import ApplicationError
 from src.modules.assessments.content import (
     CHECKLIST_NOTE,
+    COMPANY_CONDITIONAL,
     DOCUMENTS,
     DOCUMENTS_A1,
     DOCUMENTS_A2,
     DOCUMENTS_A3,
     DOCUMENTS_B1,
     DOCUMENTS_B2,
+    DOCUMENTS_HOUSEHOLD,
+    HOUSEHOLD_CONDITIONAL,
+    IN_SCOPE,
     NOTICE,
+    UNKNOWN_VALUES,
     VERSION,
     get_questionnaire,
     is_visible,
@@ -33,7 +39,9 @@ from src.modules.assessments.schemas import (
     ChecklistItemView,
     CreateAssessment,
     ItemStatus,
+    Question,
     Questionnaire,
+    Scope,
     Summary,
 )
 
@@ -69,70 +77,116 @@ def get_approved_chat_sources() -> list[SourceRecord]:
     ]
 
 
-def build_summary(data: Answers) -> Summary:
-    scope: Literal["a1", "a2", "a3", "b1", "b2", "needs_confirmation"]
-    if data.business_type == "household":
-        if data.registration_status == "no":
-            scope = "a1"
-        elif data.registration_status == "unknown":
-            scope = "needs_confirmation"
-        elif data.filing_status in ("incomplete", "never"):
-            scope = "a2"
-        elif data.filing_status == "complete" and (
-            data.tax_notice_status == "yes" or data.discrepancy_status == "yes"
-        ):
-            scope = "a3"
-        else:
-            scope = "a2"
-    elif data.business_type == "company":
-        if data.revenue_status == "no":
-            scope = "b1"
-        elif data.revenue_status == "yes":
-            scope = "b2"
-        else:
-            scope = "needs_confirmation"
-    else:
-        scope = "needs_confirmation"
-    questions = {question.id: question for question in get_questionnaire().questions}
+DOCUMENTS_BY_SCOPE = {
+    "a1": DOCUMENTS_A1,
+    "a2": DOCUMENTS_A2,
+    "a3": DOCUMENTS_A3,
+    "b1": DOCUMENTS_B1,
+    "b2": DOCUMENTS_B2,
+    "household": DOCUMENTS_HOUSEHOLD,
+}
+
+Answered = dict[str, Any]
+
+
+def normalize_answers(data: Answers) -> Answered:
+    """Kiểm tra câu bắt buộc và bỏ đáp án của câu không áp dụng, để không lưu dữ liệu thừa."""
+    answers = data.model_dump(by_alias=True, mode="json")
+    missing = []
+    for question in get_questionnaire().questions:
+        if not is_visible(question, answers):
+            answers[question.id] = None
+        elif question.required and answers.get(question.id) in (None, ""):
+            missing.append(question.id)
+    if missing:
+        raise ApplicationError(422, "Vui lòng trả lời đủ các câu hỏi bắt buộc.")
+    return answers
+
+
+def classify(answers: Answered) -> Scope:
+    """Bản thử chỉ có danh mục cho giải thể hoặc chấm dứt; thủ tục khác chuyển cho chuyên viên."""
+    if answers.get("procedure") != "dissolution":
+        return "out_of_scope"
+    if answers.get("businessType") == "household":
+        return "household"
+    return "b1" if answers.get("hasRevenue") == "no" else "b2"
+
+
+def describe(question: Question, value: object) -> str:
+    if question.kind == "choice":
+        return next(
+            (option.label for option in question.options if option.value == value), str(value)
+        )
+    if question.kind == "number" and isinstance(value, int):
+        return f"{value:,}".replace(",", ".") + (f" {question.unit}" if question.unit else "")
+    return str(value)
+
+
+# Mỗi dấu hiệu chỉ nêu việc cần xác minh với chuyên viên, không kết luận pháp lý
+RISK_FLAGS: list[tuple[Callable[[Answered], bool], str]] = [
+    (
+        lambda a: a.get("operatingStatus") == "forced",
+        "Cơ sở bị yêu cầu hoặc buộc chấm dứt: nên trao đổi với chuyên gia sớm để xác định "
+        "thời hạn và nghĩa vụ.",
+    ),
+    (
+        lambda a: a.get("dnDebtGuarantee") == "no",
+        "Doanh nghiệp chưa bảo đảm thanh toán toàn bộ nợ và nghĩa vụ tài sản: cần chuyên gia "
+        "xem xét trước khi chọn hướng xử lý.",
+    ),
+    (
+        lambda a: (
+            a.get("dnTaxDebt") in {"yes", "unreconciled"} or a.get("hhTaxObligation") == "yes"
+        ),
+        "Còn nghĩa vụ thuế, tiền phạt hoặc tiền chậm nộp chưa xác nhận: cần đối chiếu với cơ quan "
+        "thuế qua chuyên viên.",
+    ),
+    (
+        lambda a: a.get("hhEmployees") == "unresolved",
+        "Còn người lao động chưa giải quyết xong quyền lợi: cần chuyên viên hướng dẫn.",
+    ),
+    (
+        lambda a: (
+            a.get("recordsAccess") in {"none", "unknown_location"}
+            or a.get("dnRecords") in {"lost", "old_accountant", "unclear"}
+            or a.get("hhInvoiceSystem") == "inaccessible"
+        ),
+        "Hồ sơ, sổ sách hoặc dữ liệu khó truy xuất: cần chuyên viên đánh giá cách khôi phục "
+        "hoặc xác minh.",
+    ),
+]
+SCOPE_REASONS: dict[str, str] = {
+    "out_of_scope": (
+        "Bản thử chỉ chuẩn bị hồ sơ giải thể hoặc chấm dứt hoạt động; nhu cầu tạm ngừng hoặc "
+        "chuyển đổi cần trao đổi với chuyên viên."
+    ),
+    "household": (
+        "Ưu tiên xác nhận quy trình chấm dứt hoạt động hộ kinh doanh và nghĩa vụ thuế trước khi "
+        "đăng ký hộ mới."
+    ),
+    "b1": (
+        "Cần xác minh tình trạng doanh thu, hóa đơn và nghĩa vụ còn lại trước khi chọn thủ tục."
+    ),
+    "b2": (
+        "Doanh nghiệp đã phát sinh doanh thu: cần rà soát quyết toán thuế, hóa đơn và nghĩa vụ "
+        "còn lại trước khi chọn thủ tục."
+    ),
+}
+
+
+def build_summary(answers: Answered) -> Summary:
+    scope = classify(answers)
     known, unknown = [], []
-    answers = data.model_dump(by_alias=True)
-    for key, value in answers.items():
-        question = questions[key]
+    for question in get_questionnaire().questions:
         if not is_visible(question, answers):
             continue
-        if value is None or value == "unknown":
+        value = answers.get(question.id)
+        if value in (None, "") or value in UNKNOWN_VALUES:
             unknown.append(question.label)
         else:
-            label = next(
-                (option.label for option in question.options if option.value == value), value
-            )
-            known.append(f"{question.label} — {label}")
-    reasons = []
-    if scope == "a1":
-        reasons.append(
-            "Cần xác minh tình trạng đăng ký và nghĩa vụ phát sinh với cơ quan có thẩm quyền."
-        )
-    elif scope == "a2":
-        reasons.append("Ưu tiên xác nhận quy trình chấm dứt hộ hiện tại trước khi đăng ký hộ mới.")
-        if data.filing_status != "complete":
-            reasons.append("Cần rà soát các kỳ kê khai còn thiếu hoặc chưa thực hiện.")
-    elif scope == "a3":
-        reasons.append(
-            "Có dấu hiệu cần đối chiếu kê khai và số liệu; nên trao đổi với chuyên gia thuế."
-        )
-    elif scope == "b1":
-        reasons.append(
-            "Cần xác minh tình trạng doanh thu, hóa đơn và nghĩa vụ còn lại trước khi chọn thủ tục."
-        )
-    elif scope == "needs_confirmation":
-        reasons.append(
-            "Hồ sơ còn thông tin chưa xác định (loại hình, đăng ký hoặc doanh thu). "
-            "Cần trao đổi với chuyên gia để tra cứu tình trạng mã số thuế thực tế."
-        )
-    if data.filing_status != "complete" and scope not in ("a1", "a2", "a3"):
-        reasons.append("Tình trạng kê khai cần được chuyên viên xác minh.")
-    if data.tax_notice_status != "no" and scope not in ("a3",):
-        reasons.append("Cần xác minh thông báo hoặc nghĩa vụ thuế với chuyên viên.")
+            known.append(f"{question.label} — {describe(question, value)}")
+    reasons = [SCOPE_REASONS[scope]] if scope in SCOPE_REASONS else []
+    reasons += [text for applies, text in RISK_FLAGS if applies(answers)]
     return Summary(
         scope=scope,
         known_facts=known,
@@ -142,15 +196,36 @@ def build_summary(data: Answers) -> Summary:
     )
 
 
-def prepare_checklist(data: Answers, assessment_id: UUID) -> list[ChecklistItemView]:
-    documents_by_scope = {
-        "a1": DOCUMENTS_A1,
-        "a2": DOCUMENTS_A2,
-        "a3": DOCUMENTS_A3,
-        "b1": DOCUMENTS_B1,
-        "b2": DOCUMENTS_B2,
-    }
-    documents = documents_by_scope.get(build_summary(data).scope, [])
+def conditional_documents(answers: Answered, scope: Scope) -> list[tuple[str, str]]:
+    """Mục thêm vào danh mục khi chính câu trả lời cho thấy có liên quan."""
+    picks: list[str] = []
+    table: dict[str, str] = {}
+    if scope == "household":
+        table = HOUSEHOLD_CONDITIONAL
+        if answers.get("hhTaxObligation") == "yes":
+            picks.append("missing_tax_returns")
+        if answers.get("hhConditional") == "yes":
+            picks.append("licenses")
+        if answers.get("hhEmployees") == "unresolved":
+            picks.append("labor_rights")
+        if answers.get("hhInvoiceSystem") in {"einvoice", "pos", "inaccessible"}:
+            picks.append("invoice_data")
+        if answers.get("hhLocations") == "many":
+            picks.append("locations")
+    elif scope in {"b1", "b2"}:
+        table = COMPANY_CONDITIONAL
+        if answers.get("dnDebtGuarantee") == "no":
+            picks.append("debt_plan")
+        if answers.get("dnTaxDebt") in {"yes", "unreconciled"}:
+            picks.append("tax_debt_confirmation")
+        if answers.get("dnRecords") in {"lost", "old_accountant"}:
+            picks.append("record_recovery")
+    return [(code, table[code]) for code in picks]
+
+
+def prepare_checklist(answers: Answered, assessment_id: UUID) -> list[ChecklistItemView]:
+    scope = classify(answers)
+    documents = DOCUMENTS_BY_SCOPE.get(scope, []) + conditional_documents(answers, scope)
     return [
         ChecklistItemView(
             id=uuid4(),
@@ -173,7 +248,7 @@ def case_status(record: AssessmentSummaryRecord, now: datetime) -> CaseStatus:
     if record.expires_at <= now:
         return "expired"
     if (
-        record.scope in {"a1", "a2", "a3", "b1", "b2"}
+        record.scope in IN_SCOPE
         and record.available > 0
         and record.missing == 0
         and record.needs_verification == 0
@@ -224,18 +299,19 @@ class AssessmentService:
     async def create(self, owner_id: UUID, request: CreateAssessment) -> AssessmentView:
         if request.questionnaire_version != VERSION:
             raise ApplicationError(409, "Bộ câu hỏi đã thay đổi. Vui lòng mở lại khảo sát.")
+        answers = normalize_answers(request.answers)
         now = datetime.now(UTC)
         record = AssessmentRecord(
             id=uuid4(),
             content_version=VERSION,
-            answers=request.answers,
-            summary=build_summary(request.answers),
+            answers=answers,
+            summary=build_summary(answers),
             checklist=[],
             created_at=now,
             updated_at=now,
             expires_at=now + timedelta(days=7),
         )
-        record.checklist = prepare_checklist(request.answers, record.id)
+        record.checklist = prepare_checklist(answers, record.id)
         await self.repository.create(owner_id, record)
         return to_view(record)
 

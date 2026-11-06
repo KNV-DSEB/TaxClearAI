@@ -6,9 +6,13 @@ export const SCOPE_TITLES: Record<Assessment['summary']['scope'], string> = {
   a3: 'Hộ kinh doanh cần rà soát kê khai',
   b1: 'Doanh nghiệp chưa phát sinh doanh số',
   b2: 'Giải thể doanh nghiệp',
+  household: 'Chấm dứt hoạt động hộ kinh doanh',
   needs_confirmation: 'Cần xác nhận phạm vi',
   out_of_scope: 'Ngoài phạm vi bản thử',
 };
+
+// Phạm vi có danh mục giấy tờ; khớp backend (content.IN_SCOPE)
+export const IN_SCOPE: string[] = ['a1', 'a2', 'a3', 'b1', 'b2', 'household'];
 
 // "Đủ giấy tờ" là đủ để làm việc với chuyên viên, không phải đã hoàn tất thủ tục pháp lý
 export const STATUS_LABELS: Record<CaseStatus, string> = {
@@ -23,7 +27,7 @@ export function caseStatus(
   if (new Date(assessment.expiresAt).getTime() <= Date.now()) return 'expired';
   const { checklist, summary } = assessment;
   const ready =
-    ['a1', 'a2', 'a3', 'b1', 'b2'].includes(summary.scope) &&
+    IN_SCOPE.includes(summary.scope) &&
     checklist.length > 0 &&
     checklist.every((item) => item.status === 'available');
   return ready ? 'ready' : 'in_progress';

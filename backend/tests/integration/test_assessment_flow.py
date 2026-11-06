@@ -15,25 +15,12 @@ from src.core.database import get_db
 from src.core.security import hash_password
 from src.main import create_app
 from src.models.auth import User
+from src.modules.assessments.content import QUESTIONS
 from src.modules.auth.repository import AuthRepository
+from tests.fixtures import COMPANY_ANSWERS, VERSION
 
 ORIGIN = {"Origin": "http://localhost:3000"}
-PAYLOAD = {
-    "questionnaireVersion": "groups-draft-2",
-    "answers": {
-        "businessType": "company",
-        "goal": "dissolution",
-        "establishedYear": 2010,
-        "revenueStatus": "yes",
-        "revenueStartedYear": 2011,
-        "filingStatus": "unknown",
-        "recordsStatus": "partial",
-        "taxNoticeStatus": "unknown",
-        "laborInsuranceStatus": "unknown",
-        "assetsInventoryStatus": "yes",
-        "receivablesPayablesStatus": "unknown",
-    },
-}
+PAYLOAD = {"questionnaireVersion": VERSION, "answers": COMPANY_ANSWERS}
 
 
 @pytest.fixture
@@ -82,13 +69,13 @@ def test_real_postgres_flow_saves_and_reopens_checklist(live_client):
     client, username, password = live_client
     login(client, username, password)
     questions = client.get("/api/v1/questionnaires/b2")
-    assert len(questions.json()["data"]["questions"]) == 14
+    assert len(questions.json()["data"]["questions"]) == len(QUESTIONS)
     created = client.post("/api/v1/assessments", headers=ORIGIN, json=PAYLOAD)
     assert created.status_code == 201, created.text
     case = created.json()["data"]
     location = created.headers["location"]
     assert case["summary"]["scope"] == "b2"
-    assert len(case["checklist"]) == 19
+    assert len(case["checklist"]) == 19  # doanh nghiệp B2, không có mục có điều kiện
     item_id = case["checklist"][0]["id"]
     changed = client.patch(
         f"{location}/checklist-items/{item_id}", headers=ORIGIN, json={"status": "available"}

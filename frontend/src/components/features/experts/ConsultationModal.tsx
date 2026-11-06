@@ -4,6 +4,7 @@ import * as Dialog from '@radix-ui/react-dialog';
 import { X } from 'lucide-react';
 import { useEffect, useState, type FormEvent } from 'react';
 
+import { SCOPE_TITLES } from '@/components/features/assessments/case-status';
 import { assessmentsService } from '@/services/assessments.service';
 import { expertsService } from '@/services/experts.service';
 import type { Assessment } from '@/types/api.types';
@@ -191,7 +192,7 @@ export function ConsultationModal({
                       <span className={styles.caseEyebrow}>Hồ sơ được chuyển giao</span>
                       <h3>
                         {assessment
-                          ? `Nhóm ${assessment.summary.scope.toUpperCase()}`
+                          ? SCOPE_TITLES[assessment.summary.scope]
                           : 'Tóm tắt hồ sơ khảo sát'}
                       </h3>
                     </div>

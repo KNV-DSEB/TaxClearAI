@@ -84,7 +84,7 @@ describe('ConsultationModal', () => {
   it('shows the case snapshot and submits requested service with consent', async () => {
     render(<ConsultationModal expert={expert} assessmentId="case-1" open onOpenChange={vi.fn()} />);
 
-    expect(await screen.findByText('Nhóm A3')).toBeInTheDocument();
+    expect(await screen.findByText('Hộ kinh doanh cần rà soát kê khai')).toBeInTheDocument();
     expect(screen.getByText('Từ 3.500.000 đ / hồ sơ')).toBeInTheDocument();
     expect(screen.getByText('Hóa đơn')).toBeInTheDocument();
     fireEvent.change(screen.getByLabelText('Họ tên'), { target: { value: 'Nguyễn An' } });

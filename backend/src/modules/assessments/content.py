@@ -1,75 +1,277 @@
+from typing import Literal
+
 from src.modules.assessments.schemas import Option, Question, Questionnaire
 
-VERSION = "groups-draft-2"
+VERSION = "groups-draft-3"
 NOTICE = "Bản tổng hợp câu trả lời và danh mục hồ sơ cần chuẩn bị để trao đổi với chuyên viên."
 CHECKLIST_NOTE = "Mục gợi ý để khảo sát; chuyên viên cần xác nhận có áp dụng cho hồ sơ của bạn."
-TRI = [("yes", "Có"), ("no", "Không"), ("unknown", "Chưa biết")]
-QUESTION_DATA = [
-    (
+YES_NO = [("yes", "Có"), ("no", "Không")]
+# Đáp án nghĩa là "chưa rõ": đưa vào danh sách thông tin chưa biết của bản tổng hợp
+UNKNOWN_VALUES = {"unknown", "unknown_location", "unclear", "unreconciled"}
+NO_IDENTIFIER_HINT = "Không nhập tên, số điện thoại, mã số thuế hay địa chỉ cụ thể."
+
+COMPANY = {"businessType": ["company"]}
+HOUSEHOLD = {"businessType": ["household"]}
+DISSOLUTION = {"procedure": ["dissolution"]}
+# Phạm vi có danh mục giấy tờ; các phạm vi khác chỉ ghi nhận và chuyển cho chuyên viên
+IN_SCOPE = {"a1", "a2", "a3", "b1", "b2", "household"}
+
+
+def choice(
+    id: str,
+    label: str,
+    options: list[tuple[str, str]],
+    show_if: dict[str, list[str]] | None = None,
+) -> Question:
+    return Question(
+        id=id,
+        label=label,
+        kind="choice",
+        options=[Option(value=value, label=text) for value, text in options],
+        show_if=show_if,
+    )
+
+
+def fill_in(
+    id: str,
+    label: str,
+    kind: Literal["year", "text", "number"],
+    show_if: dict[str, list[str]] | None = None,
+    required: bool = False,
+    help: str | None = None,
+    unit: str | None = None,
+) -> Question:
+    return Question(
+        id=id, label=label, kind=kind, required=required, show_if=show_if, help=help, unit=unit
+    )
+
+
+# Bộ câu hỏi chuẩn hóa do trưởng nhóm cung cấp ngày 06/11/2026.
+# Các ô tự điền chỉ nhận tỉnh/thành phố, không nhận mã số doanh nghiệp hay địa chỉ cụ thể.
+QUESTIONS: list[Question] = [
+    choice(
         "businessType",
         "Bạn đang chuẩn bị hồ sơ cho loại hình nào?",
-        [("company", "Doanh nghiệp"), ("household", "Hộ kinh doanh"), ("unknown", "Chưa biết")],
+        [("company", "Doanh nghiệp"), ("household", "Hộ kinh doanh")],
     ),
-    (
-        "registrationStatus",
-        "Hộ kinh doanh đã đăng ký kinh doanh chưa?",
-        [("yes", "Đã đăng ký"), ("no", "Chưa đăng ký"), ("unknown", "Chưa biết")],
-    ),
-    (
-        "householdGoal",
-        "Mục tiêu đối với hộ kinh doanh là gì?",
+    choice(
+        "procedure",
+        "Bạn muốn thực hiện thủ tục nào?",
         [
-            ("new_household", "Chấm dứt hộ hiện tại để mở hộ mới"),
-            ("stop", "Chấm dứt hẳn"),
-            ("continue", "Điều chỉnh để tiếp tục hoạt động"),
-            ("unknown", "Chưa xác định"),
+            ("dissolution", "Giải thể hoặc chấm dứt hoạt động"),
+            ("suspension", "Tạm ngừng kinh doanh"),
+            ("conversion", "Chuyển đổi loại hình kinh doanh"),
         ],
     ),
-    (
-        "goal",
-        "Bạn muốn thực hiện việc gì?",
+    choice(
+        "operatingStatus",
+        "Hiện tại cơ sở kinh doanh của bạn đang ở trạng thái nào?",
         [
-            ("dissolution", "Chuẩn bị giải thể doanh nghiệp"),
-            ("other", "Nhu cầu khác"),
-            ("unknown", "Chưa xác định"),
+            ("active", "Vẫn đang hoạt động"),
+            ("stopped_not_started", "Đã ngừng hoạt động nhưng chưa làm thủ tục"),
+            ("stopped_preparing", "Đã ngừng và đang chuẩn bị hồ sơ"),
+            ("forced", "Bị yêu cầu hoặc buộc phải chấm dứt"),
         ],
     ),
-    ("establishedYear", "Doanh nghiệp được thành lập năm nào?", []),
-    ("revenueStatus", "Doanh nghiệp đã từng phát sinh doanh thu chưa?", TRI),
-    ("revenueStartedYear", "Năm bắt đầu phát sinh doanh thu?", []),
-    (
-        "filingStatus",
-        "Bạn biết tình trạng kê khai hiện tại không?",
+    choice(
+        "sector",
+        "Lĩnh vực kinh doanh của bạn là gì?",
         [
-            ("complete", "Theo thông tin tôi có: đã kê khai đầy đủ"),
-            ("incomplete", "Có kỳ chưa kê khai"),
-            ("never", "Chưa từng kê khai"),
-            ("unknown", "Chưa biết"),
+            ("trade", "Thương mại, bán buôn, bán lẻ"),
+            ("hospitality", "Ăn uống, lưu trú hoặc dịch vụ tiêu dùng"),
+            ("manufacturing", "Sản xuất gia công, chế biến"),
+            ("services", "Công nghệ, tư vấn hoặc dịch vụ chuyên môn"),
+            ("other", "Lĩnh vực khác"),
         ],
     ),
-    ("discrepancyStatus", "Có chênh lệch hoặc rủi ro sai lệch kê khai cần rà soát không?", TRI),
-    (
-        "recordsStatus",
-        "Hồ sơ và chứng từ hiện còn ở mức nào?",
+    fill_in(
+        "sectorOther",
+        "Lĩnh vực khác của bạn là gì?",
+        "text",
+        show_if={"sector": ["other"]},
+        required=True,
+        help="Điền ngắn gọn, ví dụ: vận tải, giáo dục.",
+    ),
+    fill_in("establishedYear", "Cơ sở kinh doanh được thành lập vào năm nào?", "year"),
+    choice(
+        "hasRevenue",
+        "Trong thời gian gần đây, bạn có phát sinh doanh thu không?",
+        [("yes", "Có phát sinh doanh thu"), ("no", "Không phát sinh doanh thu")],
+    ),
+    fill_in(
+        "lastRevenue",
+        "Giao dịch tạo doanh thu gần đây nhất phát sinh khi nào?",
+        "text",
+        show_if={"hasRevenue": ["yes"]},
+        help="Ví dụ: tháng 3/2024. Bỏ trống nếu chưa nhớ.",
+    ),
+    choice(
+        "hasCosts",
+        "Bạn có phát sinh chi phí hay giao dịch mua vào không?",
+        [("yes", "Có phát sinh chi phí"), ("no", "Không phát sinh chi phí")],
+    ),
+    choice(
+        "recordsAccess",
+        "Bạn có thể truy xuất hồ sơ không?",
         [
-            ("complete", "Còn đầy đủ theo thông tin tôi có"),
-            ("partial", "Chỉ còn một phần"),
-            ("missing", "Chưa tìm thấy"),
-            ("unknown", "Chưa biết"),
+            ("complete", "Có đầy đủ hồ sơ dữ liệu"),
+            ("partial", "Chỉ có một phần hồ sơ"),
+            ("none", "Không truy xuất được hồ sơ"),
+            ("unknown_location", "Chưa biết hồ sơ đang được lưu ở đâu"),
         ],
     ),
-    ("taxNoticeStatus", "Bạn có nhận thông báo nghĩa vụ thuế hoặc yêu cầu giải trình?", TRI),
-    (
-        "laborInsuranceStatus",
-        "Doanh nghiệp còn vấn đề lao động hoặc bảo hiểm cần rà soát?",
-        [
-            ("none", "Theo thông tin tôi có: không còn"),
-            ("obligations", "Có việc cần rà soát"),
-            ("unknown", "Chưa biết"),
-        ],
+    # ---- Hộ kinh doanh
+    fill_in(
+        "hhProvince",
+        "Hộ kinh doanh đăng ký tại tỉnh, thành phố nào?",
+        "text",
+        show_if=HOUSEHOLD,
+        required=True,
+        help="Chỉ cần tỉnh hoặc thành phố. " + NO_IDENTIFIER_HINT,
     ),
-    ("assetsInventoryStatus", "Doanh nghiệp còn tài sản hoặc hàng tồn kho?", TRI),
-    ("receivablesPayablesStatus", "Doanh nghiệp còn khoản phải thu hoặc phải trả?", TRI),
+    choice(
+        "hhLocations",
+        "Hộ kinh doanh hiện có bao nhiêu địa điểm kinh doanh?",
+        [
+            ("one", "Một địa điểm"),
+            ("many", "Nhiều địa điểm"),
+            ("none", "Không còn địa điểm hoạt động"),
+        ],
+        HOUSEHOLD,
+    ),
+    choice(
+        "hhConditional",
+        "Hộ kinh doanh có ngành nghề kinh doanh có điều kiện hoặc giấy phép chuyên ngành không?",
+        YES_NO,
+        HOUSEHOLD,
+    ),
+    choice(
+        "hhTaxObligation",
+        "Hộ kinh doanh còn nghĩa vụ khai, nộp hoặc quyết toán thuế nào chưa xác định không?",
+        [("yes", "Có"), ("no", "Không có")],
+        HOUSEHOLD,
+    ),
+    choice(
+        "hhInvoiceSystem",
+        "Hộ kinh doanh có sử dụng hóa đơn hoặc hệ thống bán hàng không?",
+        [
+            ("einvoice", "Có hóa đơn điện tử"),
+            ("pos", "Có phần mềm hoặc máy POS"),
+            ("inaccessible", "Có nhưng không truy cập được dữ liệu"),
+            ("none", "Không sử dụng"),
+        ],
+        HOUSEHOLD,
+    ),
+    choice(
+        "hhEmployees",
+        "Hộ kinh doanh có thuê người làm việc không?",
+        [
+            ("unresolved", "Có người chưa giải quyết xong quyền lợi"),
+            ("resolved", "Đã giải quyết đầy đủ"),
+            ("none", "Không thuê người"),
+        ],
+        HOUSEHOLD,
+    ),
+    fill_in(
+        "hhRevenueEstimate",
+        "Doanh thu của hộ kinh doanh trong kỳ gần nhất ước tính khoảng bao nhiêu?",
+        "number",
+        show_if=HOUSEHOLD,
+        unit="đồng",
+        help="Điền số ước tính, bỏ trống nếu chưa biết.",
+    ),
+    # ---- Doanh nghiệp
+    choice(
+        "dnType",
+        "Loại hình doanh nghiệp là gì?",
+        [
+            ("sole", "Doanh nghiệp tư nhân"),
+            ("llc1", "Công ty TNHH một thành viên"),
+            ("llc2", "Công ty TNHH hai thành viên trở lên"),
+            ("jsc", "Công ty cổ phần"),
+            ("partnership", "Công ty hợp danh"),
+        ],
+        COMPANY,
+    ),
+    fill_in(
+        "dnRegistry",
+        "Cơ quan đăng ký kinh doanh nơi đặt trụ sở thuộc tỉnh, thành phố nào?",
+        "text",
+        show_if=COMPANY,
+        required=True,
+        help="Chỉ cần tỉnh hoặc thành phố; không nhập mã số doanh nghiệp. " + NO_IDENTIFIER_HINT,
+    ),
+    fill_in(
+        "dnApprover",
+        "Ai có thẩm quyền thông qua việc giải thể?",
+        "text",
+        show_if={**COMPANY, **DISSOLUTION},
+        help="Điền theo hiểu biết của bạn, bỏ trống nếu chưa rõ. Chuyên viên sẽ xác nhận.",
+    ),
+    choice(
+        "dnDecision",
+        "Doanh nghiệp đã có quyết định hoặc nghị quyết giải thể chưa?",
+        [
+            ("adopted", "Đã thông qua"),
+            ("none", "Chưa"),
+            ("drafting", "Đang soạn"),
+            ("unknown", "Không biết"),
+        ],
+        {**COMPANY, **DISSOLUTION},
+    ),
+    choice(
+        "dnDebtGuarantee",
+        "Doanh nghiệp có bảo đảm thanh toán toàn bộ nợ và nghĩa vụ tài sản không?",
+        YES_NO,
+        {**COMPANY, **DISSOLUTION},
+    ),
+    choice(
+        "dnRevenue",
+        "Doanh nghiệp có phát sinh doanh thu trong kỳ gần nhất hoặc sau ngày dự kiến ngừng không?",
+        YES_NO,
+        COMPANY,
+    ),
+    fill_in(
+        "dnRevenueAmount",
+        "Doanh thu phát sinh khoảng bao nhiêu?",
+        "number",
+        show_if={**COMPANY, "dnRevenue": ["yes"]},
+        unit="đồng",
+        help="Điền số ước tính, bỏ trống nếu chưa biết.",
+    ),
+    choice(
+        "dnExpenses",
+        "Doanh nghiệp có phát sinh chi phí, mua vào, khấu hao, lãi vay "
+        "hoặc giao dịch ngân hàng không?",
+        YES_NO,
+        COMPANY,
+    ),
+    fill_in(
+        "dnExpenseNote",
+        "Doanh nghiệp phát sinh những khoản nào?",
+        "text",
+        show_if={**COMPANY, "dnExpenses": ["yes"]},
+        help="Ví dụ: lãi vay ngân hàng, khấu hao tài sản. " + NO_IDENTIFIER_HINT,
+    ),
+    choice(
+        "dnRecords",
+        "Báo cáo tài chính, sổ kế toán, hóa đơn và tờ khai thuế có truy xuất được không?",
+        [
+            ("complete", "Đầy đủ"),
+            ("partial", "Một phần"),
+            ("lost", "Mất dữ liệu"),
+            ("old_accountant", "Kế toán cũ đang giữ"),
+            ("unclear", "Không rõ"),
+        ],
+        COMPANY,
+    ),
+    choice(
+        "dnTaxDebt",
+        "Doanh nghiệp còn nợ thuế, tiền phạt, tiền chậm nộp "
+        "hoặc nghĩa vụ thuế chưa được xác nhận không?",
+        [("yes", "Có"), ("no", "Không"), ("unreconciled", "Chưa đối chiếu")],
+        COMPANY,
+    ),
 ]
 
 DOCUMENTS = [
@@ -131,20 +333,41 @@ DOCUMENTS_B1 = [
 ]
 
 
-COMPANY = {"businessType": ["company", "unknown"]}
-HOUSEHOLD = {"businessType": ["household"]}
-# Điều kiện hiển thị tạm thời theo logic phân loại hiện có; sẽ thay bằng bộ câu hỏi chuẩn hóa
-SHOW_IF: dict[str, dict[str, list[str]]] = {
-    "registrationStatus": HOUSEHOLD,
-    "householdGoal": HOUSEHOLD,
-    "discrepancyStatus": HOUSEHOLD,
-    "goal": COMPANY,
-    "establishedYear": COMPANY,
-    "revenueStatus": COMPANY,
-    "revenueStartedYear": {**COMPANY, "revenueStatus": ["yes", "unknown"]},
-    "laborInsuranceStatus": COMPANY,
-    "assetsInventoryStatus": COMPANY,
-    "receivablesPayablesStatus": COMPANY,
+# Hộ kinh doanh chấm dứt hoạt động: bản nháp, chuyên viên cần xác nhận từng mục
+DOCUMENTS_HOUSEHOLD = [
+    ("household_registration", "Giấy chứng nhận đăng ký hộ kinh doanh"),
+    (
+        "tax_id_termination",
+        "Đơn đề nghị chấm dứt hiệu lực MST mẫu 24/ĐK-TCT — cần chuyên viên xác nhận",
+    ),
+    (
+        "household_termination_notice",
+        "Thông báo chấm dứt hoạt động hộ kinh doanh gửi cơ quan đăng ký — cần xác nhận",
+    ),
+    (
+        "tax_obligation_confirmation",
+        "Giấy xác nhận hoàn thành nghĩa vụ thuế — cần chuyên viên xác nhận",
+    ),
+]
+
+# Mục chỉ thêm khi chính câu trả lời của người dùng cho thấy có liên quan
+HOUSEHOLD_CONDITIONAL = {
+    "missing_tax_returns": "Hồ sơ kê khai và nộp thuế các kỳ còn thiếu — cần chuyên viên xác nhận",
+    "licenses": (
+        "Giấy phép hoặc điều kiện ngành nghề đang áp dụng — cần xác nhận cách xử lý khi chấm dứt"
+    ),
+    "labor_rights": (
+        "Danh sách người lao động và quyền lợi chưa giải quyết — cần chuyên viên xác nhận"
+    ),
+    "invoice_data": "Dữ liệu hóa đơn điện tử hoặc phần mềm bán hàng",
+    "locations": "Danh sách các địa điểm kinh doanh đã đăng ký",
+}
+COMPANY_CONDITIONAL = {
+    "debt_plan": "Danh sách khoản nợ và phương án thanh toán — cần chuyên gia xác nhận",
+    "tax_debt_confirmation": (
+        "Xác nhận nghĩa vụ thuế còn tồn từ cơ quan thuế — cần chuyên viên xác nhận"
+    ),
+    "record_recovery": "Văn bản bàn giao hoặc khôi phục sổ sách, chứng từ từ nơi đang giữ",
 }
 
 
@@ -156,14 +379,4 @@ def is_visible(question: Question, answers: dict[str, object]) -> bool:
 
 
 def get_questionnaire() -> Questionnaire:
-    questions = [
-        Question(
-            id=key,
-            label=label,
-            kind="choice" if options else "year",
-            options=[Option(value=value, label=text) for value, text in options],
-            show_if=SHOW_IF.get(key),
-        )
-        for key, label, options in QUESTION_DATA
-    ]
-    return Questionnaire(version=VERSION, questions=questions)
+    return Questionnaire(version=VERSION, questions=QUESTIONS)

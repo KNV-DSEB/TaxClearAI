@@ -5,9 +5,9 @@ from sqlalchemy import and_, case, delete, func, not_, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.models.assessment import Assessment, ChecklistItem
+from src.modules.assessments.content import IN_SCOPE
 from src.modules.assessments.domain import AssessmentRecord, AssessmentSummaryRecord
 from src.modules.assessments.schemas import (
-    Answers,
     CaseFilter,
     ChecklistItemView,
     ItemStatus,
@@ -38,7 +38,7 @@ class AssessmentRepository:
                 Assessment(
                     id=record.id,
                     owner_id=owner_id,
-                    answers=record.answers.model_dump(mode="json"),
+                    answers=record.answers,
                     content_version=record.content_version,
                     summary_snapshot=record.summary.model_dump(mode="json"),
                     expires_at=record.expires_at,
@@ -82,7 +82,7 @@ class AssessmentRepository:
         return AssessmentRecord(
             id=row.id,
             content_version=row.content_version,
-            answers=Answers.model_validate(row.answers),
+            answers=dict(row.answers),
             summary=Summary.model_validate(row.summary_snapshot),
             checklist=[item_view(item) for item in items],
             created_at=row.created_at,
@@ -142,10 +142,10 @@ class AssessmentRepository:
         missing = func.coalesce(counts.c.missing, 0)
         needs_verification = func.coalesce(counts.c.needs_verification, 0)
         active = Assessment.expires_at > now
-        # Cùng định nghĩa với service.case_status(): hồ sơ B2 đủ giấy tờ khi mọi mục là "Đã có"
+        # Cùng định nghĩa với service.case_status(): đủ giấy tờ khi mọi mục là "Đã có"
         ready = and_(
             active,
-            Assessment.summary_snapshot["scope"].astext == "b2",
+            Assessment.summary_snapshot["scope"].astext.in_(sorted(IN_SCOPE)),
             available > 0,
             missing == 0,
             needs_verification == 0,

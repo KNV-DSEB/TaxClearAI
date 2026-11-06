@@ -4,10 +4,11 @@ from datetime import UTC, datetime
 from types import SimpleNamespace
 from uuid import uuid4
 
-from src.modules.assessments.schemas import Answers, Summary
+from src.modules.assessments.schemas import Summary
 from src.modules.experts.domain import ExpertRecord
 from src.modules.experts.schemas import CreateConsultationRequest
 from src.modules.experts.service import ExpertService
+from tests.fixtures import company
 
 
 def expert(full_name: str, years: int, specializations: str) -> ExpertRecord:
@@ -26,21 +27,8 @@ def expert(full_name: str, years: int, specializations: str) -> ExpertRecord:
     )
 
 
-def answers(**changes: object) -> Answers:
-    payload: dict[str, object] = {
-        "businessType": "company",
-        "goal": "dissolution",
-        "establishedYear": 2010,
-        "revenueStatus": "unknown",
-        "revenueStartedYear": None,
-        "filingStatus": "unknown",
-        "recordsStatus": "unknown",
-        "taxNoticeStatus": "unknown",
-        "laborInsuranceStatus": "unknown",
-        "assetsInventoryStatus": "unknown",
-        "receivablesPayablesStatus": "unknown",
-    }
-    return Answers.model_validate(payload | changes)
+def answers(**changes: object) -> dict[str, object]:
+    return company(**changes)
 
 
 class FakeAssessmentRepository:
@@ -95,7 +83,7 @@ class FakeAssessmentLookup:
         return self.assessment
 
 
-def make_assessment(scope: str, assessment_answers: Answers) -> SimpleNamespace:
+def make_assessment(scope: str, assessment_answers: dict[str, object]) -> SimpleNamespace:
     return SimpleNamespace(
         answers=assessment_answers,
         summary=Summary(
@@ -136,13 +124,7 @@ def test_no_specialty_matches_falls_back_to_senior_experts():
         FakeAssessmentRepository(
             make_assessment(
                 "b2",
-                answers(
-                    goal="unknown",
-                    revenueStatus="yes",
-                    filingStatus="complete",
-                    taxNoticeStatus="no",
-                    laborInsuranceStatus="none",
-                ),
+                answers(hasRevenue="yes", dnTaxDebt="no", dnRecords="complete"),
             )
         ),
     )
@@ -189,5 +171,5 @@ def test_consultation_request_stores_service_and_consented_assessment_snapshot()
     assert repository.request_data["share_data_consent"] is True
     snapshot = json.loads(repository.request_data["data_snapshot"])
     assert snapshot["scope"] == "b2"
-    assert snapshot["answers"]["business_type"] == "company"
+    assert snapshot["answers"]["businessType"] == "company"
     assert snapshot["checklist"] == []

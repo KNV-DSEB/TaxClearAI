@@ -6,27 +6,15 @@ import { useEffect, useState } from 'react';
 
 import { ApiError } from '@/services/api.client';
 import { assessmentsService } from '@/services/assessments.service';
-import type { Answers, Questionnaire } from '@/types/api.types';
+import type { Answers, Question, Questionnaire } from '@/types/api.types';
 import { markPlanPrompt } from '@/utils/plan-prompt';
 
-import { resetHiddenAnswers, visibleQuestions } from './questionnaire-flow';
-
-const initialAnswers: Answers = {
-  businessType: 'company',
-  registrationStatus: 'unknown',
-  householdGoal: 'unknown',
-  goal: 'dissolution',
-  establishedYear: null,
-  revenueStatus: 'unknown',
-  revenueStartedYear: null,
-  filingStatus: 'unknown',
-  discrepancyStatus: 'unknown',
-  recordsStatus: 'unknown',
-  taxNoticeStatus: 'unknown',
-  laborInsuranceStatus: 'unknown',
-  assetsInventoryStatus: 'unknown',
-  receivablesPayablesStatus: 'unknown',
-};
+import {
+  answerProblem,
+  isAnswered,
+  resetHiddenAnswers,
+  visibleQuestions,
+} from './questionnaire-flow';
 
 function SurveyProgress({
   current,
@@ -53,7 +41,7 @@ function SurveyProgress({
 export function QuestionnaireForm() {
   const router = useRouter();
   const [questionnaire, setQuestionnaire] = useState<Questionnaire | null>(null);
-  const [answers, setAnswers] = useState<Answers>(initialAnswers);
+  const [answers, setAnswers] = useState<Answers>({});
   const [step, setStep] = useState(0);
   const [started, setStarted] = useState(false);
   const [error, setError] = useState('');
@@ -87,31 +75,26 @@ export function QuestionnaireForm() {
     if (!questionnaire) return;
     const question = visibleQuestions(questionnaire.questions, answers)[step];
     if (!question) return;
-    const typed = {
-      ...answers,
-      [question.id]: question.kind === 'year' ? (value ? Number(value) : null) : value,
-    };
-    if (typed.revenueStatus === 'no') typed.revenueStartedYear = null;
-    setAnswers(resetHiddenAnswers(typed, questionnaire.questions, initialAnswers));
+    const numeric = question.kind === 'year' || question.kind === 'number';
+    const stored = value === '' ? null : numeric ? Number(value) : value;
+    setAnswers(resetHiddenAnswers({ ...answers, [question.id]: stored }, questionnaire.questions));
     setDirty(true);
     setError('');
   }
 
-  async function submit(): Promise<void> {
-    if (!questionnaire) return;
-    if (
-      answers.establishedYear &&
-      answers.revenueStartedYear &&
-      answers.revenueStartedYear < answers.establishedYear
-    ) {
-      setStep(
-        visibleQuestions(questionnaire.questions, answers).findIndex(
-          (question) => question.id === 'revenueStartedYear',
-        ),
-      );
-      setError('Năm phát sinh doanh thu không được trước năm thành lập. Vui lòng kiểm tra lại.');
+  function next(question: Question, last: boolean): void {
+    const problem = answerProblem(question, answers[question.id]);
+    if (problem) {
+      setError(problem);
       return;
     }
+    setError('');
+    if (last) void submit();
+    else setStep(step + 1);
+  }
+
+  async function submit(): Promise<void> {
+    if (!questionnaire) return;
     setBusy(true);
     setError('');
     try {
@@ -149,7 +132,6 @@ export function QuestionnaireForm() {
   if (!started)
     return (
       <section className="card survey-card survey-welcome" aria-labelledby="welcome-title">
-        <SurveyProgress current={1} total={total} percent={0} />
         <span className="welcome-icon">
           <ClipboardCheck size={34} />
         </span>
@@ -159,8 +141,8 @@ export function QuestionnaireForm() {
           khảo sát tình trạng doanh nghiệp
         </h1>
         <p className="survey-lead">
-          Bạn sẽ trả lời {total} câu hỏi ngắn. Câu nào chưa rõ, cứ chọn “Chưa biết” — đó là việc
-          chuyên viên sẽ giúp xác minh.
+          Các câu hỏi ngắn, số câu thay đổi theo loại hình và thủ tục bạn chọn. Câu nào chưa rõ,
+          chọn “không biết” hoặc để trống nếu câu không bắt buộc — chuyên viên sẽ giúp xác minh.
         </p>
         <div className="tip-box">
           <Lightbulb size={20} />
@@ -184,6 +166,10 @@ export function QuestionnaireForm() {
   const question = questions[Math.min(step, total - 1)];
   const last = step === total - 1;
   const value = answers[question.id];
+  const answered = isAnswered(value);
+  const help =
+    question.help ??
+    (question.kind === 'choice' ? 'Chọn thông tin gần với tình trạng thực tế bạn đang biết.' : '');
   return (
     <div className="survey-stage">
       <section className="card survey-card" aria-labelledby="question-title">
@@ -195,14 +181,13 @@ export function QuestionnaireForm() {
         <form
           onSubmit={(event) => {
             event.preventDefault();
-            if (last) void submit();
-            else setStep(step + 1);
+            next(question, last);
           }}
         >
           <h2 id="question-title" tabIndex={-1}>
             {question.label}
           </h2>
-          <p className="question-help">Chọn thông tin gần với tình trạng thực tế bạn đang biết.</p>
+          {help && <p className="question-help">{help}</p>}
           <fieldset key={question.id} disabled={busy}>
             <legend className="sr-only">{question.label}</legend>
             {question.kind === 'choice' ? (
@@ -223,19 +208,27 @@ export function QuestionnaireForm() {
               ))
             ) : (
               <div className="year-field">
-                <label htmlFor={question.id}>Năm (để trống nếu chưa biết hoặc không áp dụng)</label>
-                <input
-                  id={question.id}
-                  type="number"
-                  name={question.id}
-                  inputMode="numeric"
-                  min={1900}
-                  max={new Date().getFullYear()}
-                  value={value === null ? '' : String(value)}
-                  onChange={(event) => answer(event.target.value)}
-                  disabled={question.id === 'revenueStartedYear' && answers.revenueStatus === 'no'}
-                  placeholder="Ví dụ: 2015"
-                />
+                <label htmlFor={question.id}>
+                  {question.required ? 'Câu trả lời của bạn' : 'Có thể bỏ trống nếu chưa biết'}
+                </label>
+                <div className="field-with-unit">
+                  <input
+                    id={question.id}
+                    type={question.kind === 'text' ? 'text' : 'number'}
+                    name={question.id}
+                    autoComplete="off"
+                    inputMode={question.kind === 'text' ? 'text' : 'numeric'}
+                    maxLength={question.kind === 'text' ? 120 : undefined}
+                    min={
+                      question.kind === 'year' ? 1900 : question.kind === 'number' ? 0 : undefined
+                    }
+                    max={question.kind === 'year' ? new Date().getFullYear() : undefined}
+                    value={value === null || value === undefined ? '' : String(value)}
+                    onChange={(event) => answer(event.target.value)}
+                    placeholder={question.kind === 'year' ? 'Ví dụ: 2015' : undefined}
+                  />
+                  {question.unit && <span className="field-unit">{question.unit}</span>}
+                </div>
               </div>
             )}
           </fieldset>
@@ -253,7 +246,11 @@ export function QuestionnaireForm() {
             >
               <ArrowLeft size={17} /> Quay lại
             </button>
-            <button className="button button-primary" disabled={busy} type="submit">
+            <button
+              className="button button-primary"
+              disabled={busy || (question.required && !answered)}
+              type="submit"
+            >
               {busy ? 'Đang lưu…' : last ? 'Lưu và xem hồ sơ' : 'Câu tiếp theo'}
               {!busy && <ArrowRight size={17} />}
             </button>

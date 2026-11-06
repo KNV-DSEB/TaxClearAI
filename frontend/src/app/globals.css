@@ -766,6 +766,19 @@ fieldset {
   border-color: var(--teal);
   background: #f1f8f5;
 }
+.field-with-unit {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.field-with-unit input {
+  flex: 1;
+  min-width: 0;
+}
+.field-unit {
+  color: var(--subtle);
+  font-weight: 600;
+}
 .year-field {
   display: grid;
   gap: 8px;

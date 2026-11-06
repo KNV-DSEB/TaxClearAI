@@ -9,7 +9,7 @@ import { ApiError } from '@/services/api.client';
 import { assessmentsService } from '@/services/assessments.service';
 import type { AssessmentListItem, AssessmentPage, CaseFilter } from '@/types/api.types';
 
-import { SCOPE_TITLES, STATUS_LABELS, formatDate } from './case-status';
+import { IN_SCOPE, SCOPE_TITLES, STATUS_LABELS, formatDate } from './case-status';
 import { CaseSidebar, filterHref } from './CaseSidebar';
 
 const EMPTY_TEXT: Record<CaseFilter, string> = {
@@ -46,7 +46,7 @@ function CaseCard({ item, onRemove }: { item: AssessmentListItem; onRemove: () =
             ? 'đã hết hạn truy cập, bạn vẫn có thể xóa'
             : `cập nhật ${formatDate(item.updatedAt, true)} · lưu đến ${formatDate(item.expiresAt)}`}
         </p>
-        {['a1', 'a2', 'a3', 'b1', 'b2'].includes(item.scope) && total > 0 && (
+        {IN_SCOPE.includes(item.scope) && total > 0 && (
           <div className="case-progress">
             <progress
               className="progress"
@@ -160,7 +160,9 @@ export function AssessmentList({ filter = 'all' }: { filter?: CaseFilter }) {
             <h2>{EMPTY_TEXT[filter]}</h2>
             {filter === 'all' ? (
               <>
-                <p>Trả lời câu hỏi chẩn đoán để nhận bản tổng hợp và checklist phù hợp với hồ sơ.</p>
+                <p>
+                  Trả lời câu hỏi chẩn đoán để nhận bản tổng hợp và checklist phù hợp với hồ sơ.
+                </p>
                 <Link className="button button-primary" href="/khao-sat">
                   Bắt đầu chuẩn bị hồ sơ <ArrowRight size={16} />
                 </Link>

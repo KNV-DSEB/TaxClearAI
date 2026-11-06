@@ -59,7 +59,12 @@ class ExpertService:
 
         answers = assessment.answers
         matching_groups: list[tuple[list[str], str]] = []
-        if answers.tax_notice_status == "yes" or answers.filing_status in ("incomplete", "never"):
+        if (
+            answers.get("taxNoticeStatus") == "yes"
+            or answers.get("filingStatus") in ("incomplete", "never")
+            or answers.get("dnTaxDebt") in ("yes", "unreconciled")
+            or answers.get("hhTaxObligation") == "yes"
+        ):
             matching_groups.append(
                 (
                     ["Quyết toán thuế", "Đóng mã số thuế", "Thuế tồn đọng"],
@@ -67,7 +72,7 @@ class ExpertService:
                     "cần chuyên viên rà soát.",
                 )
             )
-        if answers.goal == "dissolution":
+        if "dissolution" in (answers.get("goal"), answers.get("procedure")):
             matching_groups.append(
                 (
                     ["Giải thể DN", "Thanh lý tài sản"],
@@ -75,7 +80,7 @@ class ExpertService:
                     "giải thể doanh nghiệp.",
                 )
             )
-        if answers.business_type == "household":
+        if answers.get("businessType") == "household":
             matching_groups.append(
                 (
                     ["Hộ kinh doanh"],
@@ -90,14 +95,20 @@ class ExpertService:
                     "rà soát chứng từ và sổ sách.",
                 )
             )
-        if answers.labor_insurance_status == "obligations":
+        if (
+            answers.get("laborInsuranceStatus") == "obligations"
+            or answers.get("hhEmployees") == "unresolved"
+        ):
             matching_groups.append(
                 (
                     ["Bảo hiểm xã hội", "Lao động"],
                     "Cần rà soát hoàn tất nghĩa vụ bảo hiểm và lao động trước khi giải thể.",
                 )
             )
-        if answers.goal == "other":
+        if answers.get("goal") == "other" or answers.get("procedure") in (
+            "suspension",
+            "conversion",
+        ):
             matching_groups.append(
                 (
                     ["Chuyển đổi loại hình", "Tạm ngừng kinh doanh"],
@@ -216,7 +227,7 @@ class ExpertService:
             data_snapshot = json.dumps(
                 {
                     "scope": assessment.summary.scope,
-                    "answers": assessment.answers.model_dump(mode="json"),
+                    "answers": dict(assessment.answers),
                     "summary": assessment.summary.model_dump(mode="json"),
                     "checklist": [item.model_dump(mode="json") for item in assessment.checklist],
                 },

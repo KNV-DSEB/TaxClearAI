@@ -12,7 +12,8 @@ export default function GuidePage() {
           <h2>Ghi nhận đúng điều bạn biết</h2>
           <p>
             Bấm Dùng thử không cần tài khoản (hoặc đăng nhập bằng tài khoản nhóm cấp) rồi trả lời
-            các câu hỏi. Nếu chưa biết, chọn Chưa biết hoặc để trống năm. Chọn Lưu và xem hồ sơ ở cuối để lưu phần chuẩn bị.
+            các câu hỏi. Câu nào chưa rõ, chọn đáp án “không biết” hoặc “không rõ” nếu có, hoặc để
+            trống ở câu không bắt buộc. Chọn Lưu và xem hồ sơ ở cuối để lưu phần chuẩn bị.
           </p>
           <h2>Ba trạng thái giấy tờ</h2>
           <ul>

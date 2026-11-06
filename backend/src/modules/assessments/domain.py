@@ -1,16 +1,16 @@
 from dataclasses import dataclass
 from datetime import date, datetime
-from typing import Literal
+from typing import Any, Literal
 from uuid import UUID
 
-from src.modules.assessments.schemas import Answers, ChecklistItemView, Summary
+from src.modules.assessments.schemas import ChecklistItemView, Scope, Summary
 
 
 @dataclass
 class AssessmentRecord:
     id: UUID
     content_version: str
-    answers: Answers
+    answers: dict[str, Any]
     summary: Summary
     checklist: list[ChecklistItemView]
     created_at: datetime
@@ -21,7 +21,7 @@ class AssessmentRecord:
 @dataclass(frozen=True)
 class AssessmentSummaryRecord:
     id: UUID
-    scope: Literal["a1", "a2", "a3", "b1", "b2", "out_of_scope", "needs_confirmation"]
+    scope: Scope
     available: int
     missing: int
     needs_verification: int

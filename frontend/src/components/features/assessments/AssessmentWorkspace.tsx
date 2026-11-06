@@ -24,7 +24,7 @@ import { clearPlanPrompt, peekPlanPrompt } from '@/utils/plan-prompt';
 import { RecommendedExpertsSection } from '@/components/features/experts/RecommendedExpertsSection';
 
 import { CaseSidebar } from './CaseSidebar';
-import { SCOPE_TITLES, STATUS_LABELS, caseStatus, formatDate } from './case-status';
+import { IN_SCOPE, SCOPE_TITLES, STATUS_LABELS, caseStatus, formatDate } from './case-status';
 
 type WorkspaceAssessment = Omit<Assessment, 'answers'>;
 
@@ -80,9 +80,14 @@ function summaryHeadline(assessment: WorkspaceAssessment): { title: string; deta
       detail:
         'Hồ sơ đang thiếu các thông tin then chốt. Hãy kết nối với chuyên gia để được hỗ trợ tra cứu và xác định lộ trình chính xác.',
     },
+    household: {
+      title: 'Hộ kinh doanh chuẩn bị chấm dứt hoạt động',
+      detail: 'Cần xác nhận quy trình chấm dứt và nghĩa vụ thuế trước khi đăng ký hộ mới.',
+    },
     out_of_scope: {
-      title: 'Hồ sơ từ phiên bản khảo sát cũ',
-      detail: 'Mở khảo sát mới để nhận phân nhóm và checklist cập nhật.',
+      title: 'Thủ tục này chưa có danh mục trong bản thử',
+      detail:
+        'Bản thử hiện chỉ chuẩn bị hồ sơ giải thể hoặc chấm dứt hoạt động. Câu trả lời của bạn được ghi lại để trao đổi với chuyên viên.',
     },
   };
   return headlines[assessment.summary.scope] ?? headlines.needs_confirmation!;
@@ -101,7 +106,7 @@ export function AssessmentWorkspace({ initial }: { initial: WorkspaceAssessment 
   useEffect(() => clearPlanPrompt(initial.id), [initial.id]);
 
   const status = caseStatus(assessment);
-  const inScope = ['a1', 'a2', 'a3', 'b1', 'b2'].includes(assessment.summary.scope);
+  const inScope = IN_SCOPE.includes(assessment.summary.scope);
   const remaining = assessment.checklist.filter((item) => item.status !== 'available').length;
   const available = assessment.checklist.length - remaining;
   const headline = summaryHeadline(assessment);
