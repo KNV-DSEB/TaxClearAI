@@ -57,6 +57,32 @@ async function fillSurvey(): Promise<void> {
 }
 
 describe('Khảo sát trước buổi làm việc', () => {
+  it('doanh nghiệp không bị hỏi câu chỉ dành cho hộ kinh doanh', async () => {
+    vi.mocked(assessmentsService.questionnaire).mockResolvedValue({
+      ...questionnaire,
+      questions: [
+        questionnaire.questions[0],
+        {
+          id: 'registrationStatus',
+          label: 'Hộ đã đăng ký chưa?',
+          kind: 'choice',
+          required: true,
+          options: [{ value: 'yes', label: 'Đã đăng ký' }],
+          showIf: { businessType: ['household'] },
+        },
+        questionnaire.questions[1],
+      ],
+    });
+    render(<QuestionnaireForm />);
+    fireEvent.click(await screen.findByRole('button', { name: /Bắt đầu khảo sát/ }));
+    await screen.findByRole('heading', { level: 2, name: 'Loại hình?' });
+    expect(screen.getByText('Câu 1 / 2')).toBeInTheDocument();
+    fireEvent.click(screen.getByLabelText('Doanh nghiệp'));
+    fireEvent.click(screen.getByRole('button', { name: 'Câu tiếp theo' }));
+    expect(screen.getByRole('heading', { level: 2, name: 'Đã có doanh thu?' })).toBeInTheDocument();
+    expect(screen.queryByText('Hộ đã đăng ký chưa?')).not.toBeInTheDocument();
+  });
+
   it('mở màn chào với số câu thật trước khi vào câu hỏi', async () => {
     render(<QuestionnaireForm />);
     expect(

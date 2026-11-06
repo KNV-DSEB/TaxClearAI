@@ -104,3 +104,49 @@ def test_draft_checklist_does_not_claim_documents_are_mandatory_or_available():
 def test_invalid_or_client_owned_fields_are_rejected(changes):
     with pytest.raises(ValidationError):
         answers(**changes)
+
+
+HOUSEHOLD_ONLY = ("Hộ kinh doanh đã đăng ký kinh doanh chưa?", "Mục tiêu đối với hộ kinh doanh")
+COMPANY_ONLY = ("Doanh nghiệp được thành lập năm nào?", "Doanh nghiệp còn vấn đề lao động")
+
+
+def mentioned(summary, labels):
+    texts = summary.known_facts + summary.unknown_facts
+    return [label for label in labels if any(text.startswith(label) for text in texts)]
+
+
+def test_company_summary_does_not_list_household_questions():
+    summary = build_summary(answers())
+    assert mentioned(summary, HOUSEHOLD_ONLY) == []
+    assert mentioned(summary, COMPANY_ONLY)
+
+
+def test_household_summary_does_not_list_company_questions():
+    household = answers(
+        businessType="household",
+        registrationStatus="yes",
+        householdGoal="stop",
+        filingStatus="incomplete",
+        establishedYear=None,
+        revenueStartedYear=None,
+        revenueStatus="unknown",
+    )
+    summary = build_summary(household)
+    assert summary.scope == "a2"
+    assert mentioned(summary, COMPANY_ONLY) == []
+    assert mentioned(summary, HOUSEHOLD_ONLY)
+
+
+def test_questionnaire_exposes_show_conditions_and_clear_registration_labels():
+    from src.modules.assessments.content import get_questionnaire, is_visible
+
+    questions = {question.id: question for question in get_questionnaire().questions}
+    assert questions["registrationStatus"].show_if == {"businessType": ["household"]}
+    assert questions["businessType"].show_if is None
+    labels = [option.label for option in questions["registrationStatus"].options]
+    assert labels == ["Đã đăng ký", "Chưa đăng ký", "Chưa biết"]
+    assert not is_visible(questions["registrationStatus"], {"businessType": "company"})
+    assert is_visible(questions["registrationStatus"], {"businessType": "household"})
+    assert not is_visible(
+        questions["revenueStartedYear"], {"businessType": "company", "revenueStatus": "no"}
+    )

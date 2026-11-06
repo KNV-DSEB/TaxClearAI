@@ -48,6 +48,8 @@ class Question(ApiModel):
     kind: Literal["year", "choice"] = "choice"
     required: bool = True
     options: list[Option] = Field(default_factory=list)
+    # Chỉ hỏi khi mọi câu trả lời trước đó nằm trong danh sách cho phép; None = luôn hỏi
+    show_if: dict[str, list[str]] | None = None
 
 
 class Questionnaire(ApiModel):

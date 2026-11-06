@@ -14,6 +14,7 @@ from src.modules.assessments.content import (
     NOTICE,
     VERSION,
     get_questionnaire,
+    is_visible,
 )
 from src.modules.assessments.domain import (
     AssessmentRecord,
@@ -94,8 +95,11 @@ def build_summary(data: Answers) -> Summary:
         scope = "needs_confirmation"
     questions = {question.id: question for question in get_questionnaire().questions}
     known, unknown = [], []
-    for key, value in data.model_dump(by_alias=True).items():
+    answers = data.model_dump(by_alias=True)
+    for key, value in answers.items():
         question = questions[key]
+        if not is_visible(question, answers):
+            continue
         if value is None or value == "unknown":
             unknown.append(question.label)
         else:

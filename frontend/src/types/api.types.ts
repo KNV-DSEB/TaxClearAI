@@ -16,17 +16,20 @@ export interface Answers {
   assetsInventoryStatus: TriState;
   receivablesPayablesStatus: TriState;
 }
+export interface Question {
+  id: keyof Answers;
+  label: string;
+  kind: 'choice' | 'year';
+  required: boolean;
+  options: { value: string; label: string }[];
+  // Chỉ hỏi khi mọi câu trả lời trước đó nằm trong danh sách cho phép; thiếu = luôn hỏi
+  showIf?: Record<string, string[]> | null;
+}
 export interface Questionnaire {
   id: string;
   version: string;
   contentStatus: 'draft' | 'approved';
-  questions: {
-    id: keyof Answers;
-    label: string;
-    kind: 'choice' | 'year';
-    required: boolean;
-    options: { value: string; label: string }[];
-  }[];
+  questions: Question[];
 }
 export interface ChecklistItem {
   id: string;

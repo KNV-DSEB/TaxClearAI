@@ -7,6 +7,9 @@ import { useEffect, useState } from 'react';
 import { ApiError } from '@/services/api.client';
 import { assessmentsService } from '@/services/assessments.service';
 import type { Answers, Questionnaire } from '@/types/api.types';
+import { markPlanPrompt } from '@/utils/plan-prompt';
+
+import { resetHiddenAnswers, visibleQuestions } from './questionnaire-flow';
 
 const initialAnswers: Answers = {
   businessType: 'company',
@@ -82,13 +85,14 @@ export function QuestionnaireForm() {
 
   function answer(value: string): void {
     if (!questionnaire) return;
-    const question = questionnaire.questions[step];
-    const next = {
+    const question = visibleQuestions(questionnaire.questions, answers)[step];
+    if (!question) return;
+    const typed = {
       ...answers,
       [question.id]: question.kind === 'year' ? (value ? Number(value) : null) : value,
     };
-    if (next.revenueStatus === 'no') next.revenueStartedYear = null;
-    setAnswers(next);
+    if (typed.revenueStatus === 'no') typed.revenueStartedYear = null;
+    setAnswers(resetHiddenAnswers(typed, questionnaire.questions, initialAnswers));
     setDirty(true);
     setError('');
   }
@@ -101,7 +105,9 @@ export function QuestionnaireForm() {
       answers.revenueStartedYear < answers.establishedYear
     ) {
       setStep(
-        questionnaire.questions.findIndex((question) => question.id === 'revenueStartedYear'),
+        visibleQuestions(questionnaire.questions, answers).findIndex(
+          (question) => question.id === 'revenueStartedYear',
+        ),
       );
       setError('Năm phát sinh doanh thu không được trước năm thành lập. Vui lòng kiểm tra lại.');
       return;
@@ -111,6 +117,7 @@ export function QuestionnaireForm() {
     try {
       const assessment = await assessmentsService.create(questionnaire.version, answers);
       setDirty(false);
+      markPlanPrompt(assessment.id);
       router.push(`/ho-so/${assessment.id}`);
     } catch (error) {
       setError(
@@ -137,7 +144,8 @@ export function QuestionnaireForm() {
       </section>
     );
 
-  const total = questionnaire.questions.length;
+  const questions = visibleQuestions(questionnaire.questions, answers);
+  const total = questions.length;
   if (!started)
     return (
       <section className="card survey-card survey-welcome" aria-labelledby="welcome-title">
@@ -173,7 +181,7 @@ export function QuestionnaireForm() {
       </section>
     );
 
-  const question = questionnaire.questions[step];
+  const question = questions[Math.min(step, total - 1)];
   const last = step === total - 1;
   const value = answers[question.id];
   return (

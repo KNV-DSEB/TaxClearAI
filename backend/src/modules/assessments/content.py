@@ -10,7 +10,11 @@ QUESTION_DATA = [
         "Bạn đang chuẩn bị hồ sơ cho loại hình nào?",
         [("company", "Doanh nghiệp"), ("household", "Hộ kinh doanh"), ("unknown", "Chưa biết")],
     ),
-    ("registrationStatus", "Hộ kinh doanh đã đăng ký kinh doanh chưa?", TRI),
+    (
+        "registrationStatus",
+        "Hộ kinh doanh đã đăng ký kinh doanh chưa?",
+        [("yes", "Đã đăng ký"), ("no", "Chưa đăng ký"), ("unknown", "Chưa biết")],
+    ),
     (
         "householdGoal",
         "Mục tiêu đối với hộ kinh doanh là gì?",
@@ -127,6 +131,30 @@ DOCUMENTS_B1 = [
 ]
 
 
+COMPANY = {"businessType": ["company", "unknown"]}
+HOUSEHOLD = {"businessType": ["household"]}
+# Điều kiện hiển thị tạm thời theo logic phân loại hiện có; sẽ thay bằng bộ câu hỏi chuẩn hóa
+SHOW_IF: dict[str, dict[str, list[str]]] = {
+    "registrationStatus": HOUSEHOLD,
+    "householdGoal": HOUSEHOLD,
+    "discrepancyStatus": HOUSEHOLD,
+    "goal": COMPANY,
+    "establishedYear": COMPANY,
+    "revenueStatus": COMPANY,
+    "revenueStartedYear": {**COMPANY, "revenueStatus": ["yes", "unknown"]},
+    "laborInsuranceStatus": COMPANY,
+    "assetsInventoryStatus": COMPANY,
+    "receivablesPayablesStatus": COMPANY,
+}
+
+
+def is_visible(question: Question, answers: dict[str, object]) -> bool:
+    """Câu hỏi có áp dụng với bộ câu trả lời này không (answers theo khóa camelCase)."""
+    if not question.show_if:
+        return True
+    return all(str(answers.get(key)) in allowed for key, allowed in question.show_if.items())
+
+
 def get_questionnaire() -> Questionnaire:
     questions = [
         Question(
@@ -134,6 +162,7 @@ def get_questionnaire() -> Questionnaire:
             label=label,
             kind="choice" if options else "year",
             options=[Option(value=value, label=text) for value, text in options],
+            show_if=SHOW_IF.get(key),
         )
         for key, label, options in QUESTION_DATA
     ]
