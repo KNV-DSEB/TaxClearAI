@@ -12,7 +12,7 @@ export function BrandLogo({ height = 36, onDark = false }: { height?: number; on
       height={height}
       width={(height * LOGO_WIDTH) / 64}
       role="img"
-      aria-label="Tax Clear AI"
+      aria-label="Tax Clear"
     >
       {/* Markup sinh sẵn từ build_brand.py, không có dữ liệu người dùng */}
       <g transform="scale(0.5)" dangerouslySetInnerHTML={{ __html: mark }} />

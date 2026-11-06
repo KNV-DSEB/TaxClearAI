@@ -101,7 +101,7 @@ describe('Trợ lý có nguồn', () => {
       citations: [
         {
           sourceId: 'product-guide',
-          title: 'Hướng dẫn sử dụng Tax Clear AI',
+          title: 'Hướng dẫn sử dụng Tax Clear',
           url: '/huong-dan',
           reviewedAt: '2026-10-30',
           kind: 'product',
@@ -112,7 +112,7 @@ describe('Trợ lý có nguồn', () => {
     ask();
     expect(await screen.findByText('Bạn chọn Đã có cho giấy tờ đang giữ.')).toBeInTheDocument();
     expect(screen.getByText('Gemini · có gọi mô hình')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Hướng dẫn sử dụng Tax Clear AI' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Hướng dẫn sử dụng Tax Clear' })).toHaveAttribute(
       'href',
       '/huong-dan',
     );

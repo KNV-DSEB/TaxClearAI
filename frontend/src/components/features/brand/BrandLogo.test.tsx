@@ -5,10 +5,10 @@ import { AnimatedMark } from './AnimatedMark';
 import { BrandLogo } from './BrandLogo';
 import { BrandMark } from './BrandMark';
 
-describe('Logo Tax Clear AI', () => {
+describe('Logo Tax Clear', () => {
   it('logo ngang có tên đọc được cho trình đọc màn hình và đủ khiên, chữ C, dấu tick', () => {
     const { container } = render(<BrandLogo />);
-    expect(screen.getByRole('img', { name: 'Tax Clear AI' })).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: 'Tax Clear' })).toBeInTheDocument();
     expect(container.querySelector('.mk-shield')).not.toBeNull();
     expect(container.querySelector('.mk-c')).not.toBeNull();
     expect(container.querySelector('.mk-tick')).not.toBeNull();

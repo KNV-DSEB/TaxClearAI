@@ -1,6 +1,6 @@
-# Thương hiệu Tax Clear AI
+# Thương hiệu Tax Clear
 
-Biểu tượng **khiên hồ sơ**: khiên teal vát hai mặt, góc trên phải gấp như tờ giấy; giữa khiên là chữ C vàng nghệ (Clear), trong lòng chữ C là dấu tick trắng. Wordmark Be Vietnam Pro SemiBold, chữ x vẽ riêng với một nét vàng nghệ. Hướng dẫn đầy đủ: artifact "Tax Clear AI Brand" (https://claude.ai/artifact/D2E1ZH8ANWJZV6JsSTVUqR); quá trình và quyết định: `specs/002-brand-identity/`.
+Biểu tượng **khiên hồ sơ**: khiên teal vát hai mặt, góc trên phải gấp như tờ giấy; giữa khiên là chữ C vàng nghệ (Clear), trong lòng chữ C là dấu tick trắng. Wordmark Be Vietnam Pro SemiBold, chữ x vẽ riêng với một nét vàng nghệ. Hướng dẫn đầy đủ: artifact "Tax Clear Brand" (https://claude.ai/artifact/D2E1ZH8ANWJZV6JsSTVUqR); quá trình và quyết định: `specs/002-brand-identity/`.
 
 | Thư mục | Nội dung |
 |---|---|
@@ -16,3 +16,6 @@ Dựng lại: `python docs/brand/tools/build_brand.py` (cần fontTools, Pillow,
 
 Màu chính: teal `#17705f` / `#0f5a4c`, vàng nghệ `#f4a23c` (chỉ cho hình), chữ vàng nghệ trên nền sáng `#a3550c`, mực `#123a35`, nền mint `#eef7f3`.
 Chưa tra cứu và chưa đăng ký nhãn hiệu.
+
+## Đổi tên hiển thị (2026-11-06)
+Bỏ hậu tố "AI" khỏi wordmark và tên hiển thị: **Tax Clear**. Tính năng trợ lý vẫn gọi là "Hỏi đáp cùng AI". Tên file tài sản (`tax-clear-ai-*.svg/png`), tên repo và tên gói giữ nguyên để không làm gãy đường dẫn; sinh lại tài sản bằng `python docs/brand/tools/build_brand.py`.

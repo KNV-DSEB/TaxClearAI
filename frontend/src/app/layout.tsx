@@ -14,12 +14,12 @@ const beVietnamPro = Be_Vietnam_Pro({
 });
 
 export const metadata: Metadata = {
-  title: 'Tax Clear AI — Chuẩn bị hồ sơ giải thể',
+  title: 'Tax Clear — Chuẩn bị hồ sơ giải thể',
   description:
     'Ghi nhận tình trạng doanh nghiệp, sắp xếp checklist và chuẩn bị khảo sát với chuyên viên.',
-  applicationName: 'Tax Clear AI',
+  applicationName: 'Tax Clear',
   openGraph: {
-    title: 'Tax Clear AI — Giải thể gọn gàng. An tâm sang trang.',
+    title: 'Tax Clear — Giải thể gọn gàng. An tâm sang trang.',
     description: 'Trợ lý chuẩn bị hồ sơ giải thể cho doanh nghiệp. Bản thử nghiệm.',
     locale: 'vi_VN',
     type: 'website',

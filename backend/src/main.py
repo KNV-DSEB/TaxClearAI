@@ -18,7 +18,7 @@ from src.modules.legal.router import router as legal_router
 
 def create_app() -> FastAPI:
     configure_logging()
-    application = FastAPI(title="Tax Clear AI", version="0.1.0")
+    application = FastAPI(title="Tax Clear", version="0.1.0")
     settings = get_settings()
     application.state.chat_service = ChatService(
         GeminiProvider(settings.gemini_api_key, settings.gemini_model),
@@ -31,7 +31,7 @@ def create_app() -> FastAPI:
     async def root() -> dict[str, str]:
         return {
             "status": "ok",
-            "name": "Tax Clear AI Backend API",
+            "name": "Tax Clear Backend API",
             "docs": "/docs",
             "health": "/health",
         }

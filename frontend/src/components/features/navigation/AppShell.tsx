@@ -61,7 +61,7 @@ export function AppShell({
         Đến nội dung chính
       </a>
       <header className="site-header">
-        <Link href="/" className="brand" aria-label="Tax Clear AI — Trang chủ">
+        <Link href="/" className="brand" aria-label="Tax Clear — Trang chủ">
           <BrandLogo height={44} />
         </Link>
         <nav className="desktop-navigation" aria-label="Điều hướng chính">
@@ -134,7 +134,7 @@ export function AppShell({
       </header>
       {children}
       <footer className="site-footer">
-        <span>Tax Clear AI · Bản thử nghiệm · Chỉ dùng dữ liệu giả định.</span>
+        <span>Tax Clear · Bản thử nghiệm · Chỉ dùng dữ liệu giả định.</span>
         <Link href="/huong-dan">Hướng dẫn sử dụng</Link>
       </footer>
     </div>

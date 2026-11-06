@@ -131,7 +131,7 @@ export function ConsultationModal({
           {result ? (
             <div className={styles.form}>
               <p className={styles.successMessage} role="status">
-                Tax Clear AI đã nhận yêu cầu tư vấn. Yêu cầu đang chờ tiếp nhận.
+                Tax Clear đã nhận yêu cầu tư vấn. Yêu cầu đang chờ tiếp nhận.
               </p>
               <div className={`${styles.formActions} ${styles.fullWidth}`}>
                 <button

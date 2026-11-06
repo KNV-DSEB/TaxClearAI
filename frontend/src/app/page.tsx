@@ -18,7 +18,7 @@ const START_POINTS = [
     href: '/khao-sat',
     icon: FileText,
     title: 'Trả lời khảo sát',
-    text: '14 câu hỏi ngắn để ghi nhận tình trạng hộ kinh doanh hoặc doanh nghiệp.',
+    text: 'Các câu hỏi ngắn để ghi nhận tình trạng của doanh nghiệp. Câu nào chưa rõ, chọn Chưa biết.',
   },
   {
     href: '/ho-so',
@@ -65,7 +65,7 @@ export default function HomePage() {
               <span>An tâm sang trang.</span>
             </h1>
             <p className="hero-description">
-              Tax Clear AI giúp doanh nghiệp từng hoạt động muốn giải thể ghi nhận tình trạng, sắp
+              Tax Clear giúp doanh nghiệp từng hoạt động muốn giải thể ghi nhận tình trạng, sắp
               xếp giấy tờ và chuẩn bị cho buổi làm việc với chuyên viên.
             </p>
             <Link className="button button-primary button-large" href="/khao-sat">

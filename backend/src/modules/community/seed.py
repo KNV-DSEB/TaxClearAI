@@ -136,7 +136,7 @@ async def seed() -> None:
             question.title = data["title"]
             question.question_content = data["question_content"]
             question.answer_content = data["answer_content"]
-            question.answered_by = "Tax Clear AI · Nội dung mẫu"
+            question.answered_by = "Tax Clear · Nội dung mẫu"
             question.answered_at = seeded_at
             question.is_published = True
         await session.commit()

@@ -15,7 +15,7 @@ EXPERTS_DATA = [
         organization="Hồ sơ minh họa, không phải đơn vị thật",
         bio=(
             "15 năm kinh nghiệm; nhận trọn gói quyết toán thuế, hoàn thiện sổ sách và giải thể "
-            "doanh nghiệp. Hồ sơ mẫu, chưa được Tax Clear AI xác minh độc lập."
+            "doanh nghiệp. Hồ sơ mẫu, chưa được Tax Clear xác minh độc lập."
         ),
         specializations="Quyết toán thuế, Giải thể DN, Dọn sổ sách",
         location="Hà Nội",
@@ -31,7 +31,7 @@ EXPERTS_DATA = [
         organization="Hồ sơ minh họa, không phải đơn vị thật",
         bio=(
             "Chuyên dọn dẹp sổ sách tồn đọng và lập báo cáo tài chính giải thể cho doanh nghiệp "
-            "nhóm B2. Hồ sơ mẫu, chưa được Tax Clear AI xác minh độc lập."
+            "nhóm B2. Hồ sơ mẫu, chưa được Tax Clear xác minh độc lập."
         ),
         specializations="Dọn sổ sách, Báo cáo tài chính, Giải thể DN B2",
         location="TP. Hồ Chí Minh",
@@ -47,7 +47,7 @@ EXPERTS_DATA = [
         organization="Hồ sơ minh họa, không phải đơn vị thật",
         bio=(
             "11 năm kinh nghiệm; chuyên gỡ rối thuế hộ kinh doanh A2/A3 và doanh nghiệp vừa và "
-            "nhỏ. Hồ sơ mẫu, chưa được Tax Clear AI xác minh độc lập."
+            "nhỏ. Hồ sơ mẫu, chưa được Tax Clear xác minh độc lập."
         ),
         specializations="Hộ kinh doanh A2/A3, Quyết toán thuế, Sổ sách kế toán",
         location="TP. Hồ Chí Minh",
@@ -63,7 +63,7 @@ EXPERTS_DATA = [
         organization="Hồ sơ minh họa, không phải đơn vị thật",
         bio=(
             "8 năm kinh nghiệm kiểm toán và kế toán thuế trọn gói cho hộ kinh doanh và doanh "
-            "nghiệp nhỏ. Hồ sơ mẫu, chưa được Tax Clear AI xác minh độc lập."
+            "nghiệp nhỏ. Hồ sơ mẫu, chưa được Tax Clear xác minh độc lập."
         ),
         specializations="Kiểm toán, Kế toán thuế, Sổ sách kế toán",
         location="Toàn quốc",
@@ -79,7 +79,7 @@ EXPERTS_DATA = [
         organization="Hồ sơ minh họa, không phải đơn vị thật",
         bio=(
             "12 năm kinh nghiệm tư vấn thủ tục giải thể, tranh chấp tài sản và tái cấu trúc. "
-            "Hồ sơ mẫu, chưa được Tax Clear AI xác minh độc lập."
+            "Hồ sơ mẫu, chưa được Tax Clear xác minh độc lập."
         ),
         specializations="Giải thể DN B2, Tranh chấp tài sản, Tái cấu trúc",
         location="Hà Nội",
@@ -95,7 +95,7 @@ EXPERTS_DATA = [
         organization="Hồ sơ minh họa, không phải đơn vị thật",
         bio=(
             "Chuyên chuyển đổi mô hình, đóng hộ cũ và mở hộ mới; 10 năm kinh nghiệm tư vấn. "
-            "Hồ sơ mẫu, chưa được Tax Clear AI xác minh độc lập."
+            "Hồ sơ mẫu, chưa được Tax Clear xác minh độc lập."
         ),
         specializations="Chuyển đổi mô hình, Đóng hộ kinh doanh, Thuế",
         location="TP. Hồ Chí Minh",
@@ -110,8 +110,8 @@ EXPERTS_DATA = [
         title="Vai trò minh họa: Chuyên gia Đại lý Thuế",
         organization="Hồ sơ minh họa, không phải đơn vị thật",
         bio=(
-            "Hồ sơ chuyên gia mẫu do Tax Clear AI cung cấp. Có 15 năm kinh nghiệm theo dữ liệu "
-            "đầu vào; hỗ trợ quyết toán thuế và hộ kinh doanh A2/A3. Chưa được Tax Clear AI "
+            "Hồ sơ chuyên gia mẫu do Tax Clear cung cấp. Có 15 năm kinh nghiệm theo dữ liệu "
+            "đầu vào; hỗ trợ quyết toán thuế và hộ kinh doanh A2/A3. Chưa được Tax Clear "
             "xác minh độc lập."
         ),
         specializations="Quyết toán thuế, Hộ kinh doanh A2/A3",
@@ -127,10 +127,10 @@ EXPERTS_DATA = [
         title="Vai trò minh họa: CPA Việt Nam",
         organization="Hồ sơ minh họa, không phải đơn vị thật",
         bio=(
-            "Hồ sơ chuyên gia mẫu do Tax Clear AI cung cấp. Có 9 năm kinh nghiệm theo dữ liệu "
+            "Hồ sơ chuyên gia mẫu do Tax Clear cung cấp. Có 9 năm kinh nghiệm theo dữ liệu "
             "đầu vào; "
             "hỗ trợ hóa đơn VAT và sổ sách kế toán. Thông tin chứng chỉ và hành nghề chưa được "
-            "Tax Clear AI xác minh độc lập."
+            "Tax Clear xác minh độc lập."
         ),
         specializations="Hóa đơn VAT, Sổ sách kế toán",
         location="Toàn quốc",

@@ -2,7 +2,7 @@ import type { MetadataRoute } from 'next';
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'Tax Clear AI',
+    name: 'Tax Clear',
     short_name: 'Tax Clear',
     description: 'Trợ lý chuẩn bị hồ sơ giải thể cho doanh nghiệp.',
     start_url: '/',

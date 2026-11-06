@@ -1,4 +1,4 @@
-"""Dựng toàn bộ tài sản thương hiệu Tax Clear AI (khiên hồ sơ + chữ C vàng nghệ).
+"""Dựng toàn bộ tài sản thương hiệu Tax Clear (khiên hồ sơ + chữ C vàng nghệ).
 
 Chạy: python docs/brand/tools/build_brand.py
 Cần: fontTools, Pillow, Playwright (Chromium) trong Python hệ thống.
@@ -139,7 +139,7 @@ KERN = {"Ta": -0.07, "Cl": -0.01}
 
 
 def wordmark(ink, accent, warm, size=30.0, x=0.0, baseline=0.0, mono=False):
-    """'Tax Clear' + chữ x vẽ riêng (một nét vàng nghệ) + 'AI' nhỏ. Trả (svg, width, cap_height)."""
+    """'Tax Clear' + chữ x vẽ riêng (một nét vàng nghệ). Trả (svg, width, cap_height)."""
     f = _font("SemiBold")
     upm = f["head"].unitsPerEm
     xh = f["OS/2"].sxHeight * size / upm
@@ -157,13 +157,8 @@ def wordmark(ink, accent, warm, size=30.0, x=0.0, baseline=0.0, mono=False):
     )
     x1 = x0 + xw + size * 0.27
     d2, w2 = text_path("Clear", "SemiBold", size, x1, baseline, tracking=-0.4, kern=KERN)
-    x2 = x1 + w2 + size * 0.2
-    d3, w3 = text_path("AI", "Medium", size * 0.6, x2, baseline, tracking=size * 0.02)
-    body = (
-        f'<path d="{d1}" fill="{ink}"/>{xs}<path d="{d2}" fill="{ink}"/>'
-        f'<path d="{d3}" fill="{ink if mono else accent}"/>'
-    )
-    return body, x2 + w3 - x, cap
+    body = f'<path d="{d1}" fill="{ink}"/>{xs}<path d="{d2}" fill="{ink}"/>'
+    return body, x1 + w2 - x, cap
 
 
 # ---------------------------------------------------------------- lockups
@@ -235,7 +230,7 @@ def animated_svg() -> str:
         "@media (prefers-reduced-motion:reduce){.mk-shield,.mk-fold,.mk-c{animation:none}"
         ".mk-tick{animation:none;stroke-dashoffset:0}}</style>"
     )
-    return svg_doc(style + mark_body("tca"), 64, 64, "Tax Clear AI")
+    return svg_doc(style + mark_body("tca"), 64, 64, "Tax Clear")
 
 
 # ---------------------------------------------------------------- web geometry (TS)
@@ -276,13 +271,13 @@ def build_svgs() -> dict[str, Path]:
         for kind, fn in (("horizontal", horizontal), ("vertical", vertical), ("wordmark", wordmark_only)):
             body, w, h = fn(theme)
             p = logo / f"tax-clear-ai-{kind}-{theme}.svg"
-            write(p, svg_doc(body, round(w, 1), round(h, 1), "Tax Clear AI"))
+            write(p, svg_doc(body, round(w, 1), round(h, 1), "Tax Clear"))
             out[p.stem] = p
-        mark = svg_doc(_mark_for(THEMES[theme], gap=gap), 64, 64, "Tax Clear AI")
+        mark = svg_doc(_mark_for(THEMES[theme], gap=gap), 64, 64, "Tax Clear")
         p = logo / f"tax-clear-ai-mark-{theme}.svg"
         write(p, mark)
         out[p.stem] = p
-    small = svg_doc(mark_body("tcs", small=True), 64, 64, "Tax Clear AI")
+    small = svg_doc(mark_body("tcs", small=True), 64, 64, "Tax Clear")
     write(logo / "tax-clear-ai-mark-small.svg", small)
     out["tax-clear-ai-mark-small"] = logo / "tax-clear-ai-mark-small.svg"
     write(BRAND / "animated" / "tax-clear-ai-mark-animated.svg", animated_svg())
@@ -362,7 +357,7 @@ def social(page, svgs: dict[str, Path]) -> None:
         {big_ghost}{fit(logo_h, 430)}
         <div><span class="tag" style="font-size:22px">Trợ lý chuẩn bị hồ sơ giải thể</span>
         <h1 style="font-size:64px;line-height:1.08;letter-spacing:-.03em;margin:22px 0 0;max-width:1040px">Giải thể gọn gàng.<br><span style="color:#17705f">An tâm sang trang.</span></h1></div>
-        <p style="margin:0;font-size:22px;color:#4d6764">Khảo sát 11 câu · Checklist giấy tờ · Hỏi đáp có trích dẫn văn bản</p></div>""",
+        <p style="margin:0;font-size:22px;color:#4d6764">Khảo sát ngắn · Checklist giấy tờ · Hỏi đáp có trích dẫn văn bản</p></div>""",
     )
     shot(
         "avatar-1080",

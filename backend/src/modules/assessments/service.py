@@ -45,7 +45,7 @@ def get_approved_chat_sources() -> list[SourceRecord]:
     return [
         SourceRecord(
             id="product-guide",
-            title="Hướng dẫn sử dụng Tax Clear AI",
+            title="Hướng dẫn sử dụng Tax Clear",
             url="/huong-dan",
             text=(
                 "Bản thử hỗ trợ hộ kinh doanh và doanh nghiệp chuẩn bị khảo sát hồ sơ. "
