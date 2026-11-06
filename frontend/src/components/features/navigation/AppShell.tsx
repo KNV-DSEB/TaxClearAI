@@ -8,6 +8,7 @@ import {
   FolderOpen,
   House,
   Menu,
+  Tags,
   UsersRound,
   X,
 } from 'lucide-react';
@@ -18,7 +19,7 @@ import { BrandLogo } from '../brand/BrandLogo';
 
 import { UserMenu } from './UserMenu';
 
-type Section = 'home' | 'cases' | 'survey' | 'chat' | 'community' | 'experts' | 'legal' | '';
+type Section = 'home' | 'cases' | 'survey' | 'chat' | 'community' | 'experts' | 'legal' | 'pricing' | '';
 
 const NAVIGATION_ITEMS = [
   { href: '/', section: 'home', label: 'Trang chủ', icon: House },
@@ -27,6 +28,7 @@ const NAVIGATION_ITEMS = [
   { href: '/cong-dong', section: 'community', label: 'Cộng đồng', icon: UsersRound },
   { href: '/chuyen-gia', section: 'experts', label: 'Chuyên gia', icon: BriefcaseBusiness },
   { href: '/phap-luat', section: 'legal', label: 'Thư viện pháp luật', icon: BookOpenText },
+  { href: '/bang-gia', section: 'pricing', label: 'Bảng giá', icon: Tags },
 ] as const;
 
 export function AppShell({

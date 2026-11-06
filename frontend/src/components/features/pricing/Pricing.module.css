@@ -1,0 +1,424 @@
+/* ---- Dùng chung: nhãn trạng thái, giá, danh sách tính năng ---- */
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.statusOpen {
+  background: #e3f4ec;
+  color: var(--teal-deep);
+}
+
+.statusPlanned {
+  border: 1px solid #f4d9a8;
+  background: #fdf1dc;
+  color: #a3550c;
+}
+
+.price {
+  color: var(--teal-deep);
+  font-size: 1.7rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+}
+
+.priceNote {
+  display: block;
+  margin-top: 2px;
+  color: var(--subtle);
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+.features {
+  display: grid;
+  gap: 9px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 14px;
+}
+
+.features li {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  gap: 9px;
+  align-items: start;
+}
+
+.features svg {
+  margin-top: 2px;
+  color: var(--teal);
+}
+
+.planned {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: #fdf1dc;
+  color: #a3550c;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.step {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 2px solid var(--teal);
+  border-radius: 50%;
+  background: #fff;
+  color: var(--teal-deep);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* ---- Trang Bảng giá ---- */
+.page {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 28px;
+}
+
+.intro h1 {
+  font-size: clamp(1.9rem, 4vw, 2.6rem);
+  letter-spacing: -0.04em;
+}
+
+.intro p {
+  max-width: 640px;
+  margin-top: 12px;
+  color: var(--subtle);
+}
+
+.notice {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 14px 16px;
+  border: 1px solid #f4d9a8;
+  border-radius: 14px;
+  background: #fdf8ee;
+  color: #6b3a08;
+  font-size: 14px;
+}
+
+.notice svg {
+  flex: none;
+  margin-top: 2px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  align-items: stretch;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background: #fff;
+  box-shadow: var(--shadow);
+}
+
+.cardCurrent {
+  border: 2px solid var(--teal);
+  box-shadow:
+    0 0 0 5px rgba(23, 112, 95, 0.1),
+    var(--shadow);
+}
+
+.cardHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.card h2 {
+  margin: 16px 0 4px;
+  font-size: 1.15rem;
+}
+
+.card > p:not(.price) {
+  color: var(--subtle);
+  font-size: 14px;
+}
+
+.card .price {
+  margin-top: 16px;
+}
+
+.cardFoot {
+  margin-top: auto;
+  padding-top: 20px;
+}
+
+.faq {
+  display: grid;
+  gap: 10px;
+}
+
+.faq details {
+  padding: 14px 18px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #fff;
+}
+
+.faq summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.faq details p {
+  margin-top: 10px;
+  color: var(--subtle);
+  font-size: 14px;
+}
+
+.closing {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px 24px;
+  border-radius: var(--radius-card);
+  background: var(--teal-deep);
+  color: #fff;
+}
+
+.closing p {
+  max-width: 520px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* ---- Cửa sổ gợi ý gói sau khảo sát ---- */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: rgba(13, 39, 35, 0.5);
+  animation: fade-in 160ms ease-out;
+}
+
+.dialog {
+  position: fixed;
+  z-index: 61;
+  top: 50%;
+  left: 50%;
+  width: min(680px, calc(100vw - 24px));
+  max-height: calc(100dvh - 24px);
+  overflow-y: auto;
+  padding: 28px;
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: 0 30px 80px rgba(13, 39, 35, 0.35);
+  transform: translate(-50%, -50%);
+  animation: dialog-in 200ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.dialogClose {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: #fff;
+  cursor: pointer;
+}
+
+.dialogTitle {
+  padding-right: 40px;
+  font-size: 1.4rem;
+  letter-spacing: -0.03em;
+}
+
+.dialogLead {
+  margin-top: 8px;
+  color: var(--subtle);
+}
+
+.counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.counts li {
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--mint);
+  color: var(--teal-deep);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.routes {
+  position: relative;
+  display: grid;
+  gap: 14px;
+  margin: 22px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Thanh nối 1 → 2 → 3: ba mức trợ giúp tăng dần */
+.routes::before {
+  content: '';
+  position: absolute;
+  top: 24px;
+  bottom: 24px;
+  left: 14px;
+  width: 2px;
+  background: linear-gradient(var(--teal), #f4a23c);
+  opacity: 0.45;
+}
+
+.route {
+  position: relative;
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.routeBody {
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: #fff;
+}
+
+.routeBodyMain {
+  border: 2px solid var(--teal);
+  background: #f6fbf9;
+}
+
+.routeTop {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px 12px;
+}
+
+.routeTop h3 {
+  font-size: 1.02rem;
+}
+
+.routePrice {
+  margin-top: 4px;
+  color: var(--teal-deep);
+  font-weight: 700;
+}
+
+.routePrice span {
+  color: var(--subtle);
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.routeText {
+  margin-top: 6px;
+  color: var(--subtle);
+  font-size: 14px;
+}
+
+.routeActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.dialogFoot {
+  margin-top: 18px;
+  color: var(--subtle);
+  font-size: 13px;
+}
+
+.dialogFoot a {
+  color: var(--teal-deep);
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, calc(-50% + 14px));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .overlay,
+  .dialog {
+    animation: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .dialog {
+    top: auto;
+    bottom: 0;
+    width: 100vw;
+    max-height: 92dvh;
+    padding: 22px 16px calc(22px + env(safe-area-inset-bottom));
+    border-radius: 24px 24px 0 0;
+    transform: translate(-50%, 0);
+    animation-name: sheet-in;
+  }
+
+  .routeActions > * {
+    flex: 1 1 100%;
+    justify-content: center;
+  }
+}
+
+@keyframes sheet-in {
+  from {
+    transform: translate(-50%, 40px);
+  }
+}

@@ -2,6 +2,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { assessmentsService } from '@/services/assessments.service';
+import { markPlanPrompt } from '@/utils/plan-prompt';
 
 import { AssessmentWorkspace } from './AssessmentWorkspace';
 
@@ -13,14 +14,8 @@ vi.mock('@/services/assessments.service', () => ({
 }));
 
 vi.mock('@/components/features/experts/RecommendedExpertsSection', () => ({
-  RecommendedExpertsSection: ({
-    initialNotes,
-  }: {
-    initialNotes: string;
-  }) => (
-    <div data-testid="expert-consultation-notes">
-      {initialNotes}
-    </div>
+  RecommendedExpertsSection: ({ initialNotes }: { initialNotes: string }) => (
+    <div data-testid="expert-consultation-notes">{initialNotes}</div>
   ),
 }));
 
@@ -53,6 +48,7 @@ const assessment = {
 };
 
 beforeEach(() => {
+  sessionStorage.clear();
   vi.resetAllMocks();
   vi.mocked(assessmentsService.list).mockResolvedValue({
     items: [],
@@ -64,6 +60,22 @@ beforeEach(() => {
 });
 
 describe('Chuẩn bị hồ sơ khảo sát', () => {
+  it('mở gợi ý gói ngay sau khi khảo sát vừa lưu và không mở lại khi tải lại', () => {
+    markPlanPrompt(assessment.id);
+    const first = render(<AssessmentWorkspace initial={assessment} />);
+    expect(screen.getByRole('dialog', { name: /Đã có danh mục giấy tờ/ })).toBeInTheDocument();
+    first.unmount();
+    render(<AssessmentWorkspace initial={assessment} />);
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  it('mở lại bảng gói bằng nút Xem các gói hỗ trợ', () => {
+    render(<AssessmentWorkspace initial={assessment} />);
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /Xem các gói hỗ trợ/ }));
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+  });
+
   it('ẩn nhãn nội bộ cũ và vẫn hiển thị thông tin chưa biết', () => {
     render(<AssessmentWorkspace initial={assessment} />);
     expect(screen.queryByText(/cố vấn xác nhận/i)).not.toBeInTheDocument();
@@ -197,7 +209,10 @@ describe('Chuẩn bị hồ sơ khảo sát', () => {
           summary: {
             ...assessment.summary,
             scope: 'needs_confirmation',
-            unknownFacts: ['Loại hình doanh nghiệp chưa xác định', 'Tình trạng doanh thu chưa biết'],
+            unknownFacts: [
+              'Loại hình doanh nghiệp chưa xác định',
+              'Tình trạng doanh thu chưa biết',
+            ],
             reviewReasons: ['Cần chuyên gia tra cứu tình trạng mã số thuế thực tế.'],
           },
         }}

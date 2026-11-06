@@ -12,6 +12,7 @@ const navigationLinks = [
   ['/cong-dong', 'Cộng đồng'],
   ['/chuyen-gia', 'Chuyên gia'],
   ['/phap-luat', 'Thư viện pháp luật'],
+  ['/bang-gia', 'Bảng giá'],
 ];
 
 function renderShell() {
@@ -25,11 +26,11 @@ function renderShell() {
 describe('AppShell navigation', () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it('keeps the six horizontal links and starts with the mobile drawer closed', () => {
+  it('keeps the seven horizontal links and starts with the mobile drawer closed', () => {
     renderShell();
 
     const desktopNavigation = screen.getByRole('navigation', { name: 'Điều hướng chính' });
-    expect(within(desktopNavigation).getAllByRole('link')).toHaveLength(6);
+    expect(within(desktopNavigation).getAllByRole('link')).toHaveLength(7);
     expect(screen.getByRole('button', { name: 'Mở menu điều hướng' })).toHaveAttribute(
       'aria-expanded',
       'false',
@@ -40,7 +41,7 @@ describe('AppShell navigation', () => {
     );
   });
 
-  it('opens the mobile drawer with all six large navigation targets', () => {
+  it('opens the mobile drawer with all seven large navigation targets', () => {
     renderShell();
     fireEvent.click(screen.getByRole('button', { name: 'Mở menu điều hướng' }));
 
@@ -49,7 +50,7 @@ describe('AppShell navigation', () => {
       'aria-expanded',
       'true',
     );
-    expect(within(drawer).getAllByRole('link')).toHaveLength(6);
+    expect(within(drawer).getAllByRole('link')).toHaveLength(7);
     navigationLinks.forEach(([href, label]) => {
       expect(within(drawer).getByRole('link', { name: label })).toHaveAttribute('href', href);
     });
