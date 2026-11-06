@@ -730,7 +730,8 @@ fieldset {
 /* ---- Hỏi đáp ---- */
 .chat-layout {
   display: grid;
-  grid-template-columns: 280px 1fr;
+  /* minmax(0, …): hàng chủ đề cuộn ngang không được kéo rộng cả cột trên điện thoại */
+  grid-template-columns: 280px minmax(0, 1fr);
   gap: 20px;
   align-items: stretch;
   min-height: 640px;
@@ -1455,7 +1456,7 @@ fieldset {
   }
   .chat-layout,
   .case-layout {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .case-sidebar {
     position: static;
